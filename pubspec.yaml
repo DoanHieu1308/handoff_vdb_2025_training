@@ -1,0 +1,67 @@
+name: handoff_vdb_2025
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0-323.0.dev
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # https://pub.dev/packages/mobx
+  mobx:
+  # https://pub.dev/packages/flutter_mobx
+  flutter_mobx: ^2.3.0
+  # https://pub.dev/packages/flutter_screenutil
+  flutter_screenutil: ^5.9.3
+  # https://pub.dev/documentation/scroll_to_index/latest/
+  scroll_to_index: any
+  # https://pub.dev/packages/flutter_svg
+  flutter_svg: ^2.2.0
+  # https://pub.dev/packages/dio
+  dio: ^5.8.0+1
+  # https://pub.dev/packages/shared_preferences
+  shared_preferences: ^2.5.3
+  # https://pub.dev/packages/path_provider
+  path_provider: ^2.1.5
+
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # https://pub.dev/packages/build_runner
+  build_runner:
+  # https://pub.dev/packages/mobx_codegen
+  mobx_codegen:
+
+
+  flutter_lints: ^5.0.0
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/base/
+    - assets/features/
+    - assets/base/icons/
+
+  fonts:
+    - family: Inter-Regular
+      fonts:
+        - asset: assets/base/fonts/inter/Inter-Regular.ttf
+    - family: Inter-Medium
+      fonts:
+        - asset: assets/base/fonts/inter/Inter-Medium.ttf
+    - family: Inter-Bold
+      fonts:
+        - asset: assets/base/fonts/inter/Inter-Bold.ttf
+    - family: Inter-ExtraBold
+      fonts:
+        - asset: assets/base/fonts/inter/Inter-ExtraBold.ttf
+    - family: Inter-SemiBold
+      fonts:
+        - asset: assets/base/fonts/inter/Inter-SemiBold.ttf

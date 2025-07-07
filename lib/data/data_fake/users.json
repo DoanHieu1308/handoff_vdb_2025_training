@@ -1,0 +1,82 @@
+[
+  {
+    "id": "u001",
+    "name": "Nguyen Van A",
+    "email": "a@example.com",
+    "password": "pw1",
+    "avatar": "https://example.com/avatar/u001.png",
+    "bio": "Yêu thích công nghệ.",
+    "createdAt": "2025-07-01T08:00:00Z",
+    "updatedAt": "2025-07-05T10:00:00Z"
+  },
+  {
+    "id": "u002",
+    "name": "Tran Thi B",
+    "email": "b@example.com",
+    "password": "pw2",
+    "avatar": "https://example.com/avatar/u002.png",
+    "bio": "Back-end developer.",
+    "createdAt": "2025-07-02T09:00:00Z",
+    "updatedAt": "2025-07-06T11:00:00Z"
+  },
+  {
+    "id": "u003",
+    "name": "Le Van C",
+    "email": "c@example.com",
+    "password": "pw3",
+    "avatar": "https://example.com/avatar/u003.png",
+    "bio": "Thích chơi cờ vua.",
+    "createdAt": "2025-07-03T10:00:00Z",
+    "updatedAt": "2025-07-07T12:00:00Z"
+  },
+  {
+    "id": "u004",
+    "name": "Pham Thi D",
+    "email": "d@example.com",
+    "password": "pw4",
+    "avatar": "https://example.com/avatar/u004.png",
+    "bio": "Designer UI/UX.",
+    "createdAt": "2025-07-04T11:00:00Z",
+    "updatedAt": "2025-07-08T13:00:00Z"
+  },
+  {
+    "id": "u005",
+    "name": "Do Van E",
+    "email": "e@example.com",
+    "password": "pw5",
+    "avatar": "https://example.com/avatar/u005.png",
+    "bio": "Yêu thể thao.",
+    "createdAt": "2025-07-05T12:00:00Z",
+    "updatedAt": "2025-07-09T14:00:00Z"
+  },
+  {
+    "id": "u006",
+    "name": "Hoang Thi F",
+    "email": "f@example.com",
+    "password": "pw6",
+    "avatar": "https://example.com/avatar/u006.png",
+    "bio": "Thích vẽ tranh.",
+    "createdAt": "2025-07-06T13:00:00Z",
+    "updatedAt": "2025-07-10T15:00:00Z"
+  },
+  {
+    "id": "u007",
+    "name": "Nguyen Van G",
+    "email": "g@example.com",
+    "password": "pw7",
+    "avatar": "https://example.com/avatar/u007.png",
+    "bio": "Flutter Dev.",
+    "createdAt": "2025-07-07T14:00:00Z",
+    "updatedAt": "2025-07-11T16:00:00Z"
+  },
+  {
+    "id": "u008",
+    "name": "Tran Thi H",
+    "email": "h@example.com",
+    "password": "pw8",
+    "avatar": "https://example.com/avatar/u008.png",
+    "bio": "Thích học AI.",
+    "createdAt": "2025-07-08T15:00:00Z",
+    "updatedAt": "2025-07-12T17:00:00Z"
+  }
+]
