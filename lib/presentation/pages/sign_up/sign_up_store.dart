@@ -102,7 +102,7 @@ abstract class _SignUpStore with Store {
       id: "",
       name: name.text.trim(),
       email: email.text.trim(),
-      password: password.text.trim(),
+      password: password.text.toString().trim(),
       avatar: "assets/features/ic_email.svg",
       bio: "dep trai qua",
       createdAt: DateTime.now(),
@@ -115,11 +115,18 @@ abstract class _SignUpStore with Store {
           isLoading = false;
           onSuccess(auth);
           print("auth $auth");
+          
+          // Debug: in ra tất cả users
+          _repository.printAllUsers();
+          
+          // Export dữ liệu ra file gốc (chỉ trong development)
+          _repository.exportToOriginalFile();
         },
         onError: (error){
           isLoading = false;
           errorMessage = error.toString();
-          onError(errorMessage!);
+          onError(errorMessage ?? "An error occurred");
+          print("error $error");
         }
     );
   }

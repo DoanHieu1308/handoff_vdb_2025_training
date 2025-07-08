@@ -78,7 +78,7 @@ mixin ApiErrorHandler {
     } else if (error is String) {
       errorDescription = error;
     } else {
-      errorDescription = 'is not a subtype of exception';
+      errorDescription = error.toString();
     }
 
     // TODO: Edit alert.error

@@ -1,26 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
 import 'package:handoff_vdb_2025/core/utils/color_resources.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
 import 'package:handoff_vdb_2025/presentation/pages/item_detail/item_detail_store.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-class ItemDetailPage extends StatelessWidget {
-  ItemDetailStore store = ItemDetailStore();
-  ItemDetailPage({super.key});
+class ItemDetailPage extends StatefulWidget {
+  final String categoryName;
+
+  const ItemDetailPage({super.key, required this.categoryName});
+
+  @override
+  State<ItemDetailPage> createState() => _ItemDetailPageState();
+}
+
+class _ItemDetailPageState extends State<ItemDetailPage> {
+  final ItemDetailStore store = ItemDetailStore();
+  late List<Map<String, dynamic>> filteredItems;
+
+  @override
+  void initState() {
+    super.initState();
+    filteredItems = store.getFilteredItems(widget.categoryName);
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
+
     return SafeArea(
       child: Container(
         width: width,
         height: height,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topRight: Radius.circular(20),
             topLeft: Radius.circular(20),
           ),
@@ -40,16 +57,20 @@ class ItemDetailPage extends StatelessWidget {
                 behavior: const ScrollBehavior().copyWith(overscroll: false),
                 child: ListView.separated(
                   controller: store.scrollController,
-                  itemBuilder: (context, index) {
-                    return _itemDetailCard(index, context);
-                  },
                   padding: EdgeInsets.symmetric(horizontal: 15.w),
                   shrinkWrap: true,
                   physics: const ClampingScrollPhysics(),
-                  separatorBuilder: (BuildContext context, int index) {
-                    return SizedBox(height: 10.h);
+                  itemCount: filteredItems.length,
+                  separatorBuilder: (_, __) => SizedBox(height: 10.h),
+                  itemBuilder: (context, index) {
+                    final item = filteredItems[index];
+                    return _itemDetailCard(
+                      index: index,
+                      context: context,
+                      name: item['name'],
+                      icon: item['image']
+                    );
                   },
-                  itemCount: 10,
                 ),
               ),
             ),
@@ -59,7 +80,7 @@ class ItemDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _itemDetailCard(int index, BuildContext context) {
+  Widget _itemDetailCard({required int index, required String name, required String icon, required BuildContext context}) {
     return AutoScrollTag(
       key: ValueKey(index),
       controller: store.scrollController,
@@ -111,7 +132,7 @@ class ItemDetailPage extends StatelessWidget {
                                 height: 50.h,
                                 child: Center(
                                   child: Text("Cancel", style: TextStyle(
-                                    color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500
+                                      color: Colors.black, fontSize: 15, fontWeight: FontWeight.w500
                                   ),),
                                 ),
                               ),
@@ -201,19 +222,18 @@ class ItemDetailPage extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 10,
-                  child: Text("Remove", style: AppText.text14_Inter),
+                  child: Text(name, style: AppText.text14_Inter),
                 ),
                 Expanded(
                   flex: 2,
                   child: CircleAvatar(
                     radius: 20,
                     backgroundColor: ColorResources.COLOR_F6F6F7,
-                    child: Image.asset(
-                      height: 20.h,
-                      width: 20.w,
-                      fit: BoxFit.cover,
-                      ImagesPath.icAddFriend,
-                    ),
+                    child: SetUpAssetImage(
+                        icon,
+                        width: 20.w,
+                        height: 20.h,
+                    )
                   ),
                 ),
               ],

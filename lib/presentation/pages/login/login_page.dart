@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 295.h,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: Colors.white,
                           borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(30),
                             topRight: Radius.circular(30),
@@ -259,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
                           color:
                           widget.store.currentPageIndex == index
                               ? ColorResources.MAIN
-                              : Colors.white,
+                              : Colors.grey,
                           shape:
                           widget.store.currentPageIndex == index
                               ? BoxShape.rectangle
@@ -295,7 +295,6 @@ class _LoginPageState extends State<LoginPage> {
               child: PageView.builder(
                 onPageChanged: (value) {
                   widget.store.onChangePageIndex(index: value);
-                  print(widget.store.currentPageIndex.toString());
                 },
                 controller: widget.store.pageController,
                 physics: const ClampingScrollPhysics(),

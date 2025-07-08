@@ -48,6 +48,7 @@ flutter:
     - assets/base/
     - assets/features/
     - assets/base/icons/
+    - assets/data_fake/
 
   fonts:
     - family: Inter-Regular

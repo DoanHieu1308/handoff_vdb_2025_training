@@ -46,30 +46,30 @@ class UserModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      if (!Validate.nullOrEmpty(id)) '_id': id,
+      if (!Validate.nullOrEmpty(id)) 'id': id,
       if (!Validate.nullOrEmpty(name)) 'name': name,
       if (!Validate.nullOrEmpty(email)) 'email': email,
       if (!Validate.nullOrEmpty(password)) 'password': password,
       if (!Validate.nullOrEmpty(avatar)) 'avatar': avatar,
       if (!Validate.nullOrEmpty(bio)) 'bio': bio,
-      if (!Validate.nullOrEmpty(createdAt)) 'createdAt': createdAt?.millisecondsSinceEpoch,
-      if (!Validate.nullOrEmpty(updatedAt)) 'updatedAt': updatedAt?.millisecondsSinceEpoch,
+      if (!Validate.nullOrEmpty(createdAt)) 'createdAt': createdAt?.toIso8601String(),
+      if (!Validate.nullOrEmpty(updatedAt)) 'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['_id'] != null ? map['_id'] as String : null,
+      id: map['id'] != null ? map['id'] as String : null,
       name: map['name'] != null ? map['name'] as String : null,
       email: map['email'] != null ? map['email'] as String : null,
       password: map['password'] != null ? map['password'] as String : null,
       avatar: map['avatar'] != null ? map['avatar'] as String : null,
       bio: map['bio'] != null ? map['bio'] as String : null,
       createdAt: map['createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int)
+          ? DateTime.parse(map['createdAt'] as String)
           : null,
       updatedAt: map['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] as int)
+          ? DateTime.parse(map['updatedAt'] as String)
           : null,
     );
   }

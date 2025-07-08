@@ -10,6 +10,7 @@ mixin ImagesPath {
   static String icFriends = "assets/features/friend.png";
   static String icBell = "assets/features/ic_bell.svg";
   static String icMessenger = "assets/features/ic_messenger.svg";
+  static String icAlreadyFriends = "assets/features/ic_already_friends.svg";
   static String icBack = "assets/features/back.png";
   static String icSearch = "assets/features/search.png";
   static String icAddFriend = "assets/base/icons/ic_add_friend.png";
@@ -26,4 +27,19 @@ mixin ImagesPath {
 
   // Place holder image path.
   static String placeHolder = 'assets/base/base_img_place_holder.jpg';
+
+  // Icon item detail friend
+  static String icAddToFolder = 'assets/features/ic_add_to_folder.svg';
+  static String icCopyLink = 'assets/features/ic_copy_link.svg';
+  static String icCreateNewPost = 'assets/features/ic_create_new_post.svg';
+  static String icPairing = 'assets/features/ic_pairing.svg';
+  static String icQuickShare = 'assets/features/ic_quick_share.png';
+  static String icRename = 'assets/features/ic_rename.svg';
+  static String icSendViaMessage = 'assets/features/ic_send_via_message.svg';
+  static String icShareToGroup = 'assets/features/ic_share_to_group.svg';
+  static String icShareToPage = 'assets/features/ic_share_to_page.svg';
+  static String icShareWithFriend = 'assets/features/ic_share_with_friends.png';
+  static String icSwitchToAnotherApp = 'assets/features/ic_switch_to_another_app.svg';
+  static String icUnfriend = 'assets/features/ic_unfriend.svg';
+  static String icUnFollow = 'assets/features/ic_unfollow.svg';
 }
