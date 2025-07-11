@@ -1,0 +1,50 @@
+[
+  {
+    "id": "fl001",
+    "follower": "u001",
+    "following": "u002",
+    "createdAt": "2025-07-01T09:00:00Z"
+  },
+  {
+    "id": "fl002",
+    "follower": "u002",
+    "following": "u003",
+    "createdAt": "2025-07-02T10:30:00Z"
+  },
+  {
+    "id": "fl003",
+    "follower": "u003",
+    "following": "u001",
+    "createdAt": "2025-07-03T12:15:00Z"
+  },
+  {
+    "id": "fl004",
+    "follower": "u004",
+    "following": "u005",
+    "createdAt": "2025-07-04T13:45:00Z"
+  },
+  {
+    "id": "fl005",
+    "follower": "u005",
+    "following": "u006",
+    "createdAt": "2025-07-05T15:00:00Z"
+  },
+  {
+    "id": "fl006",
+    "follower": "u006",
+    "following": "u007",
+    "createdAt": "2025-07-06T16:30:00Z"
+  },
+  {
+    "id": "fl007",
+    "follower": "u007",
+    "following": "u008",
+    "createdAt": "2025-07-07T17:45:00Z"
+  },
+  {
+    "id": "fl008",
+    "follower": "u008",
+    "following": "u001",
+    "createdAt": "2025-07-08T19:00:00Z"
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "f001",
+    "fromUser": "u001",
+    "toUser": "u002",
+    "status": "pending",
+    "createdAt": "2025-07-01T10:00:00Z",
+    "updatedAt": "2025-07-01T10:00:00Z"
+  },
+  {
+    "id": "f002",
+    "fromUser": "u002",
+    "toUser": "u003",
+    "status": "accepted",
+    "createdAt": "2025-07-02T11:00:00Z",
+    "updatedAt": "2025-07-03T11:30:00Z"
+  },
+  {
+    "id": "f003",
+    "fromUser": "u003",
+    "toUser": "u004",
+    "status": "rejected",
+    "createdAt": "2025-07-03T12:00:00Z",
+    "updatedAt": "2025-07-03T12:45:00Z"
+  },
+  {
+    "id": "f004",
+    "fromUser": "u004",
+    "toUser": "u005",
+    "status": "pending",
+    "createdAt": "2025-07-04T13:00:00Z",
+    "updatedAt": "2025-07-04T13:00:00Z"
+  },
+  {
+    "id": "f005",
+    "fromUser": "u005",
+    "toUser": "u006",
+    "status": "accepted",
+    "createdAt": "2025-07-05T14:00:00Z",
+    "updatedAt": "2025-07-06T15:00:00Z"
+  },
+  {
+    "id": "f006",
+    "fromUser": "u006",
+    "toUser": "u007",
+    "status": "rejected",
+    "createdAt": "2025-07-06T16:00:00Z",
+    "updatedAt": "2025-07-06T16:30:00Z"
+  },
+  {
+    "id": "f007",
+    "fromUser": "u007",
+    "toUser": "u008",
+    "status": "pending",
+    "createdAt": "2025-07-07T17:00:00Z",
+    "updatedAt": "2025-07-07T17:00:00Z"
+  },
+  {
+    "id": "f008",
+    "fromUser": "u008",
+    "toUser": "u001",
+    "status": "accepted",
+    "createdAt": "2025-07-08T18:00:00Z",
+    "updatedAt": "2025-07-09T19:00:00Z"
+  }
+]

@@ -1,0 +1,178 @@
+import 'package:flutter/cupertino.dart';
+import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
+import 'package:handoff_vdb_2025/data/model/auth/auth_model.dart';
+import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
+import 'package:mobx/mobx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../data/repositories/auth_repository.dart';
+part 'sign_up_store.g.dart';
+
+class SignUpStore = _SignUpStore with _$SignUpStore;
+
+abstract class _SignUpStore with Store {
+  final name = TextEditingController();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final confirmPassword = TextEditingController();
+
+  final focusNodeEmail = FocusNode();
+  final focusNodeName = FocusNode();
+  final focusNodePassword = FocusNode();
+  final focusNodeConfirmPassword = FocusNode();
+
+  /// SharePreference
+  SharedPreferenceHelper? _sharedPreferenceHelper;
+
+  /// Repository
+  final AuthRepository _repository = AuthRepository();
+
+  @observable
+  bool isLoading = false;
+
+  /// Error
+  @observable
+  String? errorMessage;
+
+  @observable
+  String? nameError;
+
+  @observable
+  String? emailError;
+
+  @observable
+  String? passwordError;
+
+  @observable
+  String? confirmPasswordError;
+
+  _SignUpStore () {
+    _init();
+  }
+
+  ///
+  /// Init dio
+  ///
+  Future<void> _init() async {
+    // Initialize SharedPreferences
+    _sharedPreferenceHelper = SharedPreferenceHelper.instance;
+  }
+
+  @action
+  bool validate() {
+    bool isValid = true;
+
+    // Name
+    if (name.text.trim().isEmpty){
+      nameError = 'Vui long nhap ho va ten';
+      isValid = false;
+    }else{
+      nameError = null;
+    }
+
+    // Email
+    if (email.text.trim().isEmpty) {
+      emailError = 'Vui lòng nhập email';
+      isValid = false;
+    } else if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email.text.trim())) {
+      emailError = 'Email không hợp lệ';
+      isValid = false;
+    } else {
+      emailError = null;
+    }
+
+    // Password
+    if (password.text.isEmpty) {
+      passwordError = 'Vui lòng nhập mật khẩu';
+      isValid = false;
+    } else if (password.text.length < 6) {
+      passwordError = 'Mật khẩu tối thiểu 6 ký tự';
+      isValid = false;
+    } else {
+      passwordError = null;
+    }
+
+    // Confirm password
+    if (confirmPassword.text.isEmpty) {
+      confirmPasswordError = 'Vui lòng xác nhận mật khẩu';
+      isValid = false;
+    } else if (confirmPassword.text != password.text) {
+      confirmPasswordError = 'Mật khẩu không khớp';
+      isValid = false;
+    } else {
+      confirmPasswordError = null;
+    }
+    return isValid;
+  }
+
+  @action
+  Future<void> testConnection() async {
+    isLoading = true;
+    errorMessage = null;
+    
+    try {
+      final isConnected = await _repository.testConnection();
+      if (isConnected) {
+        print('Connection test successful');
+      } else {
+        print('Connection test failed');
+        errorMessage = 'Không thể kết nối đến server';
+      }
+    } catch (e) {
+      print('Connection test error: $e');
+      errorMessage = 'Lỗi kết nối: $e';
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  @action
+  Future<void> signUp({
+    required Function(AuthModel auth) onSuccess,
+    required Function(String error) onError,
+  }) async {
+    if(!validate()) return;
+
+    isLoading = true;
+    errorMessage = null;
+
+    final user = UserModel(
+      name: name.text.trim(),
+      email: email.text.trim(),
+      password: password.text.toString().trim(),
+    );
+
+    await _repository.signUpEmail(
+        data: user,
+        onSuccess: (auth) async {
+          isLoading = false;
+
+          // Luu thong tin
+          _sharedPreferenceHelper?.setAccessToken(auth.accessToken ?? "");
+          _sharedPreferenceHelper?.setRefreshToken(auth.refreshToken ?? "");
+          _sharedPreferenceHelper?.setEmail(user.email ?? "");
+          _sharedPreferenceHelper?.setPassword(user.password ?? "");
+
+          onSuccess(auth);
+        },
+        onError: (error){
+          isLoading = false;
+          errorMessage = error.toString();
+          onError(errorMessage ?? "An error occurred");
+        }
+    );
+  }
+
+  @action
+  void checkSavedData() {
+    final accessToken = _sharedPreferenceHelper?.getAccessToken;
+    final refreshToken = _sharedPreferenceHelper?.getRefreshToken;
+    final email = _sharedPreferenceHelper?.getEmail;
+    final password = _sharedPreferenceHelper?.getPassword;
+    print("accessToken $accessToken");
+    print("refreshToken $refreshToken");
+    print("email $email");
+    print("password $password");
+  }
+
+}
