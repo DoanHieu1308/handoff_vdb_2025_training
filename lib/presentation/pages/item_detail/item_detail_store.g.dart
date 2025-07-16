@@ -31,6 +31,50 @@ mixin _$ItemDetailStore on _ItemDetailStore, Store {
     );
   }
 
+  late final _$actionItemDeniedAsyncAction = AsyncAction(
+    '_ItemDetailStore.actionItemDenied',
+    context: context,
+  );
+
+  @override
+  Future<void> actionItemDenied({
+    required String nameItemDetail,
+    required UserModel? friendPending,
+    required String? requestId,
+    required BuildContext context,
+  }) {
+    return _$actionItemDeniedAsyncAction.run(
+      () => super.actionItemDenied(
+        nameItemDetail: nameItemDetail,
+        friendPending: friendPending,
+        requestId: requestId,
+        context: context,
+      ),
+    );
+  }
+
+  late final _$actionItemUnfriendAsyncAction = AsyncAction(
+    '_ItemDetailStore.actionItemUnfriend',
+    context: context,
+  );
+
+  @override
+  Future<void> actionItemUnfriend({
+    required String nameItemDetail,
+    required String? friendId,
+    required UserModel? friendInList,
+    required BuildContext context,
+  }) {
+    return _$actionItemUnfriendAsyncAction.run(
+      () => super.actionItemUnfriend(
+        nameItemDetail: nameItemDetail,
+        friendId: friendId,
+        friendInList: friendInList,
+        context: context,
+      ),
+    );
+  }
+
   late final _$_ItemDetailStoreActionController = ActionController(
     name: '_ItemDetailStore',
     context: context,
@@ -43,28 +87,6 @@ mixin _$ItemDetailStore on _ItemDetailStore, Store {
     );
     try {
       return super.getFilteredItems(categoryName);
-    } finally {
-      _$_ItemDetailStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void actionItemDetail({
-    required String nameItemDetail,
-    required String? requestId,
-    required dynamic Function() onSuccess,
-    required dynamic Function(dynamic) onError,
-  }) {
-    final _$actionInfo = _$_ItemDetailStoreActionController.startAction(
-      name: '_ItemDetailStore.actionItemDetail',
-    );
-    try {
-      return super.actionItemDetail(
-        nameItemDetail: nameItemDetail,
-        requestId: requestId,
-        onSuccess: onSuccess,
-        onError: onError,
-      );
     } finally {
       _$_ItemDetailStoreActionController.endAction(_$actionInfo);
     }

@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
+import 'package:handoff_vdb_2025/data/model/friend/friend_request_model.dart';
+import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+
+import '../../widget/build_snackbar.dart';
 
 part 'item_detail_store.g.dart';
 
@@ -11,15 +16,20 @@ class ItemDetailStore = _ItemDetailStore with _$ItemDetailStore;
 
 abstract class _ItemDetailStore with Store {
   /// Controller
-  final AutoScrollController scrollController = AutoScrollController(axis: Axis.vertical);
+  final AutoScrollController scrollController = AutoScrollController(
+      axis: Axis.vertical);
 
   /// Store
-  final FriendsStore friendsStore = FriendsStore();
+  final FriendsStore friendsStore;
+  _ItemDetailStore(this.friendsStore);
 
-  ///
+  /// Item filtered
+  late List<Map<String, dynamic>> filteredItems;
 
+  /// List item detail all
   @observable
-  ObservableList<Map<String, dynamic>> listNameItemDetailsALL = ObservableList.of([
+  ObservableList<Map<String, dynamic>> listNameItemDetailsALL = ObservableList
+      .of([
     {'name': REMOVE, 'image': ImagesPath.icUnfriend, 'valueNumber': 0},
     {'name': DENIED, 'image': ImagesPath.icUnfriend, 'valueNumber': 1},
     {'name': UNFOLLOW, 'image': ImagesPath.icUnFollow, 'valueNumber': 2},
@@ -57,20 +67,52 @@ abstract class _ItemDetailStore with Store {
         .toList();
   }
 
+  ///
+  /// Action Denied
+  ///
   @action
-  void actionItemDetail({
+  Future<void> actionItemDenied({
     required String nameItemDetail,
+    required UserModel? friendPending,
     required String? requestId,
-    required Function() onSuccess,
-    required Function(dynamic error) onError
-  }){
-      if(nameItemDetail == DENIED){
-         friendsStore.rejectFriendRequest(
-             requestId: requestId ?? "",
-             onSuccess: onSuccess,
-             onError: onError
-         );
-      }
+    required BuildContext context,
+  }) async {
+    if (friendPending?.id == null || requestId == null) return;
+
+    await friendsStore.handleRejectFriendRequest(
+      userId: friendPending!.id!,
+      requestId: requestId,
+      context: context,
+      nameItemDetail: nameItemDetail,
+    );
+  }
+
+  ///
+  /// Action Unfriend
+  ///
+  @action
+  Future<void> actionItemUnfriend({
+    required String nameItemDetail,
+    required String? friendId,
+    required UserModel? friendInList,
+    required BuildContext context
+  }) async {
+    friendsStore.unFriend(
+        friendId: friendId ?? "",
+        onSuccess: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+              buildSnackBarNotify(
+                  textNotify: "Successfully $nameItemDetail"
+              )
+          );
+          friendsStore.friendList.remove(friendInList);
+          // friendsStore.getAllFriends();
+        },
+        onError: (error) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error)));
+        }
+    );
   }
 
 }

@@ -1,21 +1,24 @@
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
+import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:mobx/mobx.dart';
-
-import '../../../core/shared_pref/shared_preference_helper.dart';
 part 'dash_board_store.g.dart';
 
 class DashBoardStore = _DashBoardStore with _$DashBoardStore;
 
 abstract class _DashBoardStore with Store {
   /// Repository
-  final UserRepository _userRepository = UserRepository();
+  late final _userRepository;
 
   /// SharePreference
-  SharedPreferenceHelper? _sharedPreferenceHelper;
+  late final _sharedPreferenceHelper;
+
+  /// Store
+  late FriendsStore friendsStore;
 
   @observable
-  int currentIndex = 1;
+  int currentIndex = 2;
 
   @observable
   bool isLoading = false;
@@ -32,7 +35,20 @@ abstract class _DashBoardStore with Store {
     _init();
   }
   Future<void> _init() async {
-    _sharedPreferenceHelper = SharedPreferenceHelper.instance;
+    // Get dependencies directly
+    _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
+    _userRepository = UserRepository();
+    // TODO
+    friendsStore = FriendsStore();
+    friendsStore.getAllFriends();
+  }
+
+
+  ///
+  /// Dispose
+  ///
+  void disposeAll() {
+    friendsStore.disposeAll();
   }
 
 
@@ -47,15 +63,6 @@ abstract class _DashBoardStore with Store {
   ///
   Future<void> getUserProfile() async {
     isLoading = true;
-
-    // Debug: Check token before making request
-    final accessToken = _sharedPreferenceHelper?.getAccessToken;
-    final refreshToken = _sharedPreferenceHelper?.getRefreshToken;
-
-    print("=== Debug Token ===");
-    print("Access Token: $accessToken");
-    print("Refresh Token: $refreshToken");
-    print("Is Token Empty: ${accessToken == null || accessToken.isEmpty}");
 
     await _userRepository.getUserProfile(
         onSuccess: (data) {

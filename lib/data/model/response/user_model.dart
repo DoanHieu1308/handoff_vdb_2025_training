@@ -57,9 +57,22 @@ class UserModel {
     };
   }
 
+  // factory UserModel.fromMap(Map<String, dynamic> map) {
+  //   return UserModel(
+  //     id: map['_id'] ?? map['id'],
+  //     name: map['name'],
+  //     email: map['email'],
+  //     password: map['password'],
+  //     avatar: map['avatar'],
+  //     bio: map['bio'],
+  //     createdAt: map['createdAt'] != null ? DateTime.tryParse(map['createdAt']) : null,
+  //     updatedAt: map['updatedAt'] != null ? DateTime.tryParse(map['updatedAt']) : null,
+  //   );
+  // }
+
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['_id'] ?? map['id'],
+      id: map['userId'] ?? map['_id'] ?? map['id'],
       name: map['name'],
       email: map['email'],
       password: map['password'],
@@ -69,6 +82,7 @@ class UserModel {
       updatedAt: map['updatedAt'] != null ? DateTime.tryParse(map['updatedAt']) : null,
     );
   }
+
 
   String toJson() => json.encode(toMap());
 

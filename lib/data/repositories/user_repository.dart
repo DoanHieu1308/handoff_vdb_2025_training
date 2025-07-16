@@ -10,7 +10,7 @@ import '../model/response/user_model.dart';
 
 class UserRepository {
   late DioClient _dio;
-  SharedPreferenceHelper? _sharedPreferenceHelper;
+  late SharedPreferenceHelper _sharedPreferenceHelper;
 
   UserRepository() {
     _init();

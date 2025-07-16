@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/utils/color_resources.dart';
+import '../../core/utils/color_resources.dart';
 
 class ItemFolderProfile extends StatelessWidget {
   final VoidCallback onTap;
@@ -20,9 +20,9 @@ class ItemFolderProfile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(right: 3.w),
+        margin: EdgeInsets.only(right: 5.w),
         height: 40.h,
-        width: 70.h,
+        width: name.length < 6 ? 50.w : 80.w,
         decoration: BoxDecoration(
             color: isSelected ? ColorResources.COLOR_0956D6.withOpacity(0.1) : Colors.transparent,
             borderRadius: BorderRadius.circular(20)

@@ -5,6 +5,7 @@ mixin ImagesPath {
   static String imgVietNam = "assets/features/vietnam.png";
   static String imgSignUp = 'assets/features/img_signup.png';
   static String imgAvtDep = 'assets/features/avt_dep.jpg';
+  static String imgAnhNen = 'assets/features/anh_nen.jpg';
 
   // Icon
   static String icFriends = "assets/features/friend.png";
@@ -24,6 +25,7 @@ mixin ImagesPath {
   static String icLike = 'assets/base/icons/ic_like.svg';
   static String icShare = 'assets/base/icons/ic_share.svg';
   static String icComment = 'assets/base/icons/ic_comment.svg';
+  static String icEarth = 'assets/features/ic_earth.svg';
 
   // Place holder image path.
   static String placeHolder = 'assets/base/base_img_place_holder.jpg';

@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:handoff_vdb_2025/core/helper/validate.dart';
-import 'package:handoff_vdb_2025/data/data_source/dio/dio_client.dart';
 import 'package:handoff_vdb_2025/data/exception/api_error_handler.dart';
 import 'package:handoff_vdb_2025/data/model/auth/auth_model.dart';
 import 'package:handoff_vdb_2025/data/model/base/api_response.dart';
 import 'package:handoff_vdb_2025/domain/end_points/end_point.dart';
+import '../data_source/dio/dio_client.dart';
 import '../model/response/user_model.dart';
 
 class AuthRepository {
@@ -90,5 +90,22 @@ class AuthRepository {
       onSuccess(authModel);
     }
   }
+
+  Future<void> logout({
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async{
+    Response<dynamic> response;
+    try{
+      response = await _dio.post(EndPoint.LOGOUT);
+    } catch (e) {
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      onSuccess();
+    }
+  }
+
 
 }

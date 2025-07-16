@@ -28,7 +28,8 @@ dependencies:
   path_provider: ^2.1.5
   # https://pub.dev/packages/flashy_flushbar
   flashy_flushbar: ^1.4.0
-
+  # https://pub.dev/packages/pull_to_refresh
+  pull_to_refresh: ^2.0.0
 
   cupertino_icons: ^1.0.8
 

@@ -2,10 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
 import 'package:handoff_vdb_2025/data/model/auth/auth_model.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
+import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../data/repositories/auth_repository.dart';
 part 'sign_up_store.g.dart';
 
 class SignUpStore = _SignUpStore with _$SignUpStore;
@@ -22,10 +21,10 @@ abstract class _SignUpStore with Store {
   final focusNodeConfirmPassword = FocusNode();
 
   /// SharePreference
-  SharedPreferenceHelper? _sharedPreferenceHelper;
+  late final _sharedPreferenceHelper;
 
   /// Repository
-  final AuthRepository _repository = AuthRepository();
+  late final _repository;
 
   @observable
   bool isLoading = false;
@@ -54,8 +53,9 @@ abstract class _SignUpStore with Store {
   /// Init dio
   ///
   Future<void> _init() async {
-    // Initialize SharedPreferences
+    // Get dependencies directly
     _sharedPreferenceHelper = SharedPreferenceHelper.instance;
+    _repository = AuthRepository();
   }
 
   @action
@@ -169,10 +169,6 @@ abstract class _SignUpStore with Store {
     final refreshToken = _sharedPreferenceHelper?.getRefreshToken;
     final email = _sharedPreferenceHelper?.getEmail;
     final password = _sharedPreferenceHelper?.getPassword;
-    print("accessToken $accessToken");
-    print("refreshToken $refreshToken");
-    print("email $email");
-    print("password $password");
   }
 
 }

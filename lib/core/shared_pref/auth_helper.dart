@@ -1,14 +1,11 @@
-import 'shared_preference_helper.dart';
+import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
 
 class AuthHelper {
-  static SharedPreferenceHelper? _instance;
-  
   ///
-  /// Khởi tạo SharedPreferenceHelper
+  /// Lấy SharedPreferenceHelper trực tiếp
   ///
-  static Future<SharedPreferenceHelper> getInstance() async {
-    _instance =  SharedPreferenceHelper.instance;
-    return _instance!;
+  static SharedPreferenceHelper getInstance() {
+    return SharedPreferenceHelper.instance;
   }
 
   ///
@@ -20,7 +17,7 @@ class AuthHelper {
     required String email,
     required String password,
   }) async {
-    final helper = await getInstance();
+    final helper = getInstance();
     await helper.setAccessToken(accessToken);
     await helper.setRefreshToken(refreshToken);
     await helper.setEmail(email);
@@ -30,8 +27,8 @@ class AuthHelper {
   ///
   /// Lấy thông tin user hiện tại
   ///
-  static Future<Map<String, String?>> getCurrentUserData() async {
-    final helper = await getInstance();
+  static Map<String, String?> getCurrentUserData() {
+    final helper = getInstance();
     return {
       'accessToken': helper.getAccessToken,
       'refreshToken': helper.getRefreshToken,
@@ -43,8 +40,8 @@ class AuthHelper {
   ///
   /// Kiểm tra trạng thái đăng nhập
   ///
-  static Future<bool> isUserLoggedIn() async {
-    final helper = await getInstance();
+  static bool isUserLoggedIn() {
+    final helper = getInstance();
     return helper.isLoggedIn;
   }
 
@@ -52,7 +49,7 @@ class AuthHelper {
   /// Đăng xuất - xóa tất cả dữ liệu
   ///
   static Future<void> logout() async {
-    final helper = await getInstance();
+    final helper = getInstance();
     await helper.clearAuthData();
   }
 } 

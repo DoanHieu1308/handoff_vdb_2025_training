@@ -67,21 +67,21 @@ mixin _$FriendsStore on _FriendsStore, Store {
     });
   }
 
-  late final _$friendListRequestsAtom = Atom(
-    name: '_FriendsStore.friendListRequests',
+  late final _$listRequestsAtom = Atom(
+    name: '_FriendsStore.listRequests',
     context: context,
   );
 
   @override
-  List<FriendRequestModel> get friendListRequests {
-    _$friendListRequestsAtom.reportRead();
-    return super.friendListRequests;
+  List<FriendRequestModel> get listRequests {
+    _$listRequestsAtom.reportRead();
+    return super.listRequests;
   }
 
   @override
-  set friendListRequests(List<FriendRequestModel> value) {
-    _$friendListRequestsAtom.reportWrite(value, super.friendListRequests, () {
-      super.friendListRequests = value;
+  set listRequests(List<FriendRequestModel> value) {
+    _$listRequestsAtom.reportWrite(value, super.listRequests, () {
+      super.listRequests = value;
     });
   }
 
@@ -100,6 +100,64 @@ mixin _$FriendsStore on _FriendsStore, Store {
   set friendListPending(List<UserModel> value) {
     _$friendListPendingAtom.reportWrite(value, super.friendListPending, () {
       super.friendListPending = value;
+    });
+  }
+
+  late final _$friendListSuggestionAtom = Atom(
+    name: '_FriendsStore.friendListSuggestion',
+    context: context,
+  );
+
+  @override
+  List<UserModel> get friendListSuggestion {
+    _$friendListSuggestionAtom.reportRead();
+    return super.friendListSuggestion;
+  }
+
+  @override
+  set friendListSuggestion(List<UserModel> value) {
+    _$friendListSuggestionAtom.reportWrite(
+      value,
+      super.friendListSuggestion,
+      () {
+        super.friendListSuggestion = value;
+      },
+    );
+  }
+
+  late final _$friendListFollowerAtom = Atom(
+    name: '_FriendsStore.friendListFollower',
+    context: context,
+  );
+
+  @override
+  List<UserModel> get friendListFollower {
+    _$friendListFollowerAtom.reportRead();
+    return super.friendListFollower;
+  }
+
+  @override
+  set friendListFollower(List<UserModel> value) {
+    _$friendListFollowerAtom.reportWrite(value, super.friendListFollower, () {
+      super.friendListFollower = value;
+    });
+  }
+
+  late final _$friendListSearchAtom = Atom(
+    name: '_FriendsStore.friendListSearch',
+    context: context,
+  );
+
+  @override
+  List<UserModel> get friendListSearch {
+    _$friendListSearchAtom.reportRead();
+    return super.friendListSearch;
+  }
+
+  @override
+  set friendListSearch(List<UserModel> value) {
+    _$friendListSearchAtom.reportWrite(value, super.friendListSearch, () {
+      super.friendListSearch = value;
     });
   }
 
@@ -157,6 +215,62 @@ mixin _$FriendsStore on _FriendsStore, Store {
     });
   }
 
+  late final _$getDataFriendAsyncAction = AsyncAction(
+    '_FriendsStore.getDataFriend',
+    context: context,
+  );
+
+  @override
+  Future<void> getDataFriend(String name) {
+    return _$getDataFriendAsyncAction.run(() => super.getDataFriend(name));
+  }
+
+  late final _$handleAcceptFriendRequestAsyncAction = AsyncAction(
+    '_FriendsStore.handleAcceptFriendRequest',
+    context: context,
+  );
+
+  @override
+  Future<void> handleAcceptFriendRequest(int index) {
+    return _$handleAcceptFriendRequestAsyncAction.run(
+      () => super.handleAcceptFriendRequest(index),
+    );
+  }
+
+  late final _$handleRejectFriendRequestAsyncAction = AsyncAction(
+    '_FriendsStore.handleRejectFriendRequest',
+    context: context,
+  );
+
+  @override
+  Future<void> handleRejectFriendRequest({
+    required String userId,
+    required String requestId,
+    required BuildContext context,
+    required String nameItemDetail,
+  }) {
+    return _$handleRejectFriendRequestAsyncAction.run(
+      () => super.handleRejectFriendRequest(
+        userId: userId,
+        requestId: requestId,
+        context: context,
+        nameItemDetail: nameItemDetail,
+      ),
+    );
+  }
+
+  late final _$goToInfoFriendAsyncAction = AsyncAction(
+    '_FriendsStore.goToInfoFriend',
+    context: context,
+  );
+
+  @override
+  Future<void> goToInfoFriend({required BuildContext context}) {
+    return _$goToInfoFriendAsyncAction.run(
+      () => super.goToInfoFriend(context: context),
+    );
+  }
+
   late final _$checkLoginStatusAsyncAction = AsyncAction(
     '_FriendsStore.checkLoginStatus',
     context: context,
@@ -165,18 +279,6 @@ mixin _$FriendsStore on _FriendsStore, Store {
   @override
   Future<void> checkLoginStatus() {
     return _$checkLoginStatusAsyncAction.run(() => super.checkLoginStatus());
-  }
-
-  late final _$testTokenPersistenceAsyncAction = AsyncAction(
-    '_FriendsStore.testTokenPersistence',
-    context: context,
-  );
-
-  @override
-  Future<void> testTokenPersistence() {
-    return _$testTokenPersistenceAsyncAction.run(
-      () => super.testTokenPersistence(),
-    );
   }
 
   late final _$_FriendsStoreActionController = ActionController(
@@ -221,13 +323,52 @@ mixin _$FriendsStore on _FriendsStore, Store {
   }
 
   @override
+  void removeAcceptedFriend(String friendId) {
+    final _$actionInfo = _$_FriendsStoreActionController.startAction(
+      name: '_FriendsStore.removeAcceptedFriend',
+    );
+    try {
+      return super.removeAcceptedFriend(friendId);
+    } finally {
+      _$_FriendsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeFriendRequestFromLists(String requestId) {
+    final _$actionInfo = _$_FriendsStoreActionController.startAction(
+      name: '_FriendsStore.removeFriendRequestFromLists',
+    );
+    try {
+      return super.removeFriendRequestFromLists(requestId);
+    } finally {
+      _$_FriendsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void getItemSearch() {
+    final _$actionInfo = _$_FriendsStoreActionController.startAction(
+      name: '_FriendsStore.getItemSearch',
+    );
+    try {
+      return super.getItemSearch();
+    } finally {
+      _$_FriendsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 selectedCategoryName: ${selectedCategoryName},
 isLoading: ${isLoading},
 friendList: ${friendList},
-friendListRequests: ${friendListRequests},
+listRequests: ${listRequests},
 friendListPending: ${friendListPending},
+friendListSuggestion: ${friendListSuggestion},
+friendListFollower: ${friendListFollower},
+friendListSearch: ${friendListSearch},
 acceptFriend: ${acceptFriend},
 acceptedFriends: ${acceptedFriends},
 rejectFriend: ${rejectFriend}

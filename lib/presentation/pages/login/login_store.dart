@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:mobx/mobx.dart';
 import '../../../core/shared_pref/shared_preference_helper.dart';
-import '../../../data/data_source/dio/dio_client.dart';
 import '../../../data/model/auth/auth_model.dart';
 import '../../../data/model/response/user_model.dart';
 import '../../../data/repositories/auth_repository.dart';
@@ -11,8 +10,6 @@ part 'login_store.g.dart';
 class LoginStore = _LoginStore with _$LoginStore;
 
 abstract class _LoginStore with Store {
-  late final DioClient _dio;
-
   /// controller.
   final PageController pageController = PageController(initialPage: 0);
   final emailController = TextEditingController();
@@ -23,10 +20,10 @@ abstract class _LoginStore with Store {
   final emailFocusNode= FocusNode();
 
   /// SharePreference
-  SharedPreferenceHelper? _sharedPreferenceHelper;
+  late final _sharedPreferenceHelper;
 
   /// Repository
-  final AuthRepository _repository = AuthRepository();
+  late final _repository;
 
   /// Declare the data.
   @observable
@@ -62,16 +59,14 @@ abstract class _LoginStore with Store {
   /// Init
   ///
   Future<void> _init() async {
-    _dio = DioClient();
-
-    // Initialize SharedPreferences
+    // Get dependencies directly
     _sharedPreferenceHelper = SharedPreferenceHelper.instance;
+    _repository = AuthRepository();
 
-    emailSaved = _sharedPreferenceHelper?.getEmail ?? "";
-    passwordSaved = _sharedPreferenceHelper?.getPassword ?? "";
+    emailSaved = _sharedPreferenceHelper.getEmail ?? "";
+    passwordSaved = _sharedPreferenceHelper.getPassword ?? "";
 
     setTextControl();
-
   }
 
   /// Set email, password Controller

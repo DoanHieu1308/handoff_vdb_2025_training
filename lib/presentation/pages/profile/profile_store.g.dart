@@ -45,6 +45,62 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
+  late final _$isLoadingAtom = Atom(
+    name: '_ProfileStore.isLoading',
+    context: context,
+  );
+
+  @override
+  bool get isLoading {
+    _$isLoadingAtom.reportRead();
+    return super.isLoading;
+  }
+
+  @override
+  set isLoading(bool value) {
+    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
+      super.isLoading = value;
+    });
+  }
+
+  late final _$errorMessageAtom = Atom(
+    name: '_ProfileStore.errorMessage',
+    context: context,
+  );
+
+  @override
+  String? get errorMessage {
+    _$errorMessageAtom.reportRead();
+    return super.errorMessage;
+  }
+
+  @override
+  set errorMessage(String? value) {
+    _$errorMessageAtom.reportWrite(value, super.errorMessage, () {
+      super.errorMessage = value;
+    });
+  }
+
+  late final _$logOutAsyncAction = AsyncAction(
+    '_ProfileStore.logOut',
+    context: context,
+  );
+
+  @override
+  Future<void> logOut({required BuildContext context}) {
+    return _$logOutAsyncAction.run(() => super.logOut(context: context));
+  }
+
+  late final _$goToFriendPageAsyncAction = AsyncAction(
+    '_ProfileStore.goToFriendPage',
+    context: context,
+  );
+
+  @override
+  Future<void> goToFriendPage(BuildContext context) {
+    return _$goToFriendPageAsyncAction.run(() => super.goToFriendPage(context));
+  }
+
   late final _$_ProfileStoreActionController = ActionController(
     name: '_ProfileStore',
     context: context,
@@ -66,7 +122,9 @@ mixin _$ProfileStore on _ProfileStore, Store {
   String toString() {
     return '''
 selectedFolderIndex: ${selectedFolderIndex},
-isLSeeMore: ${isLSeeMore}
+isLSeeMore: ${isLSeeMore},
+isLoading: ${isLoading},
+errorMessage: ${errorMessage}
     ''';
   }
 }

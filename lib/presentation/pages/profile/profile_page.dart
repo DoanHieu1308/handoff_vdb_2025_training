@@ -4,13 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
+import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
+import 'package:handoff_vdb_2025/presentation/widget/post_status.dart';
 
 import '../../../core/utils/color_resources.dart';
-import 'component/item_post_widget.dart';
-import 'component/item_folder_profile.dart';
+import '../../widget/item_folder_profile.dart';
+import 'component/build_drawer.dart';
 
 class ProfilePage extends StatelessWidget {
   final UserModel userProfile;
@@ -33,22 +35,71 @@ class ProfilePage extends StatelessWidget {
                       children: [
                         Stack(
                           children: [
-                            Container(height: 200.h, color: Colors.grey),
+                            Container(
+                                height: 200.h,
+                                width: SizeUtil.getMaxWidth(),
+                                color: Colors.transparent,
+                              child: SetUpAssetImage(
+                                ImagesPath.imgAnhNen,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                             Positioned(
-                                right: 15.w,
-                                bottom: 10.h,
-                                child: CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: ColorResources.LIGHT_GREY,
-                                    child: Icon(Icons.camera_alt)
-                                )
-                            )
+                              right: 15.w,
+                              bottom: 10.h,
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: ColorResources.LIGHT_GREY,
+                                child: Icon(Icons.camera_alt),
+                              ),
+                            ),
+                            Positioned(
+                              top: 10.h,
+                              left: 10.w,
+                              child: IconButton(
+                                icon: Icon(Icons.menu, color: Colors.white),
+                                onPressed: () {
+                                  showGeneralDialog(
+                                    context: context,
+                                    barrierDismissible: true,
+                                    barrierLabel: "Drawer",
+                                    pageBuilder: (
+                                      context,
+                                      animation1,
+                                      animation2,
+                                    ) {
+                                      return buildDrawer(context, store);
+                                    },
+                                    transitionBuilder: (
+                                      context,
+                                      animation,
+                                      secondaryAnimation,
+                                      child,
+                                    ) {
+                                      return SlideTransition(
+                                        position: Tween<Offset>(
+                                          begin: Offset(-1, 0),
+                                          end: Offset(0, 0),
+                                        ).animate(animation),
+                                        child: child,
+                                      );
+                                    },
+                                    transitionDuration: Duration(
+                                      milliseconds: 250,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ],
                         ),
                         SizedBox(height: 50.h),
                         Padding(
                           padding: EdgeInsets.only(left: 15.w),
-                          child: Text(userProfile.name ?? "", style: AppText.text25_bold),
+                          child: Text(
+                            userProfile.name ?? "",
+                            style: AppText.text25_bold,
+                          ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 15.w),
@@ -210,7 +261,7 @@ class ProfilePage extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 15.w),
                           child: GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               store.isLSeeMore = true;
                             },
                             child: Column(
@@ -223,13 +274,14 @@ class ProfilePage extends StatelessWidget {
                                         height: 40.h,
                                         width: 30.w,
                                         child: Padding(
-                                          padding: EdgeInsets.only(bottom: 10.h),
+                                          padding: EdgeInsets.only(
+                                            bottom: 10.h,
+                                          ),
                                           child: Center(
                                             child: Text(
                                               "...",
-                                              style: AppText.text16_bold.copyWith(
-                                                color: Colors.grey,
-                                              ),
+                                              style: AppText.text16_bold
+                                                  .copyWith(color: Colors.grey),
                                             ),
                                           ),
                                         ),
@@ -243,8 +295,8 @@ class ProfilePage extends StatelessWidget {
                                 ),
                                 Visibility(
                                   visible: store.isLSeeMore,
-                                    child: Text(userProfile.bio.toString())
-                                )
+                                  child: Text(userProfile.bio.toString()),
+                                ),
                               ],
                             ),
                           ),
@@ -301,9 +353,7 @@ class ProfilePage extends StatelessWidget {
                               Expanded(
                                 flex: 4,
                                 child: GestureDetector(
-                                  onTap: (){
-
-                                  },
+                                  onTap: () {},
                                   child: Text(
                                     "Tìm bạn bè",
                                     style: AppText.text14.copyWith(
@@ -318,17 +368,21 @@ class ProfilePage extends StatelessWidget {
                         SizedBox(height: 10.h),
                         Padding(
                           padding: EdgeInsets.only(left: 15.w),
-                          child: SizedBox(
-                            height: 450.h,
-                            child: GridView.count(
-                              crossAxisCount: 3,
-                              childAspectRatio: 0.75,
-                              mainAxisSpacing: 2,
-                              crossAxisSpacing: 4,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              children: List.generate(9, (index) {
-                                return SizedBox(
+                          child: GridView.count(
+                            crossAxisCount: 3,
+                            childAspectRatio: 0.75,
+                            mainAxisSpacing: 2,
+                            crossAxisSpacing: 4,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            children: List.generate(store.friendsStore.friendList.length, (index) {
+                              return GestureDetector(
+                                onTap: (){
+                                  store.friendsStore.goToInfoFriend(
+                                      context: context
+                                  );
+                                },
+                                child: SizedBox(
                                   height: 250.h,
                                   width: 90.w,
                                   child: Column(
@@ -338,11 +392,11 @@ class ProfilePage extends StatelessWidget {
                                       SetUpAssetImage(
                                         height: 90.h,
                                         width: 90.w,
-                                        ImagesPath.icEmail,
+                                        store.friendsStore.friendList[index].avatar ?? ImagesPath.icPerson,
                                         fit: BoxFit.cover,
                                       ),
                                       Text(
-                                        'Mai Thi',
+                                        store.friendsStore.friendList[index].name ?? '',
                                         style: TextStyle(color: Colors.black),
                                       ),
                                       Visibility(
@@ -376,15 +430,15 @@ class ProfilePage extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                );
-                              }),
-                            ),
+                                ),
+                              );
+                            }),
                           ),
                         ),
                         SizedBox(height: 10.h),
                         GestureDetector(
-                          onTap: (){
-                            Navigator.of(context).pushNamed(AuthRouters.FRIENDS);
+                          onTap: () {
+                              store.goToFriendPage(context);
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 15.w),
@@ -458,149 +512,32 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ),
                         SizedBox(height: 10.h),
-                        SizedBox(
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 3.h,
-                                color: Colors.grey.withOpacity(0.3),
-                              ),
-                              SizedBox(height: 10.h),
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.w),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: CircleAvatar(
-                                        radius: 30,
-                                        child: SetUpAssetImage(
-                                          height: 35.h,
-                                          width: 35.w,
-                                          ImagesPath.icPerson,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 5.w),
-                                    Expanded(
-                                      flex: 16,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "Đoàn Hiếu",
-                                            style: AppText.text16_bold,
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "12 giờ",
-                                                style: AppText.text12,
-                                              ),
-                                              SizedBox(
-                                                height: 30.h,
-                                                child: Padding(
-                                                  padding: EdgeInsets.only(
-                                                    bottom: 7.h,
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      " . ",
-                                                      style: AppText.text14,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              Icon(
-                                                Icons.lock,
-                                                color: Colors.black.withOpacity(
-                                                  0.5,
-                                                ),
-                                                size: 15,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 4,
-                                      child: SizedBox(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                            bottom: 18.h,
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              "...",
-                                              style: AppText.text25_bold
-                                                  .copyWith(color: Colors.grey),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: 10.h),
-                              Container(height: 300.h, color: Colors.green),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 15.w),
-                                height: 55.h,
-                                color: Colors.white,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    ItemPostWidget(
-                                        width: 60,
-                                        name: "Thích",
-                                        image: ImagesPath.icLike
-                                    ),
-                                    ItemPostWidget(
-                                        width: 70,
-                                        name: "Bình luận",
-                                        image: ImagesPath.icComment
-                                    ),
-                                    ItemPostWidget(
-                                        width: 70,
-                                        name: "Nhắn tin",
-                                        image: ImagesPath.icMessenger
-                                    ),
-                                    ItemPostWidget(
-                                        width: 70,
-                                        name: "Chia sẽ",
-                                        image: ImagesPath.icShare
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        PostStatus(),
                         SizedBox(height: 40.h),
                       ],
                     ),
                     Positioned(
                       left: 10.w,
-                      top: 75.h,
+                      top: 80.h,
                       child: Stack(
                         children: [
                           CircleAvatar(
                             radius: 90,
                             backgroundColor: Colors.indigoAccent,
+                            child: SetUpAssetImage(
+                              userProfile.avatar ?? ImagesPath.icPerson,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           Positioned(
-                              right: 12.w,
-                              bottom: 12.h,
-                              child: CircleAvatar(
-                                  radius: 20,
-                                  backgroundColor: ColorResources.LIGHT_GREY,
-                                  child: Icon(Icons.camera_alt)
-                              )
-                          )
+                            right: 12.w,
+                            bottom: 12.h,
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: ColorResources.LIGHT_GREY,
+                              child: Icon(Icons.camera_alt),
+                            ),
+                          ),
                         ],
                       ),
                     ),

@@ -6,45 +6,57 @@ mixin ApiErrorHandler {
     dynamic errorDescription = '';
     if (error is Exception) {
       try {
-        if (error is DioError) {
+        if (error is DioException) {
           switch (error.type) {
-            case DioErrorType.cancel:
+            case DioExceptionType.cancel:
               errorDescription = 'Request to API server was cancelled';
               break;
-            case DioErrorType.connectionTimeout:
+            case DioExceptionType.connectionTimeout:
               errorDescription = 'Connection timeout with API server';
               break;
-            case DioErrorType.unknown:
+            case DioExceptionType.unknown:
               errorDescription = 'Connection to API server failed due to internet connection';
               break;
-            case DioErrorType.receiveTimeout:
+            case DioExceptionType.receiveTimeout:
               errorDescription = 'Receive timeout in connection with API server';
               break;
-            case DioErrorType.badResponse:
+            case DioExceptionType.badResponse:
               switch (error.response!.statusCode) {
                 case 400:
                   final ErrorResponse errors = ErrorResponse.fromJson(error.response!.data);
-                  errorDescription = errors.errors[0].detail.toString();
+                  errorDescription = errors.errors.isNotEmpty 
+                      ? errors.errors[0].detail.toString()
+                      : 'Bad Request';
                   break;
                 case 404:
                   final ErrorResponse errors = ErrorResponse.fromJson(error.response!.data);
-                  errorDescription = errors.errors[0].detail.toString();
+                  errorDescription = errors.errors.isNotEmpty 
+                      ? errors.errors[0].detail.toString()
+                      : 'Not Found';
                   break;
                 case 409:
                   final ErrorResponse errors = ErrorResponse.fromJson(error.response!.data);
-                  errorDescription = errors.errors[0].detail.toString();
+                  errorDescription = errors.errors.isNotEmpty 
+                      ? errors.errors[0].detail.toString()
+                      : 'Conflict';
                   break;
                 case 413:
                   final ErrorResponse errors = ErrorResponse.fromJson(error.response!.data);
-                  errorDescription = errors.errors[0].detail.toString();
+                  errorDescription = errors.errors.isNotEmpty 
+                      ? errors.errors[0].detail.toString()
+                      : 'Payload Too Large';
                   break;
                 case 500:
                   final ErrorResponse errors = ErrorResponse.fromJson(error.response!.data);
-                  errorDescription = errors.errors[0].detail.toString();
+                  errorDescription = errors.errors.isNotEmpty 
+                      ? errors.errors[0].detail.toString()
+                      : 'Internal Server Error';
                   break;
                 case 503:
                   final ErrorResponse errors = ErrorResponse.fromJson(error.response!.data);
-                  errorDescription = errors.errors[0].detail.toString();
+                  errorDescription = errors.errors.isNotEmpty 
+                      ? errors.errors[0].detail.toString()
+                      : 'Service Unavailable';
                   break;
 
                 default:
@@ -56,15 +68,15 @@ mixin ApiErrorHandler {
                   }
               }
               break;
-            case DioErrorType.sendTimeout:
+            case DioExceptionType.sendTimeout:
               errorDescription = 'Send timeout with server';
               break;
 
-            case DioErrorType.badCertificate:
+            case DioExceptionType.badCertificate:
               errorDescription = 'Connection to API server failed due to internet connection bad Certificate';
               break;
 
-            case DioErrorType.connectionError:
+            case DioExceptionType.connectionError:
               errorDescription = 'Connection to API server failed';
               break;
           }

@@ -9,11 +9,9 @@ import '../../../../core/utils/color_resources.dart';
 
 class BottomBarWidget extends StatefulWidget {
   final String imagePath;
-  final String text;
   final bool isSelected;
   final VoidCallback? onTap;
   const BottomBarWidget({Key? key,
-    required this.text,
     required this.onTap,
     required this.imagePath,
     required this.isSelected,
@@ -31,12 +29,12 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
       onTap: widget.onTap,
       child: Container(
         width: width / 4 - 10.w,
-        height: 85.h ,
+        height: 60.h ,
         color: Colors.transparent,
         child: Column(
           children: [
             SizedBox(
-              height: 7.h,
+              height: 2.h,
             ),
             SetUpAssetImage(
               widget.imagePath,
@@ -46,13 +44,6 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
                   ? ColorResources.COLOR_0956D6
                   : ColorResources.COLOR_071A52,
               fit: BoxFit.fill,
-            ),
-            Text(
-              widget.text,
-              style: AppText.text11.copyWith(
-                  color: widget.isSelected
-                      ? ColorResources.COLOR_0956D6
-                      : ColorResources.COLOR_071A52),
             ),
           ],
         ),

@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/core/utils/color_resources.dart';
+import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/item_detail/item_detail_store.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../../../data/model/friend/friend_request_model.dart';
-import '../../widget/build_snackbar.dart';
 
 class ItemDetailPage extends StatefulWidget {
   final String categoryName;
   final String? friendName;
   final FriendRequestModel? friendRequest;
+  final UserModel? friendInList;
 
   const ItemDetailPage({
     super.key,
     required this.categoryName,
     required this.friendName,
-    required this.friendRequest
+    this.friendRequest,
+    required this.friendInList
   });
 
   @override
@@ -26,13 +31,22 @@ class ItemDetailPage extends StatefulWidget {
 }
 
 class _ItemDetailPageState extends State<ItemDetailPage> {
-  final ItemDetailStore store = ItemDetailStore();
-  late List<Map<String, dynamic>> filteredItems;
+  late ItemDetailStore store;
 
   @override
   void initState() {
     super.initState();
-    filteredItems = store.getFilteredItems(widget.categoryName);
+    // Tạo FriendsStore và ItemDetailStore riêng cho màn hình này
+    // TODO
+    store = AppInit.instance.itemDetailStore;
+    store.filteredItems = store.getFilteredItems(widget.categoryName);
+    print("ccccc ${store.filteredItems.length}");
+  }
+
+  @override
+  void dispose() {
+    store.friendsStore.disposeAll();
+    super.dispose();
   }
 
   @override
@@ -41,7 +55,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     final width = size.width;
     final height = size.height;
 
-    return SafeArea(
+    return Observer(builder: (_) => SafeArea(
       child: Container(
         width: width,
         height: height,
@@ -69,17 +83,18 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                   padding: EdgeInsets.symmetric(horizontal: 15.w),
                   shrinkWrap: true,
                   physics: const ClampingScrollPhysics(),
-                  itemCount: filteredItems.length,
+                  itemCount: store.filteredItems.length,
                   separatorBuilder: (_, __) => SizedBox(height: 10.h),
                   itemBuilder: (context, index) {
-                    final item = filteredItems[index];
+                    final item = store.filteredItems[index];
                     return _itemDetailCard(
-                      index: index,
-                      context: context,
-                      name: item['name'],
-                      icon: item['image'],
-                      friendName: widget.friendName ?? "",
-                        friendRequest: widget.friendRequest
+                        index: index,
+                        context: context,
+                        name: item['name'],
+                        icon: item['image'],
+                        friendName: widget.friendName ?? "",
+                        friendRequest: widget.friendRequest,
+                        friendInList: widget.friendInList
                     );
                   },
                 ),
@@ -88,7 +103,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _itemDetailCard({
@@ -96,10 +111,11 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     required String name,
     required String icon,
     required String friendName,
-    required FriendRequestModel? friendRequest,
+    FriendRequestModel? friendRequest,
+    UserModel? friendInList,
     required BuildContext context,
   }) {
-    return AutoScrollTag(
+    return Observer(builder: (_) => AutoScrollTag(
       key: ValueKey(index),
       controller: store.scrollController,
       index: index,
@@ -108,8 +124,8 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           showDialog(context: context,
               builder: (_) => DiaLogNotification(
                 nameItemDetail: name,
-                friendName: friendName,
                 friendRequest: friendRequest,
+                friendInList: friendInList,
                 store: store,
               ));
         },
@@ -140,26 +156,26 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
 class DiaLogNotification extends StatelessWidget {
   final ItemDetailStore store;
   final String nameItemDetail;
-  final String? friendName;
   final FriendRequestModel? friendRequest;
+  final UserModel? friendInList;
   const DiaLogNotification({
     super.key,
     required this.nameItemDetail,
-    required this.friendName,
     required this.store,
-    required this.friendRequest
+    this.friendRequest,
+    this.friendInList
   });
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
+    return Observer(builder: (_) => Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
         padding: EdgeInsets.all(20),
@@ -172,7 +188,7 @@ class DiaLogNotification extends StatelessWidget {
             Text('Confirm $nameItemDetail', style: AppText.text14_Inter),
             SizedBox(height: 20.h),
             Text(
-              'You are about to $nameItemDetail $friendName. Are you sure you want to proceed?',
+              'You are about to $nameItemDetail ${friendInList?.name ?? "this user"}. Are you sure you want to proceed?',
               style: AppText.text12,
             ),
             SizedBox(height: 20.h),
@@ -206,23 +222,27 @@ class DiaLogNotification extends StatelessWidget {
                     builder: (scaffoldContext) {
                       return GestureDetector(
                         onTap: () {
-                          store.actionItemDetail(
-                              nameItemDetail: nameItemDetail,
-                              requestId: friendRequest?.id ?? "",
-                              onSuccess: (){
-                                ScaffoldMessenger.of(context,).showSnackBar(
-                                    buildSnackBarNotify(
-                                        textNotify: "Successfully $nameItemDetail"
-                                    )
-                                );
-                                store.friendsStore.getAllFriendsRequests();
-                              },
-                              onError: (error) {
-                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
-                              }
-                          );
-                          Navigator.pop(context);
-                          Navigator.pop(context);
+                          if(nameItemDetail == DENIED){
+                            store.actionItemDenied(
+                                nameItemDetail: nameItemDetail,
+                                requestId: friendRequest?.id ?? "",
+                                friendPending: friendInList,
+                                context: context
+                            );
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          }else if(nameItemDetail == UNFRIEND) {
+                            if (friendInList != null) {
+                              store.actionItemUnfriend(
+                                  nameItemDetail: nameItemDetail,
+                                  friendId: friendInList!.id,
+                                  friendInList: friendInList,
+                                  context: context
+                              );
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }
+                          }
                         },
                         child: SizedBox(
                           width: 70.w,
@@ -247,6 +267,6 @@ class DiaLogNotification extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }

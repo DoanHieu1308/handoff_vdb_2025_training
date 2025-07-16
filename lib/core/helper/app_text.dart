@@ -152,6 +152,13 @@ class AppText extends TextStyle{
     color: Colors.black,
   );
 
+  static TextStyle get text13_bold => TextStyle(
+    fontSize: 13.sp,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
+
   static TextStyle get text14_bold => TextStyle(
     fontSize: 14.sp,
     fontStyle: FontStyle.normal,

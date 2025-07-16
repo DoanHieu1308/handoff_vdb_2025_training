@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
 import 'package:handoff_vdb_2025/data/data_source/dio/logging_interceptor.dart';
 import 'package:handoff_vdb_2025/domain/end_points/end_point.dart';
+import '../../../core/shared_pref/shared_preference_helper.dart';
 
 class DioClient {
-  SharedPreferenceHelper? _sharedPreferenceHelper;
+  late SharedPreferenceHelper _sharedPreferenceHelper;
   Dio? dio;
   String? token;
   LoggingInterceptor? loggingInterceptor;
@@ -23,9 +23,7 @@ class DioClient {
     dio = Dio();
     _sharedPreferenceHelper = SharedPreferenceHelper.instance;
     
-    String? jwtToken = _sharedPreferenceHelper?.getAccessToken;
-    
-    print("bbbbbb $jwtToken");
+    String? jwtToken = _sharedPreferenceHelper.getAccessToken;
 
     dio!
       ..options.baseUrl = EndPoint.BASE_URL
@@ -34,8 +32,8 @@ class DioClient {
       ..httpClientAdapter
       ..options.headers = {
         'Content-Type': 'application/json; charset=UTF-8',
-        // 'Authorization': 'Bearer $jwtToken',
-        'Cookie': 'accessToken=$jwtToken',
+        if (jwtToken != null && jwtToken.isNotEmpty)
+          'Cookie': 'accessToken=$jwtToken',
       };
     dio!.interceptors.add(LoggingInterceptor());
     _isInitialized = true;
@@ -54,7 +52,7 @@ class DioClient {
   /// Refresh token
   ///
   Future<void> refreshToken() async {
-    final String? refreshToken = _sharedPreferenceHelper?.getRefreshToken;
+    final String? refreshToken = _sharedPreferenceHelper.getRefreshToken;
     
     if (refreshToken != null && refreshToken.isNotEmpty) {
       try {
@@ -64,21 +62,36 @@ class DioClient {
         );
         
         if (response.statusCode == 200) {
-          final newAccessToken = response.data['accessToken'];
-          await _sharedPreferenceHelper?.setAccessToken(newAccessToken);
-          
-          // Update headers with new token
-          dio!.options.headers = {
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $newAccessToken',
-          };
+          final results = response.data as dynamic;
+
+          final metadatas = results['metadata'] as Map<String, dynamic>;
+          final tokens = metadatas['tokens']  != null ? metadatas['tokens'] as Map<String, dynamic> : null;
+
+          final newAccessToken = tokens?['accessToken'].toString();
+          if (newAccessToken != null) {
+            await _sharedPreferenceHelper.setAccessToken(newAccessToken);
+            
+            print("_____newAccessToken___$newAccessToken}");
+            // Update headers with new token
+            _updateAuthorizationHeader(newAccessToken);
+          }
         }
       } catch (e) {
-        print('Refresh token failed: $e');
+        print('Token refresh failed: $e');
         // If refresh fails, clear all auth data
-        await _sharedPreferenceHelper?.clearAuthData();
+        await _sharedPreferenceHelper.clearAuthData();
       }
     }
+  }
+
+  ///
+  /// Update Authorization header for all future requests
+  ///
+  void _updateAuthorizationHeader(String token) {
+    dio!.options.headers = {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $token',
+    };
   }
 
   Future<Response> get(

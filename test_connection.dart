@@ -13,10 +13,11 @@ void main() async {
     print('Response: ${response.data}');
   } catch (e) {
     print('Connection failed: $e');
-    if (e is DioError) {
-      print('DioError type: ${e.type}');
-      print('DioError message: ${e.message}');
-      print('DioError response: ${e.response?.statusCode}');
+    if (e is DioException) {
+      print('DioException type: ${e.type}');
+      print('DioException message: ${e.message}');
+      print('DioException response: ${e.response?.statusCode}');
+      
     }
   }
 } 

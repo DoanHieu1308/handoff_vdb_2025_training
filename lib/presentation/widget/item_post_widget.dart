@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/base_widget/images/set_up_asset_image.dart';
-import '../../../../core/helper/app_text.dart';
+import '../../core/base_widget/images/set_up_asset_image.dart';
+import '../../core/helper/app_text.dart';
 
 class ItemPostWidget extends StatelessWidget {
   final String name;

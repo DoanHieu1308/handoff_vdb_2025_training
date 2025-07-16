@@ -1,11 +1,19 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
+import 'package:handoff_vdb_2025/core/helper/size_util.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
+import 'package:handoff_vdb_2025/presentation/pages/search/component/list_item_friend_search.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
-import 'component/Item_friend.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import '../search/search_page.dart';
+import 'component/list_Item_friend.dart';
+import 'component/header.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -15,100 +23,153 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
-  final FriendsStore store = FriendsStore();
+  late FriendsStore store;
+  late RefreshController searchRefreshController;
+  late VoidCallback searchListener;
 
   @override
   void initState() {
+    store = AppInit.instance.friendsStore;
     store.getAllFriends();
-    store.getAllFriendsRequests();
+
+    searchRefreshController = RefreshController();
+
+    store.searchCtrl.searchText = '';
+    // Thêm listener cho search text thay đổi
+    searchListener = () {
+      if (mounted) {
+        store.getItemSearch();
+        // Tắt bàn phím khi search text rỗng
+        if (store.searchCtrl.searchText.isEmpty) {
+          FocusScope.of(context).unfocus();
+        }
+      }
+    };
+    store.searchCtrl.textEditingController.addListener(searchListener);
+    
     super.initState();
   }
 
   @override
   void dispose() {
     store.disposeAll();
+    searchRefreshController.dispose();
+    
+    // Remove listener
+    store.searchCtrl.textEditingController.removeListener(searchListener);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
-          },
-          child: Image.asset(
-            height: 24.h,
-            width: 24.w,
-            ImagesPath.icBack,
-            color: Colors.grey,
-          ),
-        ),
-        title: Text("Friends"),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 15.w),
-            child: Image.asset(
-              height: 24.h,
-              width: 24.w,
-              ImagesPath.icSearch,
-              color: Colors.grey,
+    return Observer(
+      builder:
+          (_) => WillPopScope(
+            onWillPop: () async {
+              FocusScope.of(context).unfocus();
+              return true;
+            },
+            child: SafeArea(
+              child: GestureDetector(
+                onTap: () {
+                  // Tắt bàn phím khi tap vào màn hình
+                  FocusScope.of(context).unfocus();
+                },
+                child: Scaffold(
+                  resizeToAvoidBottomInset: false,
+                  body: Column(
+                children: [
+                  SizedBox(height: 30.h,),
+                  Header(),
+                  Container(
+                    margin: EdgeInsets.only(top: 10.h),
+                    height: 1.h,
+                    width: SizeUtil.getMaxWidth(),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20.h),
+                        if (store.searchCtrl.searchText.isNotEmpty)
+                          _buildData()
+                        else
+                          Expanded(child: _buildBodyFriend()),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ],
-      ),
-      body: Observer(builder: (_) => _buildBodyFriend()),
+    )));
+  }
+
+  Widget _buildData() {
+    return Expanded(
+        child: Observer(builder: (context){
+          if(store.friendListSearch.isNotEmpty) {
+            return ListItemFriendSearch(
+              friendList:store.friendListSearch,
+              icon: ImagesPath.icMessenger,
+              numberFriend: "${store.friendListSearch.length} friends",
+              store: store,
+            );
+          } else {
+            return Center(child: Text("No friends found"));
+          }
+        })
     );
   }
 
   /// Body
   Widget _buildBodyFriend() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildCategoryFriends(),
-          Padding(
-            padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-            child: SizedBox(
-              height: 20.h,
-              child: Text(
-                "1000 friends",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
+    return Observer(
+      builder:
+          (_) => Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildCategoryFriends(),
+              SizedBox(height: 10.h),
+              Expanded(child: ListItemFriend(store: store)),
+            ],
           ),
-          Expanded(
-            child: ItemFriend(store: store,),
-          ),
-        ],
-      ),
     );
   }
 
   /// Category Friends Page
   Widget _buildCategoryFriends() {
-    return Padding(
-          padding: EdgeInsets.only(top: 10.h),
-          child: Container(
-            constraints: BoxConstraints(maxHeight: 35.h),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildCategoryButton(ALL_FRIENDS),
-                  _buildCategoryButton(SUGGESTIONS_FRIENDS),
-                  _buildCategoryButton(FRIEND_REQUESTS),
-                  _buildCategoryButton(FOLLOWING),
-                ],
+    return Observer(
+      builder:
+          (_) => Padding(
+            padding: EdgeInsets.only(top: 10.h),
+            child: Container(
+              constraints: BoxConstraints(maxHeight: 35.h),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildCategoryButton(ALL_FRIENDS),
+                    _buildCategoryButton(SUGGESTIONS_FRIENDS),
+                    _buildCategoryButton(FRIEND_REQUESTS),
+                    _buildCategoryButton(FOLLOWING),
+                  ],
+                ),
               ),
             ),
           ),
-        );
+    );
   }
 
   /// Category button
@@ -126,6 +187,7 @@ class _FriendsPageState extends State<FriendsPage> {
           child: TextButton(
             onPressed: () {
               store.setSelectedCategory(buttonText);
+              store.getDataFriend(buttonText);
             },
             child: Text(
               buttonText,
@@ -139,5 +201,3 @@ class _FriendsPageState extends State<FriendsPage> {
     );
   }
 }
-
-
