@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_model.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_request_model.dart';
+import 'package:handoff_vdb_2025/data/model/friend/friend_sent_model.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/domain/end_points/end_point.dart';
 import '../../core/helper/validate.dart';
@@ -10,16 +12,14 @@ import '../exception/api_error_handler.dart';
 import '../model/base/api_response.dart';
 
 class FriendRepository {
-  late DioClient _dio;
-  late SharedPreferenceHelper _sharedPreferenceHelper;
+  final DioClient _dio = AppInit.instance.dioClient;
+  final SharedPreferenceHelper _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
 
   FriendRepository() {
     _init();
   }
 
   Future<void> _init() async {
-    _dio = DioClient();
-    _sharedPreferenceHelper = SharedPreferenceHelper.instance;
   }
 
   ///
@@ -31,7 +31,9 @@ class FriendRepository {
   }) async {
     
     // Check if user is logged in
-    final accessToken = _sharedPreferenceHelper?.getAccessToken;
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    print("accessToken o get All friend ${accessToken}");
+    
     if (accessToken == null || accessToken.isEmpty) {
       onError("User not logged in");
       return;
@@ -39,7 +41,15 @@ class FriendRepository {
 
     Response<dynamic> response;
     try{
-      response = await _dio.get(EndPoint.ALL_FRIENDS);
+      response = await _dio.get(
+        EndPoint.ALL_FRIENDS_REQUESTS,
+        queryParameters: {'type': 'all'},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
     }catch (e) {
       print("Error details: $e");
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
@@ -48,12 +58,13 @@ class FriendRepository {
     if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
       final results = response.data as Map<String, dynamic>;
 
-      final friends = results['metadata'] as List<dynamic>;
+      final metadata = results['metadata'] as Map<String, dynamic>;
+      final data = metadata['data'] as List<dynamic>;
 
-      final List<UserModel> friendList = friends
-          .map((friend) => UserModel.fromMap(friend as Map<String, dynamic>))
+      final List<UserModel> allFriendList = data
+          .map((item) => UserModel.fromMap(item as Map<String, dynamic>))
           .toList();
-      onSuccess(friendList);
+      onSuccess(allFriendList);
     }
   }
 
@@ -74,7 +85,15 @@ class FriendRepository {
 
     Response<dynamic> response;
     try{
-      response = await _dio.get(EndPoint.ALL_FRIENDS_REQUESTS);
+      response = await _dio.get(
+        EndPoint.ALL_FRIENDS_REQUESTS,
+        queryParameters: {'type': 'pending'},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
     }catch (e) {
       print("Error details: $e");
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
@@ -92,7 +111,7 @@ class FriendRepository {
   }
 
   ///
-  /// Get all friends
+  /// Get all friends suggestion
   ///
   Future<void> getAllFriendSuggestions ({
     required Function(List<UserModel> data) onSuccess,
@@ -108,7 +127,18 @@ class FriendRepository {
 
     Response<dynamic> response;
     try{
-      response = await _dio.get(EndPoint.ALL_FRIENDS_SUGGESTIONS);
+      response = await _dio.get(
+        EndPoint.ALL_FRIENDS_SUGGESTIONS,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+        queryParameters: {
+          'limit': 12,
+          'page': 1,
+        },
+      );
     }catch (e) {
       print("Error details: $e");
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
@@ -118,15 +148,94 @@ class FriendRepository {
       final results = response.data as Map<String, dynamic>;
 
       final metadata = results['metadata'] as Map<String, dynamic>;
+      final data = metadata['data'] as List<dynamic>;
 
-      final users = metadata['users'] as List<dynamic>;
-
-      final List<UserModel> user = users
-          .map((friend) => UserModel.fromMap(friend as Map<String, dynamic>))
+      final List<UserModel> allSuggestionFriendList = data
+          .map((item) => UserModel.fromMap(item as Map<String, dynamic>))
           .toList();
-      onSuccess(user);
+      onSuccess(allSuggestionFriendList);
     }
   }
+
+  ///
+  /// Get all friends requests
+  ///
+  Future<void> getAllFriendSent ({
+    required Function(List<FriendSentModel> data) onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    Response<dynamic> response;
+    try{
+      response = await _dio.get(
+        EndPoint.ALL_FRIENDS_REQUESTS,
+        queryParameters: {'type': 'sent'},
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+    }catch (e) {
+      print("Error details: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      final results = response.data as Map<String, dynamic>;
+
+      final metadata = results['metadata'] as List<dynamic>;
+
+      final List<FriendSentModel> friendSentList = metadata
+          .map((item) => FriendSentModel.fromMap(item as Map<String, dynamic>)).toList();
+      onSuccess(friendSentList);
+    }
+  }
+
+  // ///
+  // /// Get followers
+  // ///
+  // Future<void> getAllFriendFollowers ({
+  //   required Function(List<FriendRequestModel> data) onSuccess,
+  //   required Function(dynamic error) onError
+  // }) async {
+  //
+  //   // Check if user is logged in
+  //   final accessToken = _sharedPreferenceHelper.getAccessToken;
+  //   if (accessToken == null || accessToken.isEmpty) {
+  //     onError("User not logged in");
+  //     return;
+  //   }
+  //
+  //   Response<dynamic> response;
+  //   try{
+  //     response = await _dio.get(EndPoint.ALL_FRIENDS_FOLLOWERS);
+  //   }catch (e) {
+  //     print("Error details: $e");
+  //     onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+  //     return;
+  //   }
+  //   if (!Validate.nullOrEmpty(response.statusCode) &&
+  //       response.statusCode! >= 200 &&
+  //       response.statusCode! <= 300) {
+  //     final results = response.data as Map<String, dynamic>;
+  //     final metadata = results['metadata'] as Map<String, dynamic>;
+  //     final followers = metadata['followers'] as List<dynamic>;
+  //
+  //     final List<FriendRequestModel> friendRequestList = followers
+  //         .map((item) => FriendRequestModel.fromMap(item as Map<String, dynamic>))
+  //         .toList();
+  //
+  //     onSuccess(friendRequestList);
+  //   }
+  // }
 
   ///
   /// Accept friend
@@ -146,7 +255,18 @@ class FriendRepository {
 
     Response<dynamic> response;
     try{
-      response = await _dio.post("${EndPoint.FRIENDS_REQUESTS}/$userId/action/accept");
+      response = await _dio.post(
+        EndPoint.FRIENDS_REQUESTS,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+        data: {
+          'userId' : userId,
+          'type' : "accept"
+        }
+      );
     }catch (e) {
       print("Error details: $e");
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
@@ -165,7 +285,7 @@ class FriendRepository {
   /// Reject friend
   ///
   Future<void> rejectFriendRequest ({
-    required String userId,
+    required String friendId,
     required Function(FriendModel data) onSuccess,
     required Function(dynamic error) onError
   }) async {
@@ -179,7 +299,18 @@ class FriendRepository {
 
     Response<dynamic> response;
     try{
-      response = await _dio.post("${EndPoint.FRIENDS_REQUESTS}/$userId/action/reject");
+      response = await _dio.post(
+        EndPoint.FRIENDS_REQUESTS,
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $accessToken',
+            },
+          ),
+          data: {
+            'userId' : friendId,
+            'type' : "reject"
+          }
+      );
     }catch (e) {
       print("Error details: $e");
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
@@ -199,7 +330,7 @@ class FriendRepository {
   ///
   Future<void> unFriend ({
     required String friendId,
-    required Function(FriendModel data) onSuccess,
+    required Function() onSuccess,
     required Function(dynamic error) onError
   }) async {
 
@@ -212,18 +343,105 @@ class FriendRepository {
 
     Response<dynamic> response;
     try{
-      response = await _dio.post("${EndPoint.FRIENDS_REQUESTS}/$friendId/action/unfriend");
+      response = await _dio.post(
+          EndPoint.FRIENDS_REQUESTS,
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $accessToken',
+            },
+          ),
+          data: {
+            'userId' : friendId,
+            'type' : "unfriend"
+          }
+      );
     }catch (e) {
       print("Error details: $e");
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
       return;
     }
     if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
-      final results = response.data as Map<String, dynamic>;
-      final metadata = results['metadata'] as Map<String, dynamic>;
+      onSuccess();
+    }
+  }
 
-      final FriendModel friend = FriendModel.fromMap(metadata);
-      onSuccess(friend);
+  ///
+  /// Sent friend request
+  ///
+  Future<void> sentFriendRequest ({
+    required String friendId,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    Response<dynamic> response;
+    try{
+      response = await _dio.post(
+          EndPoint.FRIENDS_REQUESTS,
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $accessToken',
+            },
+          ),
+          data: {
+            'userId' : friendId,
+            'type' : "send"
+          }
+      );
+    }catch (e) {
+      print("Error details: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      onSuccess();
+    }
+  }
+
+  ///
+  /// Cancel friend request
+  ///
+  Future<void> cancelFriendRequest ({
+    required String friendId,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    Response<dynamic> response;
+    try{
+      response = await _dio.post(
+          EndPoint.FRIENDS_REQUESTS,
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $accessToken',
+            },
+          ),
+          data: {
+            'userId' : friendId,
+            'type' : "deleted"
+          }
+      );
+    }catch (e) {
+      print("Error details: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      onSuccess();
     }
   }
 }

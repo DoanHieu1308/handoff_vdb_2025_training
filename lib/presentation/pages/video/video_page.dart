@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
+import 'package:handoff_vdb_2025/core/base_widget/video/set_up_video_player.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
@@ -44,15 +45,23 @@ class _VideoPageState extends State<VideoPage> {
             itemBuilder: (context, index) {
               double scale =
                   (index - store.currentPage).abs() < 1
-                      ? 1 - (index - store.currentPage).abs() * 0.05
-                      : 0.95;
+                      ? 1 - (index - store.currentPage).abs() * 0.03
+                      : 0.97;
               return Transform.scale(
                 scale: scale,
                 child: Container(
                   height: SizeUtil.getMaxHeight(),
-                  color: Colors.black,
+                  color: Colors.black.withOpacity(1),
                   child: Stack(
                     children: [
+                      SetUpVideoPlayer(
+                        height: SizeUtil.getMaxHeight(),
+                        videoUrl: ImagesPath.Video2,
+                        isAsset: true,
+                        autoPlay: true,
+                        looping: true,
+                        fit: BoxFit.cover,
+                      ),
                       Padding(
                         padding: EdgeInsets.only(
                           top: SizeUtil.getMaxHeight() - 430.h,

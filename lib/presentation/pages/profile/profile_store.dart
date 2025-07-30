@@ -3,18 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
-import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:mobx/mobx.dart';
+
+import '../../../core/shared_pref/shared_preference_helper.dart';
+import '../../../data/model/response/user_model.dart';
 part 'profile_store.g.dart';
 
 class ProfileStore = _ProfileStore with _$ProfileStore;
 
 abstract class _ProfileStore with Store {
   /// Repository
-  AuthRepository _authRepository =  AppInit.instance.authRepository;
+  final _userRepository = AppInit.instance.userRepository;
+  final _authRepository =  AppInit.instance.authRepository;
 
   /// Store
-  late FriendsStore friendsStore;
+  final friendsStore = AppInit.instance.friendsStore;
+
+  /// SharePreference
+  final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
 
   /// Value
   @observable
@@ -26,6 +32,10 @@ abstract class _ProfileStore with Store {
   @observable
   bool isLoading = false;
 
+  /// Accept
+  @observable
+  UserModel userProfile = UserModel();
+
   /// Text error
   @observable
   String? errorMessage;
@@ -34,8 +44,13 @@ abstract class _ProfileStore with Store {
   /// Init
   ///
   _ProfileStore() {
-    friendsStore = AppInit.instance.friendsStore;
-    friendsStore.getAllFriends();
+    _init();
+  }
+
+  ///
+  /// Init
+  ///
+  Future<void> _init() async {
   }
 
   ///
@@ -65,6 +80,12 @@ abstract class _ProfileStore with Store {
     await _authRepository.logout(
         onSuccess: () async {
           isLoading = false;
+
+          await _sharedPreferenceHelper.clearAuthData();
+          print("accesstoken: ${_sharedPreferenceHelper.getAccessToken}");
+
+          await AppInit.instance.dioClient.cookieJar.deleteAll();
+          friendsStore.friendListSuggestionStatus.clear();
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -103,5 +124,22 @@ abstract class _ProfileStore with Store {
     Navigator.of(
       context,
     ).pushNamed(AuthRouters.FRIENDS);
+  }
+
+  ///
+  /// Get All Friends
+  ///
+  Future<void> getUserProfile() async {
+    String userId = _sharedPreferenceHelper.getIdUser.toString();
+    await _userRepository.getUserProfile(
+        userId: userId,
+        onSuccess: (data) {
+          userProfile = data;
+          print(userProfile.name);
+        },
+        onError: (error){
+          print("loi o all friend $error");
+        }
+    );
   }
 }

@@ -6,19 +6,21 @@ class FriendRequestModel {
   String? id;
   UserModel? fromUser;
   String? toUser;
-  String? status;
+  String? type;
   DateTime? acceptedAt;
   DateTime? createdAt;
   DateTime? updatedAt;
+  String? isFollowing;
 
   FriendRequestModel({
     this.id,
     this.fromUser,
     this.toUser,
-    this.status,
+    this.type,
     this.acceptedAt,
     this.createdAt,
     this.updatedAt,
+    this.isFollowing,
   });
 
   FriendRequestModel copyWith({
@@ -29,15 +31,17 @@ class FriendRequestModel {
     DateTime? acceptedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? isFollowing,
   }) {
     return FriendRequestModel(
       id: id ?? this.id,
       fromUser: fromUser ?? this.fromUser,
       toUser: toUser ?? this.toUser,
-      status: status ?? this.status,
+      type: status ?? this.type,
       acceptedAt: acceptedAt ?? this.acceptedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      isFollowing: isFollowing ?? this.isFollowing,
     );
   }
 
@@ -46,10 +50,11 @@ class FriendRequestModel {
       if (!Validate.nullOrEmpty(id)) '_id': id,
       if (fromUser != null) 'fromUser': fromUser!.toMap(),
       if (!Validate.nullOrEmpty(toUser)) 'toUser': toUser,
-      if (!Validate.nullOrEmpty(status)) 'status': status,
+      if (!Validate.nullOrEmpty(type)) 'type': type,
       if (acceptedAt != null) 'acceptedAt': acceptedAt!.toIso8601String(),
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
       if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
+      if (!Validate.nullOrEmpty(isFollowing)) 'isFollowing': isFollowing,
     };
   }
 
@@ -60,7 +65,7 @@ class FriendRequestModel {
           ? UserModel.fromMap(map['fromUser'] as Map<String, dynamic>)
           : null,
       toUser: map['toUser'] as String?,
-      status: map['status'] as String?,
+      type: map['type'] as String?,
       acceptedAt: map['acceptedAt'] != null
           ? DateTime.tryParse(map['acceptedAt'] as String)
           : null,
@@ -70,6 +75,7 @@ class FriendRequestModel {
       updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'] as String)
           : null,
+      isFollowing: map['isFollowing'] as String?,
     );
   }
 
@@ -80,7 +86,7 @@ class FriendRequestModel {
 
   @override
   String toString() {
-    return 'FriendRequestModel(id: $id, fromUser: $fromUser, toUser: $toUser, status: $status, acceptedAt: $acceptedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'FriendRequestModel(id: $id, fromUser: $fromUser, toUser: $toUser, type: $type, acceptedAt: $acceptedAt, createdAt: $createdAt, updatedAt: $updatedAt, isFollowing: $isFollowing)';
   }
 
   @override
@@ -90,10 +96,11 @@ class FriendRequestModel {
     return other.id == id &&
         other.fromUser == fromUser &&
         other.toUser == toUser &&
-        other.status == status &&
+        other.type == type &&
         other.acceptedAt == acceptedAt &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.isFollowing == isFollowing;
   }
 
   @override
@@ -101,9 +108,10 @@ class FriendRequestModel {
     return id.hashCode ^
     fromUser.hashCode ^
     toUser.hashCode ^
-    status.hashCode ^
+    type.hashCode ^
     acceptedAt.hashCode ^
     createdAt.hashCode ^
-    updatedAt.hashCode;
+    updatedAt.hashCode ^
+    isFollowing.hashCode;
   }
 }

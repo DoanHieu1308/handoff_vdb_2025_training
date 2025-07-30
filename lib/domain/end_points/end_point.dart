@@ -6,7 +6,7 @@ class EndPoint {
   EndPoint._internal();
 
   static const String BASE_URL = "http://192.168.100.64:5000/v1/api";
-  // static const String BASE_URL = "http://192.168.1.8:5000/v1/api";
+  // static const String BASE_URL = "http://192.168.1.4:5000/v1/api";
 
   ///AUTH
   // Đăng kí email.
@@ -20,15 +20,18 @@ class EndPoint {
 
   ///Friend
   // get all friends
-  static const String ALL_FRIENDS = "/friends/list/all";
-  // get all friend requests
-  static const String ALL_FRIENDS_REQUESTS = "/friends/list/pending";
+  static const String ALL_FRIENDS_REQUESTS = "/friends";
+  // get all friends suggestion
+  static const String ALL_FRIENDS_SUGGESTIONS = "/user";
   // get all friends
-  static const String ALL_FRIENDS_SUGGESTIONS = "/users";
+  static const String ALL_FRIENDS_FOLLOWERS = "/follow/followers";
   // accept friend requests
-  static const String FRIENDS_REQUESTS = "/friends/requests";
+  static const String FRIENDS_REQUESTS = "/friends/update-status";
 
 
-  /// Profile
-  static const String USER_PROFILE = "/users/profile";
+  /// Profile user
+  static const String USER_PROFILE = "/user";
+  static const String UPLOAD = "/upload";
+  /// Follow
+  static const String FOLLOW_REQUESTS = "/follow";
 }

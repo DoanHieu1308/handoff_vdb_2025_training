@@ -10,20 +10,14 @@ import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/item_detail/item_detail_store.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import '../../../data/model/friend/friend_request_model.dart';
-
 class ItemDetailPage extends StatefulWidget {
   final String categoryName;
-  final String? friendName;
-  final FriendRequestModel? friendRequest;
-  final UserModel? friendInList;
+  final UserModel friend;
 
   const ItemDetailPage({
     super.key,
     required this.categoryName,
-    required this.friendName,
-    this.friendRequest,
-    required this.friendInList
+    required this.friend
   });
 
   @override
@@ -36,8 +30,6 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Tạo FriendsStore và ItemDetailStore riêng cho màn hình này
-    // TODO
     store = AppInit.instance.itemDetailStore;
     store.filteredItems = store.getFilteredItems(widget.categoryName);
     print("ccccc ${store.filteredItems.length}");
@@ -92,9 +84,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
                         context: context,
                         name: item['name'],
                         icon: item['image'],
-                        friendName: widget.friendName ?? "",
-                        friendRequest: widget.friendRequest,
-                        friendInList: widget.friendInList
+                        friend: widget.friend
                     );
                   },
                 ),
@@ -110,9 +100,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     required int index,
     required String name,
     required String icon,
-    required String friendName,
-    FriendRequestModel? friendRequest,
-    UserModel? friendInList,
+    required UserModel friend,
     required BuildContext context,
   }) {
     return Observer(builder: (_) => AutoScrollTag(
@@ -124,8 +112,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           showDialog(context: context,
               builder: (_) => DiaLogNotification(
                 nameItemDetail: name,
-                friendRequest: friendRequest,
-                friendInList: friendInList,
+                friend: friend,
                 store: store,
               ));
         },
@@ -163,14 +150,12 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
 class DiaLogNotification extends StatelessWidget {
   final ItemDetailStore store;
   final String nameItemDetail;
-  final FriendRequestModel? friendRequest;
-  final UserModel? friendInList;
+  final UserModel? friend;
   const DiaLogNotification({
     super.key,
     required this.nameItemDetail,
     required this.store,
-    this.friendRequest,
-    this.friendInList
+    this.friend
   });
 
   @override
@@ -188,7 +173,7 @@ class DiaLogNotification extends StatelessWidget {
             Text('Confirm $nameItemDetail', style: AppText.text14_Inter),
             SizedBox(height: 20.h),
             Text(
-              'You are about to $nameItemDetail ${friendInList?.name ?? "this user"}. Are you sure you want to proceed?',
+              'You are about to $nameItemDetail ${friend?.name ?? "this user"}. Are you sure you want to proceed?',
               style: AppText.text12,
             ),
             SizedBox(height: 20.h),
@@ -225,18 +210,16 @@ class DiaLogNotification extends StatelessWidget {
                           if(nameItemDetail == DENIED){
                             store.actionItemDenied(
                                 nameItemDetail: nameItemDetail,
-                                requestId: friendRequest?.id ?? "",
-                                friendPending: friendInList,
+                                friendPending: friend,
                                 context: context
                             );
                             Navigator.pop(context);
                             Navigator.pop(context);
                           }else if(nameItemDetail == UNFRIEND) {
-                            if (friendInList != null) {
+                            if (friend != null) {
                               store.actionItemUnfriend(
                                   nameItemDetail: nameItemDetail,
-                                  friendId: friendInList!.id,
-                                  friendInList: friendInList,
+                                  friendUnFriend: friend,
                                   context: context
                               );
                               Navigator.pop(context);

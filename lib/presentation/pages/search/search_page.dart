@@ -39,7 +39,7 @@ class _SearchPageState extends State<SearchPage> {
                   child: Observer(builder: (context) => TextFormField(
                     controller: store.textEditingController,
                     decoration: InputDecoration(
-                      hintText: "Tim kiem ban be",
+                      hintText: "Tìm kiếm bạn bè",
                       hintStyle: AppText.text14.copyWith(
                         color: ColorResources.COLOR_D2D6DE,
                         fontFamily: 'Inter-Regular',

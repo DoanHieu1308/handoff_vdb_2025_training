@@ -29,10 +29,12 @@ class DashBoardPage extends StatelessWidget {
               return CustomDialog(
                 title: "Ban co muon thoat?",
                 message: "------------------",
-                onCancel: (){
+                textNumber1: "No",
+                textNumber2: "Yes",
+                onTapNumber1: (){
                   Navigator.pop(context);
                 },
-                onConfirm: (){
+                onTapNumber2: (){
                   exit(0);
                 },
               );
@@ -61,9 +63,7 @@ class DashBoardPage extends StatelessWidget {
                   HomePage(),
                   VideoPage(),
                   FriendsPage(),
-                  ProfilePage(
-                    userProfile: store.userProfile,
-                  ),
+                  ProfilePage(),
                 ],
               )
           
@@ -101,7 +101,7 @@ class DashBoardPage extends StatelessWidget {
             ),
             BottomBarWidget(
               onTap: () {
-                store.getUserProfile();
+                store.profileStore.getUserProfile();
                 store.onChangedDashboardPage(index: 3);
               },
               imagePath: ImagesPath.icPerson,

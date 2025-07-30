@@ -27,42 +27,6 @@ mixin _$DashBoardStore on _DashBoardStore, Store {
     });
   }
 
-  late final _$isLoadingAtom = Atom(
-    name: '_DashBoardStore.isLoading',
-    context: context,
-  );
-
-  @override
-  bool get isLoading {
-    _$isLoadingAtom.reportRead();
-    return super.isLoading;
-  }
-
-  @override
-  set isLoading(bool value) {
-    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
-      super.isLoading = value;
-    });
-  }
-
-  late final _$userProfileAtom = Atom(
-    name: '_DashBoardStore.userProfile',
-    context: context,
-  );
-
-  @override
-  UserModel get userProfile {
-    _$userProfileAtom.reportRead();
-    return super.userProfile;
-  }
-
-  @override
-  set userProfile(UserModel value) {
-    _$userProfileAtom.reportWrite(value, super.userProfile, () {
-      super.userProfile = value;
-    });
-  }
-
   late final _$_DashBoardStoreActionController = ActionController(
     name: '_DashBoardStore',
     context: context,
@@ -83,9 +47,7 @@ mixin _$DashBoardStore on _DashBoardStore, Store {
   @override
   String toString() {
     return '''
-currentIndex: ${currentIndex},
-isLoading: ${isLoading},
-userProfile: ${userProfile}
+currentIndex: ${currentIndex}
     ''';
   }
 }

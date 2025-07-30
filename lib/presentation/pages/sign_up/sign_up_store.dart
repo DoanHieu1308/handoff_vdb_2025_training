@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
-import 'package:handoff_vdb_2025/data/model/auth/auth_model.dart';
+import 'package:handoff_vdb_2025/data/data_source/dio/dio_client.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
 import 'package:mobx/mobx.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../core/init/app_init.dart';
+import '../../../data/model/auth/auth_model.dart';
 part 'sign_up_store.g.dart';
 
 class SignUpStore = _SignUpStore with _$SignUpStore;
@@ -21,7 +23,7 @@ abstract class _SignUpStore with Store {
   final focusNodeConfirmPassword = FocusNode();
 
   /// SharePreference
-  late final _sharedPreferenceHelper;
+  final _sharedPreferenceHelper = SharedPreferenceHelper.instance;
 
   /// Repository
   late final _repository;
@@ -53,10 +55,9 @@ abstract class _SignUpStore with Store {
   /// Init dio
   ///
   Future<void> _init() async {
-    // Get dependencies directly
-    _sharedPreferenceHelper = SharedPreferenceHelper.instance;
     _repository = AuthRepository();
   }
+
 
   @action
   bool validate() {
@@ -146,12 +147,7 @@ abstract class _SignUpStore with Store {
         data: user,
         onSuccess: (auth) async {
           isLoading = false;
-
-          // Luu thong tin
-          _sharedPreferenceHelper?.setAccessToken(auth.accessToken ?? "");
-          _sharedPreferenceHelper?.setRefreshToken(auth.refreshToken ?? "");
-          _sharedPreferenceHelper?.setEmail(user.email ?? "");
-          _sharedPreferenceHelper?.setPassword(user.password ?? "");
+          _saveLocalData(auth,user);
 
           onSuccess(auth);
         },
@@ -163,12 +159,32 @@ abstract class _SignUpStore with Store {
     );
   }
 
+  Future<void> _saveLocalData(AuthModel auth, UserModel user) async {
+    final instance = _sharedPreferenceHelper;
+
+    final List<Future<void>?> futures = [
+      instance.setAccessToken(auth.accessToken!),
+      instance.setRefreshToken(auth.refreshToken!),
+      instance.setIdUser(auth.user!.id!),
+      instance.setEmail(user.email ?? ""),
+      instance.setPassword(user.password ?? ""),
+    ];
+
+    await Future.wait(futures.whereType<Future<void>>());
+    checkSavedData();
+  }
+
   @action
   void checkSavedData() {
-    final accessToken = _sharedPreferenceHelper?.getAccessToken;
-    final refreshToken = _sharedPreferenceHelper?.getRefreshToken;
-    final email = _sharedPreferenceHelper?.getEmail;
-    final password = _sharedPreferenceHelper?.getPassword;
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    final refreshToken = _sharedPreferenceHelper.getRefreshToken;
+    final email = _sharedPreferenceHelper.getEmail;
+    final password = _sharedPreferenceHelper.getPassword;
+    print("--------Luu token o sign up--------");
+    print("accessToken: $accessToken");
+    print("refreshToken: $refreshToken");
+    print("email: $email");
+    print("password: $password");
   }
 
 }

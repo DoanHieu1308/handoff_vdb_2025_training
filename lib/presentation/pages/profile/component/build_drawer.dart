@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 
 import '../../../../core/base_widget/images/set_up_asset_image.dart';
@@ -7,7 +8,7 @@ import '../../../../core/helper/app_text.dart';
 import '../../../../core/helper/size_util.dart';
 import '../../../../core/utils/images_path.dart';
 
-Widget buildDrawer(BuildContext context, ProfileStore store) {
+Widget buildDrawer(BuildContext context, ProfileStore store, UserModel userProfile) {
   return Align(
     alignment: Alignment.centerLeft,
     child: Material(
@@ -53,7 +54,7 @@ Widget buildDrawer(BuildContext context, ProfileStore store) {
                             child: SetUpAssetImage(ImagesPath.icPerson),
                           ),
                           SizedBox(width: 10.w),
-                          Text("Đoàn Hiếu", style: AppText.text16_bold),
+                          Text(userProfile.name ?? "Ten", style: AppText.text16_bold),
                           Spacer(),
                           Stack(
                             children: [

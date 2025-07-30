@@ -40,14 +40,12 @@ mixin _$ItemDetailStore on _ItemDetailStore, Store {
   Future<void> actionItemDenied({
     required String nameItemDetail,
     required UserModel? friendPending,
-    required String? requestId,
     required BuildContext context,
   }) {
     return _$actionItemDeniedAsyncAction.run(
       () => super.actionItemDenied(
         nameItemDetail: nameItemDetail,
         friendPending: friendPending,
-        requestId: requestId,
         context: context,
       ),
     );
@@ -61,15 +59,13 @@ mixin _$ItemDetailStore on _ItemDetailStore, Store {
   @override
   Future<void> actionItemUnfriend({
     required String nameItemDetail,
-    required String? friendId,
-    required UserModel? friendInList,
+    required UserModel? friendUnFriend,
     required BuildContext context,
   }) {
     return _$actionItemUnfriendAsyncAction.run(
       () => super.actionItemUnfriend(
         nameItemDetail: nameItemDetail,
-        friendId: friendId,
-        friendInList: friendInList,
+        friendUnFriend: friendUnFriend,
         context: context,
       ),
     );

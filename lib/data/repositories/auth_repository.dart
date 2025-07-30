@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:handoff_vdb_2025/core/helper/validate.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/data/exception/api_error_handler.dart';
 import 'package:handoff_vdb_2025/data/model/auth/auth_model.dart';
 import 'package:handoff_vdb_2025/data/model/base/api_response.dart';
@@ -11,7 +12,7 @@ class AuthRepository {
   late final DioClient _dio;
 
   AuthRepository() {
-    _dio = DioClient();
+    _dio = AppInit.instance.dioClient;
   }
 
   ///
@@ -46,7 +47,7 @@ class AuthRepository {
        final results = response.data as Map<String, dynamic>;
 
        final metadatas = results['metadata'] as Map<String, dynamic>;
-       final shopData = metadatas['shop'] as Map<String, dynamic>;
+       final shopData = metadatas['user'] as Map<String, dynamic>;
        final tokens = metadatas['tokens']  != null ? metadatas['tokens'] as Map<String, dynamic> : null;
 
        final user = UserModel.fromMap(shopData);
@@ -71,14 +72,19 @@ class AuthRepository {
     try{
       response = await _dio.post(EndPoint.LOGIN, data: dataLogin);
     } catch (e) {
-      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      if (e is DioError && e.response != null) {
+        final msg = e.response?.data?['message'] ?? 'Unknown error';
+        onError(msg);
+      } else {
+        onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      }
       return;
     }
     if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
       final results = response.data as dynamic;
 
       final metadatas = results['metadata'] as Map<String, dynamic>;
-      final shopData = metadatas['shop'] as Map<String, dynamic>;
+      final shopData = metadatas['user'] as Map<String, dynamic>;
       final tokens = metadatas['tokens']  != null ? metadatas['tokens'] as Map<String, dynamic> : null;
 
       final user = UserModel.fromMap(shopData);
@@ -88,6 +94,9 @@ class AuthRepository {
       authModel.refreshToken = tokens?['refreshToken'].toString();
       authModel.accessToken = tokens?['accessToken'].toString();
       onSuccess(authModel);
+    }else {
+      final message = response.data?['message'] ?? 'Unknown error';
+      onError(message);
     }
   }
 

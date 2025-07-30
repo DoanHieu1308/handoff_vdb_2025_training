@@ -5,12 +5,13 @@ import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_model.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_request_model.dart';
+import 'package:handoff_vdb_2025/data/model/friend/friend_sent_model.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
+import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/search/search_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import '../../../core/shared_pref/shared_preference_helper.dart';
 import '../../widget/build_snackbar.dart';
 
 part 'friends_store.g.dart';
@@ -29,12 +30,14 @@ abstract class _FriendsStore with Store {
 
   /// Store
   final SearchStore searchCtrl = AppInit.instance.searchStore;
+  // Lazy initialization to break circular dependency
+  InfoFriendStore get infoFriendStore => AppInit.instance.infoFriendStore;
 
   /// Repository
   late final FriendRepository _friendRepository;
 
   /// SharePreference
-  late final _sharedPreferenceHelper;
+  final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
 
   /// Select Category
   @observable
@@ -46,21 +49,22 @@ abstract class _FriendsStore with Store {
 
   /// ALl
   @observable
-  List<UserModel> friendList = [];
+  ObservableList<UserModel> friendList = ObservableList.of([]);
 
   /// Pending
   @observable
-  List<FriendRequestModel> listRequests = [];
-  @observable
-  List<UserModel> friendListPending = [];
+  ObservableList<FriendRequestModel> friendListPending = ObservableList.of([]);
 
   /// Suggestion
   @observable
-  List<UserModel> friendListSuggestion = [];
-
-  /// Follow
+  ObservableList<UserModel> friendListSuggestion = ObservableList.of([]);
   @observable
-  List<UserModel> friendListFollower = [];
+  ObservableList<Map<String, dynamic>> friendListSuggestionStatus = ObservableList.of([]);
+
+  /// Sent
+  @observable
+  ObservableList<FriendSentModel> friendListSent = ObservableList.of([]);
+
 
   /// Search
   @observable
@@ -69,14 +73,12 @@ abstract class _FriendsStore with Store {
   /// Accept
   @observable
   FriendModel acceptFriend = FriendModel();
-  @observable
-  ObservableMap<String, bool> acceptedFriends = ObservableMap<String, bool>();
 
   /// Reject
   @observable
   FriendModel rejectFriend = FriendModel();
 
-  ///
+  ///-------------------------------------------------------------
   /// Init
   ///
   _FriendsStore() {
@@ -85,33 +87,9 @@ abstract class _FriendsStore with Store {
   Future<void> _init() async {
     // Get dependencies directly
     _friendRepository = FriendRepository();
-    _sharedPreferenceHelper = SharedPreferenceHelper.instance;
   }
 
-  ///
-  /// on Refresh
-  ///
-  void onRefresh() async{
-    try{
-      await Future.delayed(Duration(milliseconds: 1000));
-      await getAllFriendsRequests();
-      print("acceptedFriends ${acceptedFriends.length}");
-      refreshController.refreshCompleted();
-    }catch (e) {
-      refreshController.refreshFailed();
-    }
-
-  }
-
-  ///
-  /// on Loading
-  ///
-  void onLoading() async{
-    await Future.delayed(Duration(milliseconds: 1000));
-    refreshController.loadComplete();
-  }
-
-  ///
+  ///------------------------------------------------------------
   /// Dispose
   ///
   void disposeAll() {
@@ -120,7 +98,7 @@ abstract class _FriendsStore with Store {
     searchCtrl.disposeAll();
   }
 
-  ///
+  ///------------------------------------------------------------
   /// Selected Category
   ///
   @action
@@ -128,7 +106,7 @@ abstract class _FriendsStore with Store {
     selectedCategoryName = name;
   }
 
-  ///
+  ///------------------------------------------------------------
   /// Get data
   ///
   @action
@@ -152,22 +130,26 @@ abstract class _FriendsStore with Store {
         isLoading = false;
       });
     }
-    else if(name == FOLLOWING){
+    else if(name == FRIEND_SEND){
       Future.delayed(const Duration(milliseconds: 700), () async {
+        await getAllFriendsSent();
         isLoading = false;
       });
     }
   }
 
-  ///
+
+
+  ///---------------------------------------------------------------
   /// Get All Friends
   ///
   Future<void> getAllFriends() async {
      isLoading = true;
+     print("get all friend access __${_sharedPreferenceHelper.getAccessToken}");
      // Debug: Check token before making request
          await _friendRepository.getAllFriend(
          onSuccess: (list) {
-           friendList = list;
+           friendList = ObservableList.of(list);
 
            if (friendList.isNotEmpty) {
              print("friend list ${friendList[0].name}");
@@ -183,18 +165,20 @@ abstract class _FriendsStore with Store {
      );
   }
 
-  ///
-  /// Get All Friends
+
+
+  ///----------------------------------------------------------
+  /// Get All Friends Suggestion
   ///
   Future<void> getAllFriendSuggestions() async {
     isLoading = true;
 
     await _friendRepository.getAllFriendSuggestions(
         onSuccess: (list) {
-          friendListSuggestion = list;
+          friendListSuggestion = ObservableList.of(list);
 
           if (friendListSuggestion.isNotEmpty) {
-            print("friend list ${friendListSuggestion[0].name}");
+            print("friend list sugges ${friendListSuggestion[0].name}");
           } else {
             print("No friends found");
           }
@@ -207,7 +191,9 @@ abstract class _FriendsStore with Store {
     );
   }
 
-  ///
+
+
+  ///-------------------------------------------------------
   /// Get All Friends Requests
   ///
   Future<void> getAllFriendsRequests() async {
@@ -215,26 +201,15 @@ abstract class _FriendsStore with Store {
 
     await _friendRepository.getAllFriendRequests(
         onSuccess: (list) {
-          listRequests = list;
+          friendListPending = ObservableList.of(list);
 
-          if (listRequests.isNotEmpty) {
-            print(listRequests[0].fromUser?.name);
+          if (friendListPending.isNotEmpty) {
+            print(friendListPending[0].fromUser?.name);
           } else {
             print("No friend requests found");
           }
-
-          friendListPending = ObservableList.of(
-            listRequests.map((item) => item.fromUser!).toList(),
-          );
-
-          if (friendListPending.isNotEmpty) {
-            print(friendListPending[0].name);
-          } else {
-            print("No pending friends found");
-          }
           print("Updated friendListPending length: ${friendListPending.length}");
 
-          acceptedFriends.clear();
           isLoading = false;
         },
         onError: (error){
@@ -244,132 +219,113 @@ abstract class _FriendsStore with Store {
     );
   }
 
+
+
+  ///-------------------------------------------------------
+  /// Get All Friends Sent
   ///
-  /// List check friend accepted
-  ///
-  @action
-  void markFriendAccepted(String friendId) {
-    acceptedFriends[friendId] = true;
-    print("Marked friend $friendId as accepted");
+  Future<void> getAllFriendsSent() async {
+    isLoading = true;
+
+    await _friendRepository.getAllFriendSent(
+        onSuccess: (list) {
+          friendListSent = ObservableList.of(list);
+
+          if (friendListSent.isNotEmpty) {
+            print(friendListSent[0].toUser?.name);
+          } else {
+            print("No friend requests found");
+          }
+          print("Updated friendListPending length: ${friendListSent.length}");
+
+          isLoading = false;
+        },
+        onError: (error){
+          isLoading = false;
+          print("loi o friend requests $error");
+        }
+    );
   }
 
-  ///
-  /// Kiểm tra xem friend đã được chấp nhận chưa
-  ///
-  bool isFriendAccepted(String friendId) {
-    return acceptedFriends[friendId] == true;
-  }
-
-  ///
-  /// Reset accepted friends status
-  ///
-  @action
-  void resetAcceptedFriends() {
-    acceptedFriends.clear();
-    print("Reset all accepted friends status");
-  }
-
-  ///
-  /// Remove accept friend
-  ///
-  @action
-  void removeAcceptedFriend(String friendId) {
-    acceptedFriends.remove(friendId);
-    print("Removed friend $friendId from accepted list");
-  }
-
-  ///
-  /// Get All Friends Requests
+  ///--------------------------------------------------
+  /// Accept
   ///
   Future<void> acceptFriendRequest({
     required String userId,
     required Function() onSuccess,
     required Function(dynamic error) onError
   }) async {
-    isLoading = true;
 
     await _friendRepository.acceptFriendRequest(
         userId: userId,
         onSuccess: (data) {
           acceptFriend = data;
           print("accept: ${acceptFriend.toUser}");
-
-          isLoading = false;
           onSuccess();
         },
         onError: (error){
-          isLoading = false;
           print("loi o friend requests $error");
           onError(error);
         }
     );
   }
 
-  ///
   /// Handle accept friend request from UI
-  ///
   @action
-  Future<void> handleAcceptFriendRequest(int index) async {
-    if (index < listRequests.length) {
-      final requestId = listRequests[index].id;
-      final friendId = listRequests[index].fromUser?.id;
-      
-      if (requestId != null && friendId != null) {
-        markFriendAccepted(friendId);
-        
-        await acceptFriendRequest(
-          userId: friendId,
-          onSuccess: () async {
+  Future<void> handleAcceptFriendRequest({required String friendId}) async {
+    if (friendId.isNotEmpty) {
+      await acceptFriendRequest(
+        userId: friendId,
+        onSuccess: () async {
+          final index = friendListPending.indexWhere(
+                  (friend) => friend.fromUser?.id == friendId);
+          if (index != -1) {
+            final updatedFriend = friendListPending[index].copyWith(status: "accepted");
+            friendListPending[index] = updatedFriend;
             print("Friend request accepted successfully");
-            await getAllFriends();
-          },
-          onError: (error) {
-            removeAcceptedFriend(friendId);
-            print("Error accepting friend request: $error");
-          },
-        );
-      }
+          } else {
+            print("Friend not found in pending list.");
+          }
+        },
+        onError: (error) {
+          print("Error accepting friend request: $error");
+        },
+      );
     }
   }
 
-
-  ///
+  ///----------------------------------------------------------------
   /// Handle reject friend request from UI
   ///
   // Remove friend request from lists
-  @action
-  void removeFriendRequestFromLists(String requestId) {
-    // Remove from listRequests
-    listRequests.removeWhere((request) => request.id == requestId);
-
-    // Force update friendListPending to trigger UI rebuild
-    friendListPending = ObservableList.of(
-      listRequests.map((item) => item.fromUser!).toList(),
-    );
+  void removeFriendRequestFromLists(String friendId) {
+    friendListPending.removeWhere((request) => request.fromUser?.id == friendId);
   }
-
+  // Handle reject
   @action
   Future<void> handleRejectFriendRequest({
-    required String userId,
-    required String requestId,
+    required String friendId,
     required BuildContext context,
     required String nameItemDetail,
+    required Function() onSuccess,
   }) async {
     isLoading = true;
 
     await _friendRepository.rejectFriendRequest(
-      userId: userId,
+      friendId: friendId,
       onSuccess: (data) async {
         rejectFriend = data;
         print("reject: ${rejectFriend.toUser}");
         isLoading = false;
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          buildSnackBarNotify(textNotify: "Successfully $nameItemDetail"),
-        );
-
-        removeFriendRequestFromLists(requestId);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            buildSnackBarNotify(textNotify: "Successfully $nameItemDetail"),
+          );
+        }
+        removeFriendRequestFromLists(friendId);
         await getAllFriendsRequests();
+        onSuccess();
       },
       onError: (error) {
         isLoading = false;
@@ -382,68 +338,256 @@ abstract class _FriendsStore with Store {
     );
   }
 
-
-  ///
-  ///  Go to info friend
-  ///
-  @action
-  Future<void> goToInfoFriend({
-    required BuildContext context
-  })async {
-      Navigator.of(context).pushNamed(
-          AuthRouters.INFO_FRIENDS,
-      );
-
-  }
-
-  ///
+  ///--------------------------------------------------------
   ///  Unfriend
   ///
-  Future<void> unFriend({
+  @action
+  void removeFriendFromAllLists(String friendId) {
+    friendList.removeWhere((friend) => friend.id == friendId);
+  }
+
+  Future<void> handleUnFriendRequest({
     required String friendId,
-    required Function() onSuccess,
-    required Function(dynamic error) onError
+    required BuildContext context,
+    required String nameItemDetail,
   }) async {
     isLoading = true;
 
     await _friendRepository.unFriend(
         friendId: friendId,
-        onSuccess: (data) {
+        onSuccess: () async {
           isLoading = false;
-          onSuccess();
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              buildSnackBarNotify(textNotify: "Successfully $nameItemDetail"),
+            );
+          }
+          removeFriendFromAllLists(friendId);
+          await getAllFriends();
         },
         onError: (error){
           isLoading = false;
-          print("loi o unfriend $error");
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error)));
+        }
+    );
+  }
+
+
+
+  ///------------------------------------------------------------------------
+  /// Sent
+  ///
+
+  /// Get All Friends Requests
+  Future<void> sentFriendRequest({
+    required String friendId,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+    await _friendRepository.sentFriendRequest(
+        friendId: friendId,
+        onSuccess: () {
+          onSuccess();
+        },
+        onError: (error){
+          print("loi o sent friend requests $error");
           onError(error);
         }
     );
   }
 
+  /// Remove friend from suggestion if fail
+  @action
+  void removeFriendFromSuggestionIfFailed(String friendId) {
+    final index = friendListSuggestionStatus.indexWhere(
+          (friend) => friend['id'] == friendId,
+    );
+
+    if (index != -1) {
+      friendListSuggestionStatus.removeAt(index);
+      print("Removed friend with id $friendId due to failed request.");
+    } else {
+      print("Friend with id $friendId not found.");
+    }
+  }
+
+  String getStatusForFriend(String friendId) {
+    final index = friendListSuggestionStatus.indexWhere(
+          (item) => item['id'] == friendId,
+    );
+    return index != -1 ? friendListSuggestionStatus[index]['type'] ?? 'none' : 'none';
+  }
+
+  /// Set send status in friend suggestion
+  @action
+  void setSendStatus(String friendId){
+    final index = friendListSuggestion.indexWhere(
+          (friend) => friend.id == friendId,
+    );
+
+    if (index != -1) {
+      final statusIndex = friendListSuggestionStatus.indexWhere(
+            (item) => item['id'] == friendId,
+      );
+
+      if (statusIndex != -1) {
+        // Nếu đã có, cập nhật lại status
+        friendListSuggestionStatus[statusIndex] = {
+          ...friendListSuggestionStatus[statusIndex],
+          'type': 'send',
+        };
+      } else {
+        // Nếu chưa có, thêm mới
+        friendListSuggestionStatus.add({
+          'id': friendId,
+          'type': 'send',
+        });
+      }
+      print("Friend request sent successfully");
+    } else {
+      print("Friend not found in suggestion list.");
+    }
+  }
+
+  /// Handle accept friend request from UI
+  @action
+  Future<void> handleSentFriendRequest({
+    required String friendId,
+    required Function() onSuccess,
+  }) async {
+    if (friendId.isNotEmpty) {
+      await sentFriendRequest(
+        friendId: friendId,
+        onSuccess: () async {
+          setSendStatus(friendId);
+          onSuccess();
+        },
+        onError: (error) {
+          removeFriendFromSuggestionIfFailed(friendId);
+          print("Error sending friend request: $error");
+        },
+      );
+    }
+  }
+
+
+  /// -------------------------------------------------------------
+  /// Cancel sent friend request
   ///
+
+  /// Cancel friend request
+  Future<void> cancelFriendRequest({
+    required String friendId,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+    await _friendRepository.cancelFriendRequest(
+        friendId: friendId,
+        onSuccess: () {
+          onSuccess();
+        },
+        onError: (error){
+          print("loi o sent friend requests $error");
+          onError(error);
+        }
+    );
+  }
+
+  @action
+  void setCancelStatus(String friendId){
+    print(friendListSuggestionStatus.toString());
+    final index = friendListSuggestionStatus.indexWhere(
+          (friend) => friend['id'] == friendId,
+    );
+    print("index$index");
+    if (index != -1) {
+      final statusIndex = friendListSuggestionStatus.indexWhere(
+            (item) => item['id'] == friendId,
+      );
+
+      if (statusIndex != -1) {
+        // Nếu đã tồn tại, cập nhật lại status
+        friendListSuggestionStatus[statusIndex] = {
+          ...friendListSuggestionStatus[statusIndex],
+          'type': 'canceled',
+        };
+      } else {
+        // Nếu chưa tồn tại thì thêm mới
+        friendListSuggestionStatus.add({
+          'id': friendId,
+          'type': 'canceled',
+        });
+      }
+
+      print("Friend request canceled successfully");
+    } else {
+      print("Friend not found in pending list.");
+    }
+  }
+
+  /// Handle cancel friend request from UI
+  @action
+  Future<void> handleCancelFriendRequest({
+    required String friendId,
+    required Function() onSuccess,
+  }) async {
+    if (friendId.isNotEmpty) {
+      await cancelFriendRequest(
+        friendId: friendId,
+        onSuccess: () async {
+            setCancelStatus(friendId);
+            onSuccess();
+        },
+        onError: (error) {
+          removeFriendFromSuggestionIfFailed(friendId);
+          print("Error canceling friend request: $error");
+        },
+      );
+    }
+  }
+
+  /// -----------------------------------------------------------
   /// Searching
   ///
   @action
   void getItemSearch() {
     friendListSearch.clear();
     final lowerSearch = searchCtrl.searchText.toLowerCase();
+
     for (final item in friendList) {
-      if (item.name != null && item.name!.toLowerCase().contains(lowerSearch)) {
+      final name = item.name;
+      if (name != null && name.toLowerCase().contains(lowerSearch)) {
         friendListSearch.add(item);
       }
     }
   }
 
-
+  ///--------------------------------------------------------
+  ///  Go to info friend
   ///
+  @action
+  Future<void> goToInfoFriend({
+    required String friendId,
+    required BuildContext context
+  })async {
+    await infoFriendStore.getFriendProfile(friendId: friendId).then((_) {
+      Navigator.of(context).pushNamed(
+        AuthRouters.INFO_FRIENDS,
+      );
+    });
+  }
+
+  /// --------------------------------------------------------------
   /// Kiểm tra trạng thái đăng nhập
   ///
   @action
   Future<void> checkLoginStatus() async {
-    // await ensureInitialized();
-    
-    final accessToken = _sharedPreferenceHelper?.getAccessToken;
-    final refreshToken = _sharedPreferenceHelper?.getRefreshToken;
-    final email = _sharedPreferenceHelper?.getEmail;
+    print("Friend store");
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    final refreshToken = _sharedPreferenceHelper.getRefreshToken;
+    final email = _sharedPreferenceHelper.getEmail;
+    print("accessToken: $accessToken");
   }
+
 }

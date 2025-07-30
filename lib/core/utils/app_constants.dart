@@ -1,7 +1,8 @@
 const String ALL_FRIENDS = 'All';
 const String SUGGESTIONS_FRIENDS = 'Suggestions';
 const String FRIEND_REQUESTS = 'Friend requests';
-const String FOLLOWING = 'Following';
+// const String FOLLOWERS = 'Followers';
+const String FRIEND_SEND = 'Friend send';
 
 const String REMOVE = 'Remove';
 const String DENIED = 'Denied';
@@ -18,6 +19,19 @@ const String ADD_TO_FOLDER = 'Add to folder';
 const String RENAME = 'Rename';
 const String PAIRING = 'Pairing';
 const String UNFRIEND = 'Unfriend';
+const String unFOLLOW = 'unfollow';
+
+
+const String FOLLOWED = 'followed';
+const String LIKED = 'liked';
+const String PENDING = 'pending';
+const String ACCEPTED = 'accepted';
+const String REJECTED = 'rejected';
+const String CANCELED = 'canceled';
+const String unFRIEND = 'unfriend';
+const String STRANGER = 'stranger';
+const String PENDING_SENT = 'pending_sent';
+const String PENDING_RECEIVED = 'pending_received';
 
 
 /// [checkImageWithExtSvg] to check image form svg.

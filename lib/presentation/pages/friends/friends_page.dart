@@ -8,12 +8,12 @@ import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
-import 'package:handoff_vdb_2025/presentation/pages/search/component/list_item_friend_search.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/search/component/list_item_friend_search.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import '../search/search_page.dart';
-import 'component/list_Item_friend.dart';
 import 'component/header.dart';
+import 'component/list_friend_request.dart';
+import 'component/list_user_friend.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({super.key});
@@ -29,12 +29,13 @@ class _FriendsPageState extends State<FriendsPage> {
 
   @override
   void initState() {
-    store = AppInit.instance.friendsStore;
-    store.getAllFriends();
+    super.initState();
 
+    store = AppInit.instance.friendsStore;
     searchRefreshController = RefreshController();
 
     store.searchCtrl.searchText = '';
+
     // Thêm listener cho search text thay đổi
     searchListener = () {
       if (mounted) {
@@ -46,8 +47,6 @@ class _FriendsPageState extends State<FriendsPage> {
       }
     };
     store.searchCtrl.textEditingController.addListener(searchListener);
-    
-    super.initState();
   }
 
   @override
@@ -142,10 +141,28 @@ class _FriendsPageState extends State<FriendsPage> {
             children: [
               _buildCategoryFriends(),
               SizedBox(height: 10.h),
-              Expanded(child: ListItemFriend(store: store)),
+              Expanded(
+                  child: _buildFriendList()
+              ),
             ],
           ),
     );
+  }
+
+  /// Build friend list
+  Widget _buildFriendList() {
+    final category = store.selectedCategoryName;
+
+    if (store.isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (category == ALL_FRIENDS || category == SUGGESTIONS_FRIENDS) {
+      return ListUserFriend(store: store);
+    }
+    else {
+      return ListFriendRequest(store: store);
+    }
   }
 
   /// Category Friends Page
@@ -163,7 +180,7 @@ class _FriendsPageState extends State<FriendsPage> {
                     _buildCategoryButton(ALL_FRIENDS),
                     _buildCategoryButton(SUGGESTIONS_FRIENDS),
                     _buildCategoryButton(FRIEND_REQUESTS),
-                    _buildCategoryButton(FOLLOWING),
+                    _buildCategoryButton(FRIEND_SEND),
                   ],
                 ),
               ),

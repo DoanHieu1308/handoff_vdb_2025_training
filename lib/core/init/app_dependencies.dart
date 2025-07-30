@@ -14,6 +14,9 @@ import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_store.dart';
 class AppDependencies {
   static AppInit get _appInit => AppInit.instance;
 
+  // Shared Preferences
+  static get sharedPreferences => _appInit.sharedPreferenceHelper;
+
   // Repositories
   static AuthRepository get authRepository => _appInit.authRepository;
   static FriendRepository get friendRepository => _appInit.friendRepository;
@@ -27,9 +30,6 @@ class AppDependencies {
   static FriendsStore get friendStore => _appInit.friendsStore;
   static SearchStore get searchStore => _appInit.searchStore;
   static InfoFriendStore get infoFriendStore => _appInit.infoFriendStore;
-
-  // Shared Preferences
-  static get sharedPreferences => _appInit.sharedPreferenceHelper;
 
   // Dio Client
   static get dioClient => _appInit.dioClient;

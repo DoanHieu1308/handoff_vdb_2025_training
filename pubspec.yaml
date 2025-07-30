@@ -30,8 +30,35 @@ dependencies:
   flashy_flushbar: ^1.4.0
   # https://pub.dev/packages/pull_to_refresh
   pull_to_refresh: ^2.0.0
+  # https://pub.dev/packages/video_player
+  video_player: ^2.10.0
+  # https://pub.dev/packages/dio_cookie_manager
+  dio_cookie_manager: ^3.2.0
+  # https://pub.dev/packages/cookie_jar
+  cookie_jar: ^4.0.8
+  # Camera. https://pub.dev/packages/camera
+  camera: 0.10.5
+  # https://pub.dev/packages/app_tracking_transparency
+  carousel_slider: ^4.0.0
+  # https://pub.dev/packages/image_picker
+  image_picker: ^1.0.7
+  #https://pub.dev/packages/image_cropper
+  image_cropper: ^9.1.0
+  # https://pub.dev/packages/http_parser
+  http_parser: ^4.1.2
+  # https://pub.dev/packages/cached_network_image/example
+  cached_network_image: ^3.4.1
+  # https://pub.dev/packages/intl
+  intl: ^0.20.2
+  # https://pub.dev/packages/file_picker
+  file_picker: ^10.2.0
+  # https://pub.dev/packages/path
+  path: ^1.9.1
+  # https://pub.dev/packages/image
+  image: ^4.5.4
 
   cupertino_icons: ^1.0.8
+
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +78,7 @@ flutter:
     - assets/base/
     - assets/features/
     - assets/base/icons/
+    - assets/features/video1.mp4
 
   fonts:
     - family: Inter-Regular

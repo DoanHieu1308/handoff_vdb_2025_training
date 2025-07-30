@@ -16,18 +16,13 @@ class Header extends StatelessWidget {
         right: 10.w,
         left: 10.w,
       ),
-      child: SizedBox(
-        height: 50,
-        child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: SizedBox(
-                child: SizedBox(
-                    height: 50.h,
-                    width: SizeUtil.getMaxWidth(),
-                    child: SearchPage()
-                )
-            )
-        ),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+              height: 50.h,
+              width: SizeUtil.getMaxWidth(),
+              child: SearchPage()
+          )
       ),
     );
   }

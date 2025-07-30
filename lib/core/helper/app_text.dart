@@ -101,6 +101,13 @@ class AppText extends TextStyle{
     color: Colors.black,
   );
 
+  static TextStyle get text24 => TextStyle(
+    fontSize: 24.sp,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.normal,
+    color: Colors.black,
+  );
+
   static TextStyle get text26 => TextStyle(
     fontSize: 26.sp,
     fontStyle: FontStyle.normal,
@@ -140,6 +147,14 @@ class AppText extends TextStyle{
   // bold
   static TextStyle get text10_bold => TextStyle(
     fontSize: 10.sp,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
+
+  // bold
+  static TextStyle get text11_bold => TextStyle(
+    fontSize: 11.sp,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.bold,
     color: Colors.black,
@@ -187,8 +202,22 @@ class AppText extends TextStyle{
     color: Colors.black,
   );
 
+  static TextStyle get text23_bold => TextStyle(
+    fontSize: 23.sp,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
+
   static TextStyle get text25_bold => TextStyle(
     fontSize: 25.sp,
+    fontStyle: FontStyle.normal,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
+
+  static TextStyle get text28_bold => TextStyle(
+    fontSize: 28.sp,
     fontStyle: FontStyle.normal,
     fontWeight: FontWeight.bold,
     color: Colors.black,

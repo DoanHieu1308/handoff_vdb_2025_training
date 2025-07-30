@@ -59,10 +59,10 @@ class SharedPreferenceHelper {
   /// Xóa tất cả dữ liệu authentication
   ///
   Future<void> clearAuthData() async {
+    // await setAccessToken("");
+    // await setRefreshToken("");
     await _sharedPreference.remove(Preferences.accessToken);
     await _sharedPreference.remove(Preferences.refreshToken);
-    await _sharedPreference.remove(Preferences.email);
-    await _sharedPreference.remove(Preferences.password);
   }
 
   ///

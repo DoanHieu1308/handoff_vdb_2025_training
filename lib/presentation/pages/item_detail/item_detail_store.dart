@@ -2,13 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
-import 'package:handoff_vdb_2025/data/model/friend/friend_request_model.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import '../../widget/build_snackbar.dart';
 
 part 'item_detail_store.g.dart';
 
@@ -55,11 +53,11 @@ abstract class _ItemDetailStore with Store {
     if (categoryName == ALL_FRIENDS) {
       excludedValues = [0, 1, 2];
     } else if (categoryName == SUGGESTIONS_FRIENDS) {
-      excludedValues = [1, 2];
+      excludedValues = [1, 2, 14];
     } else if (categoryName == FRIEND_REQUESTS) {
-      excludedValues = [0, 2];
-    } else if (categoryName == FOLLOWING) {
-      excludedValues = [0, 1];
+      excludedValues = [0, 2, 14];
+    } else if (categoryName == FRIEND_SEND) {
+      excludedValues = [0, 1,2, 14];
     }
 
     return listNameItemDetailsALL
@@ -74,16 +72,15 @@ abstract class _ItemDetailStore with Store {
   Future<void> actionItemDenied({
     required String nameItemDetail,
     required UserModel? friendPending,
-    required String? requestId,
     required BuildContext context,
   }) async {
-    if (friendPending?.id == null || requestId == null) return;
+    if (friendPending?.id == null) return;
 
     await friendsStore.handleRejectFriendRequest(
-      userId: friendPending!.id!,
-      requestId: requestId,
+      friendId: friendPending!.id!,
       context: context,
       nameItemDetail: nameItemDetail,
+      onSuccess: (){}
     );
   }
 
@@ -93,25 +90,13 @@ abstract class _ItemDetailStore with Store {
   @action
   Future<void> actionItemUnfriend({
     required String nameItemDetail,
-    required String? friendId,
-    required UserModel? friendInList,
+    required UserModel? friendUnFriend,
     required BuildContext context
   }) async {
-    friendsStore.unFriend(
-        friendId: friendId ?? "",
-        onSuccess: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-              buildSnackBarNotify(
-                  textNotify: "Successfully $nameItemDetail"
-              )
-          );
-          friendsStore.friendList.remove(friendInList);
-          // friendsStore.getAllFriends();
-        },
-        onError: (error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error)));
-        }
+    friendsStore.handleUnFriendRequest(
+        friendId: friendUnFriend!.id!,
+        context: context,
+        nameItemDetail: nameItemDetail
     );
   }
 

@@ -4,15 +4,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomDialog extends StatelessWidget {
   final String title;
   final String message;
-  final VoidCallback? onConfirm;
-  final VoidCallback? onCancel;
+  final String textNumber1;
+  final String textNumber2;
+  final VoidCallback? onTapNumber2;
+  final VoidCallback? onTapNumber1;
 
   const CustomDialog({
     super.key,
     required this.title,
     required this.message,
-    this.onConfirm,
-    this.onCancel,
+    this.onTapNumber2,
+    this.onTapNumber1,
+    required this.textNumber1,
+    required this.textNumber2,
   });
 
   @override
@@ -20,7 +24,7 @@ class CustomDialog extends StatelessWidget {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         height: 200.h,
         width: 370.w,
         child: Column(
@@ -38,13 +42,13 @@ class CustomDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   GestureDetector(
-                    onTap: onCancel,
+                    onTap: onTapNumber1,
                     child: SizedBox(
                       width: 70.w,
                       height: 50.h,
                       child: Center(
                         child: Text(
-                          "No",
+                          textNumber1,
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 15.sp,
@@ -56,13 +60,13 @@ class CustomDialog extends StatelessWidget {
                   ),
                   SizedBox(width: 10.w),
                   GestureDetector(
-                    onTap: onConfirm,
+                    onTap: onTapNumber2,
                     child: SizedBox(
                       width: 70.w,
                       height: 50.h,
                       child: Center(
                         child: Text(
-                          "Yes",
+                          textNumber2,
                           style: TextStyle(
                             color: Colors.blue,
                             fontSize: 15.sp,

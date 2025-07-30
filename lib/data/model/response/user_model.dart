@@ -10,6 +10,8 @@ class UserModel {
   String? bio;
   DateTime? createdAt;
   DateTime? updatedAt;
+  int? followingCount;
+  int? countFollowers;
 
   UserModel({
     this.id,
@@ -20,6 +22,8 @@ class UserModel {
     this.bio,
     this.createdAt,
     this.updatedAt,
+    this.followingCount,
+    this.countFollowers,
   });
 
   UserModel copyWith({
@@ -31,6 +35,8 @@ class UserModel {
     String? bio,
     DateTime? createdAt,
     DateTime? updatedAt,
+    int? followingCount,
+    int? countFollowers,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -41,6 +47,8 @@ class UserModel {
       bio: bio ?? this.bio,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      followingCount: followingCount ?? this.followingCount,
+      countFollowers: countFollowers ?? this.countFollowers,
     );
   }
 
@@ -54,21 +62,10 @@ class UserModel {
       if (!Validate.nullOrEmpty(bio)) 'bio': bio,
       if (!Validate.nullOrEmpty(createdAt)) 'createdAt': createdAt?.toIso8601String(),
       if (!Validate.nullOrEmpty(updatedAt)) 'updatedAt': updatedAt?.toIso8601String(),
+      if (followingCount != null) 'followingCount': followingCount,
+      if (countFollowers != null) 'countFollowers': countFollowers,
     };
   }
-
-  // factory UserModel.fromMap(Map<String, dynamic> map) {
-  //   return UserModel(
-  //     id: map['_id'] ?? map['id'],
-  //     name: map['name'],
-  //     email: map['email'],
-  //     password: map['password'],
-  //     avatar: map['avatar'],
-  //     bio: map['bio'],
-  //     createdAt: map['createdAt'] != null ? DateTime.tryParse(map['createdAt']) : null,
-  //     updatedAt: map['updatedAt'] != null ? DateTime.tryParse(map['updatedAt']) : null,
-  //   );
-  // }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
@@ -80,9 +77,10 @@ class UserModel {
       bio: map['bio'],
       createdAt: map['createdAt'] != null ? DateTime.tryParse(map['createdAt']) : null,
       updatedAt: map['updatedAt'] != null ? DateTime.tryParse(map['updatedAt']) : null,
+      followingCount: map['followingCount'] != null ? map['followingCount'] as int : null,
+      countFollowers: map['countFollowers'] != null ? map['countFollowers'] as int : null,
     );
   }
-
 
   String toJson() => json.encode(toMap());
 
@@ -91,7 +89,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, password: $password, avatar: $avatar, bio: $bio, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'UserModel(id: $id, name: $name, email: $email, password: $password, avatar: $avatar, bio: $bio, createdAt: $createdAt, updatedAt: $updatedAt, followingCount: $followingCount, countFollowers: $countFollowers)';
   }
 
   @override
@@ -103,7 +101,9 @@ class UserModel {
         other.avatar == avatar &&
         other.bio == bio &&
         other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.updatedAt == updatedAt &&
+        other.followingCount == followingCount &&
+        other.countFollowers == countFollowers;
   }
 
   @override
@@ -115,7 +115,9 @@ class UserModel {
     avatar.hashCode ^
     bio.hashCode ^
     createdAt.hashCode ^
-    updatedAt.hashCode;
+    updatedAt.hashCode ^
+    followingCount.hashCode ^
+    countFollowers.hashCode;
   }
 
   Map<String, dynamic> signUpEmail() => {
@@ -131,4 +133,3 @@ class UserModel {
     if (!Validate.nullOrEmpty(password)) 'password': password,
   };
 }
-

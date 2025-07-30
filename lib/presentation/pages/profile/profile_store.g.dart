@@ -63,6 +63,24 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
+  late final _$userProfileAtom = Atom(
+    name: '_ProfileStore.userProfile',
+    context: context,
+  );
+
+  @override
+  UserModel get userProfile {
+    _$userProfileAtom.reportRead();
+    return super.userProfile;
+  }
+
+  @override
+  set userProfile(UserModel value) {
+    _$userProfileAtom.reportWrite(value, super.userProfile, () {
+      super.userProfile = value;
+    });
+  }
+
   late final _$errorMessageAtom = Atom(
     name: '_ProfileStore.errorMessage',
     context: context,
@@ -124,6 +142,7 @@ mixin _$ProfileStore on _ProfileStore, Store {
 selectedFolderIndex: ${selectedFolderIndex},
 isLSeeMore: ${isLSeeMore},
 isLoading: ${isLoading},
+userProfile: ${userProfile},
 errorMessage: ${errorMessage}
     ''';
   }

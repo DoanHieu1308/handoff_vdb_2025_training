@@ -11,6 +11,7 @@ import '../../../core/helper/app_text.dart';
 import '../../../core/helper/size_util.dart';
 import '../../../core/utils/color_resources.dart';
 import '../../../core/utils/images_path.dart';
+import '../../widget/build_snackbar.dart';
 import '../account/personal_information/widget/auth_input.dart';
 import 'component/intro_widget.dart';
 
@@ -215,7 +216,12 @@ class _LoginPageState extends State<LoginPage> {
                               widget.store.checkSavedData();
                             },
                             onError: (error) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                buildSnackBarNotifyError(
+                                  textNotify: error,
+                                ),
+                              );
+                              print("Login loi : $error");
                             }
                         );
                       },

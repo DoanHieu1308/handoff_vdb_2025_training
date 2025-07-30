@@ -55,33 +55,15 @@ mixin _$FriendsStore on _FriendsStore, Store {
   );
 
   @override
-  List<UserModel> get friendList {
+  ObservableList<UserModel> get friendList {
     _$friendListAtom.reportRead();
     return super.friendList;
   }
 
   @override
-  set friendList(List<UserModel> value) {
+  set friendList(ObservableList<UserModel> value) {
     _$friendListAtom.reportWrite(value, super.friendList, () {
       super.friendList = value;
-    });
-  }
-
-  late final _$listRequestsAtom = Atom(
-    name: '_FriendsStore.listRequests',
-    context: context,
-  );
-
-  @override
-  List<FriendRequestModel> get listRequests {
-    _$listRequestsAtom.reportRead();
-    return super.listRequests;
-  }
-
-  @override
-  set listRequests(List<FriendRequestModel> value) {
-    _$listRequestsAtom.reportWrite(value, super.listRequests, () {
-      super.listRequests = value;
     });
   }
 
@@ -91,13 +73,13 @@ mixin _$FriendsStore on _FriendsStore, Store {
   );
 
   @override
-  List<UserModel> get friendListPending {
+  ObservableList<FriendRequestModel> get friendListPending {
     _$friendListPendingAtom.reportRead();
     return super.friendListPending;
   }
 
   @override
-  set friendListPending(List<UserModel> value) {
+  set friendListPending(ObservableList<FriendRequestModel> value) {
     _$friendListPendingAtom.reportWrite(value, super.friendListPending, () {
       super.friendListPending = value;
     });
@@ -109,13 +91,13 @@ mixin _$FriendsStore on _FriendsStore, Store {
   );
 
   @override
-  List<UserModel> get friendListSuggestion {
+  ObservableList<UserModel> get friendListSuggestion {
     _$friendListSuggestionAtom.reportRead();
     return super.friendListSuggestion;
   }
 
   @override
-  set friendListSuggestion(List<UserModel> value) {
+  set friendListSuggestion(ObservableList<UserModel> value) {
     _$friendListSuggestionAtom.reportWrite(
       value,
       super.friendListSuggestion,
@@ -125,21 +107,43 @@ mixin _$FriendsStore on _FriendsStore, Store {
     );
   }
 
-  late final _$friendListFollowerAtom = Atom(
-    name: '_FriendsStore.friendListFollower',
+  late final _$friendListSuggestionStatusAtom = Atom(
+    name: '_FriendsStore.friendListSuggestionStatus',
     context: context,
   );
 
   @override
-  List<UserModel> get friendListFollower {
-    _$friendListFollowerAtom.reportRead();
-    return super.friendListFollower;
+  ObservableList<Map<String, dynamic>> get friendListSuggestionStatus {
+    _$friendListSuggestionStatusAtom.reportRead();
+    return super.friendListSuggestionStatus;
   }
 
   @override
-  set friendListFollower(List<UserModel> value) {
-    _$friendListFollowerAtom.reportWrite(value, super.friendListFollower, () {
-      super.friendListFollower = value;
+  set friendListSuggestionStatus(ObservableList<Map<String, dynamic>> value) {
+    _$friendListSuggestionStatusAtom.reportWrite(
+      value,
+      super.friendListSuggestionStatus,
+      () {
+        super.friendListSuggestionStatus = value;
+      },
+    );
+  }
+
+  late final _$friendListSentAtom = Atom(
+    name: '_FriendsStore.friendListSent',
+    context: context,
+  );
+
+  @override
+  ObservableList<FriendSentModel> get friendListSent {
+    _$friendListSentAtom.reportRead();
+    return super.friendListSent;
+  }
+
+  @override
+  set friendListSent(ObservableList<FriendSentModel> value) {
+    _$friendListSentAtom.reportWrite(value, super.friendListSent, () {
+      super.friendListSent = value;
     });
   }
 
@@ -179,24 +183,6 @@ mixin _$FriendsStore on _FriendsStore, Store {
     });
   }
 
-  late final _$acceptedFriendsAtom = Atom(
-    name: '_FriendsStore.acceptedFriends',
-    context: context,
-  );
-
-  @override
-  ObservableMap<String, bool> get acceptedFriends {
-    _$acceptedFriendsAtom.reportRead();
-    return super.acceptedFriends;
-  }
-
-  @override
-  set acceptedFriends(ObservableMap<String, bool> value) {
-    _$acceptedFriendsAtom.reportWrite(value, super.acceptedFriends, () {
-      super.acceptedFriends = value;
-    });
-  }
-
   late final _$rejectFriendAtom = Atom(
     name: '_FriendsStore.rejectFriend',
     context: context,
@@ -231,9 +217,9 @@ mixin _$FriendsStore on _FriendsStore, Store {
   );
 
   @override
-  Future<void> handleAcceptFriendRequest(int index) {
+  Future<void> handleAcceptFriendRequest({required String friendId}) {
     return _$handleAcceptFriendRequestAsyncAction.run(
-      () => super.handleAcceptFriendRequest(index),
+      () => super.handleAcceptFriendRequest(friendId: friendId),
     );
   }
 
@@ -244,17 +230,53 @@ mixin _$FriendsStore on _FriendsStore, Store {
 
   @override
   Future<void> handleRejectFriendRequest({
-    required String userId,
-    required String requestId,
+    required String friendId,
     required BuildContext context,
     required String nameItemDetail,
+    required dynamic Function() onSuccess,
   }) {
     return _$handleRejectFriendRequestAsyncAction.run(
       () => super.handleRejectFriendRequest(
-        userId: userId,
-        requestId: requestId,
+        friendId: friendId,
         context: context,
         nameItemDetail: nameItemDetail,
+        onSuccess: onSuccess,
+      ),
+    );
+  }
+
+  late final _$handleSentFriendRequestAsyncAction = AsyncAction(
+    '_FriendsStore.handleSentFriendRequest',
+    context: context,
+  );
+
+  @override
+  Future<void> handleSentFriendRequest({
+    required String friendId,
+    required dynamic Function() onSuccess,
+  }) {
+    return _$handleSentFriendRequestAsyncAction.run(
+      () => super.handleSentFriendRequest(
+        friendId: friendId,
+        onSuccess: onSuccess,
+      ),
+    );
+  }
+
+  late final _$handleCancelFriendRequestAsyncAction = AsyncAction(
+    '_FriendsStore.handleCancelFriendRequest',
+    context: context,
+  );
+
+  @override
+  Future<void> handleCancelFriendRequest({
+    required String friendId,
+    required dynamic Function() onSuccess,
+  }) {
+    return _$handleCancelFriendRequestAsyncAction.run(
+      () => super.handleCancelFriendRequest(
+        friendId: friendId,
+        onSuccess: onSuccess,
       ),
     );
   }
@@ -265,9 +287,12 @@ mixin _$FriendsStore on _FriendsStore, Store {
   );
 
   @override
-  Future<void> goToInfoFriend({required BuildContext context}) {
+  Future<void> goToInfoFriend({
+    required String friendId,
+    required BuildContext context,
+  }) {
     return _$goToInfoFriendAsyncAction.run(
-      () => super.goToInfoFriend(context: context),
+      () => super.goToInfoFriend(friendId: friendId, context: context),
     );
   }
 
@@ -299,48 +324,48 @@ mixin _$FriendsStore on _FriendsStore, Store {
   }
 
   @override
-  void markFriendAccepted(String friendId) {
+  void removeFriendFromAllLists(String friendId) {
     final _$actionInfo = _$_FriendsStoreActionController.startAction(
-      name: '_FriendsStore.markFriendAccepted',
+      name: '_FriendsStore.removeFriendFromAllLists',
     );
     try {
-      return super.markFriendAccepted(friendId);
+      return super.removeFriendFromAllLists(friendId);
     } finally {
       _$_FriendsStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void resetAcceptedFriends() {
+  void removeFriendFromSuggestionIfFailed(String friendId) {
     final _$actionInfo = _$_FriendsStoreActionController.startAction(
-      name: '_FriendsStore.resetAcceptedFriends',
+      name: '_FriendsStore.removeFriendFromSuggestionIfFailed',
     );
     try {
-      return super.resetAcceptedFriends();
+      return super.removeFriendFromSuggestionIfFailed(friendId);
     } finally {
       _$_FriendsStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void removeAcceptedFriend(String friendId) {
+  void setSendStatus(String friendId) {
     final _$actionInfo = _$_FriendsStoreActionController.startAction(
-      name: '_FriendsStore.removeAcceptedFriend',
+      name: '_FriendsStore.setSendStatus',
     );
     try {
-      return super.removeAcceptedFriend(friendId);
+      return super.setSendStatus(friendId);
     } finally {
       _$_FriendsStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void removeFriendRequestFromLists(String requestId) {
+  void setCancelStatus(String friendId) {
     final _$actionInfo = _$_FriendsStoreActionController.startAction(
-      name: '_FriendsStore.removeFriendRequestFromLists',
+      name: '_FriendsStore.setCancelStatus',
     );
     try {
-      return super.removeFriendRequestFromLists(requestId);
+      return super.setCancelStatus(friendId);
     } finally {
       _$_FriendsStoreActionController.endAction(_$actionInfo);
     }
@@ -364,13 +389,12 @@ mixin _$FriendsStore on _FriendsStore, Store {
 selectedCategoryName: ${selectedCategoryName},
 isLoading: ${isLoading},
 friendList: ${friendList},
-listRequests: ${listRequests},
 friendListPending: ${friendListPending},
 friendListSuggestion: ${friendListSuggestion},
-friendListFollower: ${friendListFollower},
+friendListSuggestionStatus: ${friendListSuggestionStatus},
+friendListSent: ${friendListSent},
 friendListSearch: ${friendListSearch},
 acceptFriend: ${acceptFriend},
-acceptedFriends: ${acceptedFriends},
 rejectFriend: ${rejectFriend}
     ''';
   }

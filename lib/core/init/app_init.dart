@@ -3,17 +3,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
 import 'package:handoff_vdb_2025/data/data_source/dio/dio_client.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
+import 'package:handoff_vdb_2025/data/repositories/follow_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
+import 'package:handoff_vdb_2025/presentation/pages/camera/camera_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/home/home_page.dart';
+import 'package:handoff_vdb_2025/presentation/pages/home/home_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/item_detail/item_detail_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/login/login_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/post_status/post_status_page.dart';
+import 'package:handoff_vdb_2025/presentation/pages/post_status/post_status_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/search/search_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/video/video_store.dart';
+
+import '../../presentation/pages/create_post/component/post_advanced_options_setting/post_options_setting_store.dart';
 
 class AppInit {
   static AppInit? _instance;
@@ -31,18 +40,23 @@ class AppInit {
   late final AuthRepository authRepository;
   late final FriendRepository friendRepository;
   late final UserRepository userRepository;
+  late final FollowRepository followRepository;
 
   // Stores
   late final LoginStore loginStore;
   late final SignUpStore signUpStore;
   late final DashBoardStore dashBoardStore;
   late final VideoStore videoStore;
+  late final CameraStore cameraStore;
   late final ProfileStore profileStore;
   late final InfoFriendStore infoFriendStore;
   late final SearchStore searchStore;
   late final FriendsStore friendsStore;
   late final ItemDetailStore itemDetailStore;
-
+  late final HomeStore homeStore;
+  late final CreatePostStore createPostStore;
+  late final PostOptionsSettingStore postOptionsSettingStore;
+  late final PostStatusStore postStatusStore;
 
   /// Initialize all dependencies
   Future<void> init() async {
@@ -96,6 +110,7 @@ class AppInit {
       authRepository = AuthRepository();
       friendRepository = FriendRepository();
       userRepository = UserRepository();
+      followRepository = FollowRepository();
       debugPrint('Repositories initialized');
     } catch (e) {
       debugPrint('Repositories initialization failed: $e');
@@ -103,18 +118,34 @@ class AppInit {
     }
   }
 
-  /// Initialize Stores
   Future<void> _initStores() async {
     try {
-      searchStore = SearchStore();
-      friendsStore = FriendsStore();
-      profileStore = ProfileStore();
-      loginStore = LoginStore();
+      // 1. Khởi tạo các store độc lập trước
       signUpStore = SignUpStore();
-      dashBoardStore = DashBoardStore();
+      loginStore = LoginStore();
+      searchStore = SearchStore();
       videoStore = VideoStore();
+
+      // 2. Khởi tạo FriendsStore (phụ thuộc vào SearchStore)
+      friendsStore = FriendsStore();
+
+      // 3. Khởi tạo InfoFriendStore (phụ thuộc vào FriendsStore qua lazy getter)
       infoFriendStore = InfoFriendStore();
+
+      // 4. Khởi tạo các store phụ thuộc vào FriendsStore
+      profileStore = ProfileStore();
+      postStatusStore = PostStatusStore();
+      homeStore = HomeStore();
+      dashBoardStore = DashBoardStore();
+      cameraStore = CameraStore();
+      createPostStore = CreatePostStore();
+      postOptionsSettingStore = PostOptionsSettingStore();
+
+
+
+      // 5. Khởi tạo ItemDetailStore cuối cùng (phụ thuộc vào FriendsStore qua constructor)
       itemDetailStore = ItemDetailStore(friendsStore);
+      
       debugPrint('Stores initialized');
     } catch (e) {
       debugPrint('Stores initialization failed: $e');

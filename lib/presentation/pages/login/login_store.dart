@@ -1,15 +1,21 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:mobx/mobx.dart';
-import '../../../core/shared_pref/shared_preference_helper.dart';
+import '../../../data/data_source/dio/dio_client.dart';
 import '../../../data/model/auth/auth_model.dart';
 import '../../../data/model/response/user_model.dart';
 import '../../../data/repositories/auth_repository.dart';
+import '../../widget/build_snackbar.dart';
 part 'login_store.g.dart';
 
 class LoginStore = _LoginStore with _$LoginStore;
 
 abstract class _LoginStore with Store {
+  /// Dio
+  final DioClient _dio = AppInit.instance.dioClient;
+
   /// controller.
   final PageController pageController = PageController(initialPage: 0);
   final emailController = TextEditingController();
@@ -20,7 +26,7 @@ abstract class _LoginStore with Store {
   final emailFocusNode= FocusNode();
 
   /// SharePreference
-  late final _sharedPreferenceHelper;
+  final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
 
   /// Repository
   late final _repository;
@@ -60,7 +66,6 @@ abstract class _LoginStore with Store {
   ///
   Future<void> _init() async {
     // Get dependencies directly
-    _sharedPreferenceHelper = SharedPreferenceHelper.instance;
     _repository = AuthRepository();
 
     emailSaved = _sharedPreferenceHelper.getEmail ?? "";
@@ -183,31 +188,33 @@ abstract class _LoginStore with Store {
     final instance = _sharedPreferenceHelper;
 
     final List<Future<void>?> futures = [
-      instance?.setAccessToken(auth.accessToken!),
-      instance?.setRefreshToken(auth.refreshToken!),
-      instance?.setIdUser(auth.user!.id!),
+      instance.setAccessToken(auth.accessToken!),
+      instance.setRefreshToken(auth.refreshToken!),
+      instance.setIdUser(auth.user!.id!),
       if (isRemember) ...[
-        instance?.setEmail(user.email ?? ""),
-        instance?.setPassword(user.password ?? ""),
+        instance.setEmail(user.email ?? ""),
+        instance.setPassword(user.password ?? ""),
       ] else ...[
-        instance?.setEmail(""),
-        instance?.setPassword(""),
+        instance.setEmail(""),
+        instance.setPassword(""),
       ]
     ];
 
     await Future.wait(futures.whereType<Future<void>>());
 
-    // await _dio.refreshToken();
+
+    checkSavedData();
+    // await _dio.refreshTokens();
   }
 
 
   @action
   void checkSavedData() {
-    final accessToken = _sharedPreferenceHelper?.getAccessToken;
-    final refreshToken = _sharedPreferenceHelper?.getRefreshToken;
-    final email = _sharedPreferenceHelper?.getEmail;
-    final password = _sharedPreferenceHelper?.getPassword;
-    final idUser = _sharedPreferenceHelper?.getIdUser;
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    final refreshToken = _sharedPreferenceHelper.getRefreshToken;
+    final email = _sharedPreferenceHelper.getEmail;
+    final password = _sharedPreferenceHelper.getPassword;
+    final idUser = _sharedPreferenceHelper.getIdUser;
     print("accessToken $accessToken");
     print("refreshToken $refreshToken");
     print("email $email");
