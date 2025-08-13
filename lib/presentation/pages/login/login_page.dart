@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/base_widget/lazy_index_stack.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/presentation/pages/login/login_store.dart';
-import 'package:mobx/mobx.dart';
-
-import '../../../config/routes/route_path/auth_routers.dart';
 import '../../../core/helper/app_text.dart';
 import '../../../core/helper/size_util.dart';
+import '../../../core/init/app_init.dart';
 import '../../../core/utils/color_resources.dart';
 import '../../../core/utils/images_path.dart';
 import '../../widget/build_snackbar.dart';
@@ -26,6 +26,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
+    widget.store.init();
     widget.store.startAutoScroll();
     super.initState();
   }
@@ -40,61 +41,58 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffFCFAF3),
-      body: Observer(
-        builder:
-            (_) => SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  Column(
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                SizedBox(height: 50.h),
+                Text(
+                  "Đăng nhập",
+                  style: AppText.text30.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: SizeUtil.SPACE_2X),
+                Padding(
+                  padding: SizeUtil.setEdgeInsetsSymmetric(
+                    horizontal: SizeUtil.SPACE_3X,
+                  ),
+                  child: Text(
+                    'Chào mừng bạn đến với \nHANDOFF',
+                    style: AppText.text18.copyWith(
+                      color: ColorResources.COLOR_464647,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(height: 17.h),
+                Container(
+                  height: 295.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Column(
                     children: [
-                      SizedBox(height: 50.h),
-                      Text(
-                        "Đăng nhập",
-                        style: AppText.text30.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: SizeUtil.SPACE_2X),
-                      Padding(
-                        padding: SizeUtil.setEdgeInsetsSymmetric(
-                          horizontal: SizeUtil.SPACE_3X,
-                        ),
-                        child: Text(
-                          'Chào mừng bạn đến với \nHANDOFF',
-                          style: AppText.text18.copyWith(
-                            color: ColorResources.COLOR_464647,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(height: 17.h),
-                      Container(
-                        height: 295.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(30),
-                            topRight: Radius.circular(30),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Expanded(child: _bodyIntro()),
-                            _dotButton(),
-                          ],
-                        ),
-                      ),
+                      Expanded(child: _bodyIntro()),
+                      _dotButton(),
                     ],
                   ),
-                  _buildBodyLogin(context),
-                ],
-              ),
+                ),
+              ],
             ),
+            _buildBodyLogin(context),
+          ],
+        ),
       ),
     );
   }
@@ -206,13 +204,11 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 20.h),
                     GestureDetector(
-                      onTap: () {
+                          onTap: () {
                         widget.store.logIn(
                             onSuccess: (auth) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                AuthRouters.DASH_BOARD,
-                                    (route) => false,
-                              );
+                              AppInit.instance.dashBoardStore.onChangedDashboardPage(index: 0);
+                              context.go(AuthRoutes.DASH_BOARD);
                               widget.store.checkSavedData();
                             },
                             onError: (error) {
@@ -295,52 +291,49 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _bodyIntro() {
-    return Observer(
-      builder:
-          (_) => Container(
-            height: 250.h,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(30),
-              color: Colors.white,
-            ),
-            child: ScrollConfiguration(
-              behavior: const ScrollBehavior().copyWith(overscroll: false),
-              child: PageView.builder(
-                onPageChanged: (value) {
-                  widget.store.onChangePageIndex(index: value);
-                },
-                controller: widget.store.pageController,
-                physics: const ClampingScrollPhysics(),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return LazyIndexedStack(
-                    index: index,
-                    children: [
-                      IntroWiget(
-                        index: index,
-                        title: "Page1",
-                        subTitle: "Page1",
-                        imagesPath: ImagesPath.icEmail,
-                      ),
-                      IntroWiget(
-                        index: index,
-                        title: "Page1",
-                        subTitle: "Page1",
-                        imagesPath: ImagesPath.icMessenger,
-                      ),
-                      IntroWiget(
-                        index: index,
-                        title: "Page1",
-                        subTitle: "Page1",
-                        imagesPath: ImagesPath.icHome,
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
+    return Container(
+      height: 250.h,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        color: Colors.white,
+      ),
+      child: ScrollConfiguration(
+        behavior: const ScrollBehavior().copyWith(overscroll: false),
+        child: PageView.builder(
+          onPageChanged: (value) {
+            widget.store.onChangePageIndex(index: value);
+          },
+          controller: widget.store.pageController,
+          physics: const ClampingScrollPhysics(),
+          itemCount: 3,
+          itemBuilder: (context, index) {
+            return LazyIndexedStack(
+              index: index,
+              children: [
+                IntroWiget(
+                  index: index,
+                  title: "Page1",
+                  subTitle: "Page1",
+                  imagesPath: ImagesPath.icEmail,
+                ),
+                IntroWiget(
+                  index: index,
+                  title: "Page1",
+                  subTitle: "Page1",
+                  imagesPath: ImagesPath.icMessenger,
+                ),
+                IntroWiget(
+                  index: index,
+                  title: "Page1",
+                  subTitle: "Page1",
+                  imagesPath: ImagesPath.icHome,
+                ),
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 }

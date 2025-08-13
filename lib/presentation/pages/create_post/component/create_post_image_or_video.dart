@@ -1,13 +1,12 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
-import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
-
+import 'package:handoff_vdb_2025/core/extensions/dynamic_extension.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/component/show_image.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/component/show_video.dart';
 import '../../../../core/base_widget/images/set_up_asset_image.dart';
-import '../../../../core/base_widget/video/set_up_video_player.dart';
 import '../../../../core/helper/app_text.dart';
 import '../../../../core/helper/size_util.dart';
 import '../../../../core/utils/color_resources.dart';
@@ -15,8 +14,10 @@ import '../../../../core/utils/images_path.dart';
 import '../../account/personal_information/widget/auth_input.dart';
 
 class CreatePostImageOrVideo extends StatelessWidget {
-  CreatePostStore store;
-  CreatePostImageOrVideo({super.key, required this.store});
+  final store = AppInit.instance.createPostStore;
+  final List<dynamic>? listFile;
+  final String? title;
+  CreatePostImageOrVideo({super.key, this.listFile, this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -25,36 +26,60 @@ class CreatePostImageOrVideo extends StatelessWidget {
         return Column(
           children: [
             AuthInput(
-              controller: store.feelingEditingController,
+              controller: store.textStore.feelingEditingController,
               hintText: "Hãy nói gì đó về các bức ảnh/video này...",
               maxLine: 2,
-              hintStyle: AppText.text14.copyWith(color: ColorResources.GREY),
               textStyle: AppText.text20_bold,
               focusNode: store.feelingFocusNode,
             ),
             ListView.builder(
               padding: EdgeInsets.symmetric(vertical: 10.h),
               shrinkWrap: true,
-              controller: store.scrollController,
-              itemCount: store.listFile.length,
+              controller: store.mediaStore.scrollController,
+              itemCount: listFile?.length,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index){
-                final file = store.listFile[index];
-                final isVideo = file.path.isVideoFile;
+                final file = listFile?[index];
+                if (file == null) return const SizedBox();
+                bool isVideoFile = false;
+                bool isUrlFile = false;
 
+                if (file is String) {
+                  isVideoFile = file.isVideo;
+                  isUrlFile = file.isUrl;
+                } else if (file is File) {
+                  isVideoFile = file.isVideo;
+                  isUrlFile = file.isUrl;
+                } else {
+                  final path = file.path ?? file.toString();
+                  isUrlFile = path.startsWith('http://') || path.startsWith('https://');
+                  isVideoFile = path.toLowerCase().endsWith('.mp4') ||
+                               path.toLowerCase().endsWith('.mov') ||
+                               path.toLowerCase().endsWith('.avi') ||
+                               path.toLowerCase().endsWith('.mkv');
+                }
+                
                 return Stack(
-                  key: ValueKey(file.path),
+                  key: ValueKey(file is String ? file : file.path),
                   children: [
                     Padding(
                       padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
-                      child: isVideo ? buildShowVideo(file) : buildShowImage(file),
+                      child: isVideoFile
+                          ? ShowVideo(
+                              fileVideo: file,
+                              isNetwork: isUrlFile,
+                            )
+                          : ShowImage(
+                              fileImage: file,
+                              isNetwork: isUrlFile,
+                            ),
                     ),
                     Positioned(
-                      top: 15.h,
-                      left: SizeUtil.getMaxWidth() - 50.w,
+                      top: 20.h,
+                      left: SizeUtil.getMaxWidth() - 40.w,
                       child: buildDeleteButton(
                         onTap: () {
-                          store.removeFile(file);
+                          store.mediaStore.removeFile(file);
                         },
                       ),
                     ),
@@ -65,7 +90,7 @@ class CreatePostImageOrVideo extends StatelessWidget {
             SizedBox(height: 20.h),
             GestureDetector(
               onTap: (){
-                  store.checkFileLimit(context);
+                  store.mediaStore.checkFileLimit(context);
               },
               child: SizedBox(
                 height: 130.h,
@@ -99,50 +124,6 @@ class CreatePostImageOrVideo extends StatelessWidget {
     );
   }
 
-  Widget buildShowVideo(File fileVideo) {
-    return SizedBox(
-      width: SizeUtil.getMaxWidth(),
-      child: SetUpVideoPlayer(
-        key: UniqueKey(),
-        fileVideo: fileVideo,
-        videoUrl: '',
-        autoPlay: true,
-        looping: true,
-        fit: BoxFit.cover,
-      ),
-    );
-  }
-
-  Widget buildShowImage(File fileImage) {
-    return Observer(
-        builder: (context) {
-          return FutureBuilder<Size>(
-            future: store.getImageSize(fileImage),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final imageSize = snapshot.data!;
-                final aspectRatio = imageSize.width / imageSize.height;
-                return AspectRatio(
-                  aspectRatio: aspectRatio,
-                  child: Image.file(
-                    key: UniqueKey(),
-                    fileImage,
-                    fit: BoxFit.cover,
-                    filterQuality: FilterQuality.high,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Text('Image load error');
-                    },
-                  ),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          );
-        }
-    );
-  }
-
   GestureDetector buildDeleteButton({required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
@@ -151,12 +132,12 @@ class CreatePostImageOrVideo extends StatelessWidget {
         width: 25.w,
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.transparent,
+          color: Colors.white70,
         ),
         child: Center(
           child: SetUpAssetImage(
-            height: 15.h,
-            width: 15.w,
+            height: 13.h,
+            width: 13.w,
             ImagesPath.icCancel,
             color: Colors.black54,
           ),

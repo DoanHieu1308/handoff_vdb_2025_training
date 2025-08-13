@@ -2,19 +2,22 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
+import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:mobx/mobx.dart';
 import '../../../data/data_source/dio/dio_client.dart';
 import '../../../data/model/auth/auth_model.dart';
 import '../../../data/model/response/user_model.dart';
 import '../../../data/repositories/auth_repository.dart';
 import '../../widget/build_snackbar.dart';
+import '../home/home_store.dart';
 part 'login_store.g.dart';
 
 class LoginStore = _LoginStore with _$LoginStore;
 
 abstract class _LoginStore with Store {
-  /// Dio
-  final DioClient _dio = AppInit.instance.dioClient;
+  /// store
+  HomeStore get homeStore => AppInit.instance.homeStore;
 
   /// controller.
   final PageController pageController = PageController(initialPage: 0);
@@ -29,7 +32,7 @@ abstract class _LoginStore with Store {
   final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
 
   /// Repository
-  late final _repository;
+  final _authRepository = AppInit.instance.authRepository;
 
   /// Declare the data.
   @observable
@@ -57,20 +60,12 @@ abstract class _LoginStore with Store {
   bool isLoading = false;
 
 
-  _LoginStore () {
-    _init();
-  }
-
   ///
   /// Init
   ///
-  Future<void> _init() async {
-    // Get dependencies directly
-    _repository = AuthRepository();
-
+  Future<void> init() async {
     emailSaved = _sharedPreferenceHelper.getEmail ?? "";
     passwordSaved = _sharedPreferenceHelper.getPassword ?? "";
-
     setTextControl();
   }
 
@@ -168,11 +163,13 @@ abstract class _LoginStore with Store {
       password: passwordController.text.toString().trim(),
     );
 
-    await _repository.loginEmail(
+    await _authRepository.loginEmail(
         data: user,
         onSuccess: (auth) async {
           isLoading = false;
           _saveLocalData(auth, user);
+
+          await homeStore.getALlPosts(type: PUBLIC);
 
           onSuccess(auth);
         },

@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
-import 'package:handoff_vdb_2025/data/data_source/dio/dio_client.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
 import 'package:mobx/mobx.dart';
 
-import '../../../core/init/app_init.dart';
 import '../../../data/model/auth/auth_model.dart';
 part 'sign_up_store.g.dart';
 
@@ -47,14 +45,10 @@ abstract class _SignUpStore with Store {
   @observable
   String? confirmPasswordError;
 
-  _SignUpStore () {
-    _init();
-  }
-
   ///
   /// Init dio
   ///
-  Future<void> _init() async {
+  Future<void> init() async {
     _repository = AuthRepository();
   }
 

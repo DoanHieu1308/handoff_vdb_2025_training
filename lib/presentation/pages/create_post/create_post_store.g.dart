@@ -9,93 +9,39 @@ part of 'create_post_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$CreatePostStore on _CreatePostStore, Store {
-  late final _$listFileAtom = Atom(
-    name: '_CreatePostStore.listFile',
+  late final _$isLoadingEditPostAtom = Atom(
+    name: '_CreatePostStore.isLoadingEditPost',
     context: context,
   );
 
   @override
-  ObservableList<File> get listFile {
-    _$listFileAtom.reportRead();
-    return super.listFile;
+  bool get isLoadingEditPost {
+    _$isLoadingEditPostAtom.reportRead();
+    return super.isLoadingEditPost;
   }
 
   @override
-  set listFile(ObservableList<File> value) {
-    _$listFileAtom.reportWrite(value, super.listFile, () {
-      super.listFile = value;
+  set isLoadingEditPost(bool value) {
+    _$isLoadingEditPostAtom.reportWrite(value, super.isLoadingEditPost, () {
+      super.isLoadingEditPost = value;
     });
   }
 
-  late final _$isVideoAtom = Atom(
-    name: '_CreatePostStore.isVideo',
+  late final _$_sharedTextAtom = Atom(
+    name: '_CreatePostStore._sharedText',
     context: context,
   );
 
   @override
-  bool get isVideo {
-    _$isVideoAtom.reportRead();
-    return super.isVideo;
+  String? get _sharedText {
+    _$_sharedTextAtom.reportRead();
+    return super._sharedText;
   }
 
   @override
-  set isVideo(bool value) {
-    _$isVideoAtom.reportWrite(value, super.isVideo, () {
-      super.isVideo = value;
-    });
-  }
-
-  late final _$videoControllerAtom = Atom(
-    name: '_CreatePostStore.videoController',
-    context: context,
-  );
-
-  @override
-  VideoPlayerController? get videoController {
-    _$videoControllerAtom.reportRead();
-    return super.videoController;
-  }
-
-  @override
-  set videoController(VideoPlayerController? value) {
-    _$videoControllerAtom.reportWrite(value, super.videoController, () {
-      super.videoController = value;
-    });
-  }
-
-  late final _$fellingTextAtom = Atom(
-    name: '_CreatePostStore.fellingText',
-    context: context,
-  );
-
-  @override
-  String get fellingText {
-    _$fellingTextAtom.reportRead();
-    return super.fellingText;
-  }
-
-  @override
-  set fellingText(String value) {
-    _$fellingTextAtom.reportWrite(value, super.fellingText, () {
-      super.fellingText = value;
-    });
-  }
-
-  late final _$hasTextAtom = Atom(
-    name: '_CreatePostStore.hasText',
-    context: context,
-  );
-
-  @override
-  bool get hasText {
-    _$hasTextAtom.reportRead();
-    return super.hasText;
-  }
-
-  @override
-  set hasText(bool value) {
-    _$hasTextAtom.reportWrite(value, super.hasText, () {
-      super.hasText = value;
+  set _sharedText(String? value) {
+    _$_sharedTextAtom.reportWrite(value, super._sharedText, () {
+      super._sharedText = value;
     });
   }
 
@@ -114,60 +60,6 @@ mixin _$CreatePostStore on _CreatePostStore, Store {
   set initialChildSize(double value) {
     _$initialChildSizeAtom.reportWrite(value, super.initialChildSize, () {
       super.initialChildSize = value;
-    });
-  }
-
-  late final _$hasImageAtom = Atom(
-    name: '_CreatePostStore.hasImage',
-    context: context,
-  );
-
-  @override
-  bool get hasImage {
-    _$hasImageAtom.reportRead();
-    return super.hasImage;
-  }
-
-  @override
-  set hasImage(bool value) {
-    _$hasImageAtom.reportWrite(value, super.hasImage, () {
-      super.hasImage = value;
-    });
-  }
-
-  late final _$hasVideoAtom = Atom(
-    name: '_CreatePostStore.hasVideo',
-    context: context,
-  );
-
-  @override
-  bool get hasVideo {
-    _$hasVideoAtom.reportRead();
-    return super.hasVideo;
-  }
-
-  @override
-  set hasVideo(bool value) {
-    _$hasVideoAtom.reportWrite(value, super.hasVideo, () {
-      super.hasVideo = value;
-    });
-  }
-
-  late final _$listNameItemOptionAtom = Atom(
-    name: '_CreatePostStore.listNameItemOption',
-    context: context,
-  );
-
-  @override
-  ObservableList<Map<String, dynamic>> get listNameItemOption {
-    _$listNameItemOptionAtom.reportRead();
-    return super.listNameItemOption;
-  }
-
-  @override
-  set listNameItemOption(ObservableList<Map<String, dynamic>> value) {
-    _$listNameItemOptionAtom.reportWrite(value, super.listNameItemOption, () {
-      super.listNameItemOption = value;
     });
   }
 
@@ -193,56 +85,10 @@ mixin _$CreatePostStore on _CreatePostStore, Store {
     );
   }
 
-  late final _$pickImageFromGalleryAsyncAction = AsyncAction(
-    '_CreatePostStore.pickImageFromGallery',
-    context: context,
-  );
-
-  @override
-  Future<void> pickImageFromGallery(BuildContext context) {
-    return _$pickImageFromGalleryAsyncAction.run(
-      () => super.pickImageFromGallery(context),
-    );
-  }
-
-  late final _$getImageSizeAsyncAction = AsyncAction(
-    '_CreatePostStore.getImageSize',
-    context: context,
-  );
-
-  @override
-  Future<Size> getImageSize(File file) {
-    return _$getImageSizeAsyncAction.run(() => super.getImageSize(file));
-  }
-
-  late final _$pickVideoFromGalleryAsyncAction = AsyncAction(
-    '_CreatePostStore.pickVideoFromGallery',
-    context: context,
-  );
-
-  @override
-  Future<void> pickVideoFromGallery() {
-    return _$pickVideoFromGalleryAsyncAction.run(
-      () => super.pickVideoFromGallery(),
-    );
-  }
-
   late final _$_CreatePostStoreActionController = ActionController(
     name: '_CreatePostStore',
     context: context,
   );
-
-  @override
-  void showDialogSelectImageOrVideo(BuildContext context) {
-    final _$actionInfo = _$_CreatePostStoreActionController.startAction(
-      name: '_CreatePostStore.showDialogSelectImageOrVideo',
-    );
-    try {
-      return super.showDialogSelectImageOrVideo(context);
-    } finally {
-      _$_CreatePostStoreActionController.endAction(_$actionInfo);
-    }
-  }
 
   @override
   void onTapOptionDraggable(BuildContext context, int index) {
@@ -257,12 +103,12 @@ mixin _$CreatePostStore on _CreatePostStore, Store {
   }
 
   @override
-  void onTapOptionPost(BuildContext context, int index) {
+  void resetPostForm() {
     final _$actionInfo = _$_CreatePostStoreActionController.startAction(
-      name: '_CreatePostStore.onTapOptionPost',
+      name: '_CreatePostStore.resetPostForm',
     );
     try {
-      return super.onTapOptionPost(context, index);
+      return super.resetPostForm();
     } finally {
       _$_CreatePostStoreActionController.endAction(_$actionInfo);
     }
@@ -271,15 +117,8 @@ mixin _$CreatePostStore on _CreatePostStore, Store {
   @override
   String toString() {
     return '''
-listFile: ${listFile},
-isVideo: ${isVideo},
-videoController: ${videoController},
-fellingText: ${fellingText},
-hasText: ${hasText},
+isLoadingEditPost: ${isLoadingEditPost},
 initialChildSize: ${initialChildSize},
-hasImage: ${hasImage},
-hasVideo: ${hasVideo},
-listNameItemOption: ${listNameItemOption},
 listNameItemDraggable: ${listNameItemDraggable}
     ''';
   }

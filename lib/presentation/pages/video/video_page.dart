@@ -51,16 +51,20 @@ class _VideoPageState extends State<VideoPage> {
                 scale: scale,
                 child: Container(
                   height: SizeUtil.getMaxHeight(),
-                  color: Colors.black.withOpacity(1),
+                  color: Colors.black,
                   child: Stack(
                     children: [
-                      SetUpVideoPlayer(
+                      SizedBox(
                         height: SizeUtil.getMaxHeight(),
-                        videoUrl: ImagesPath.Video2,
-                        isAsset: true,
-                        autoPlay: true,
-                        looping: true,
-                        fit: BoxFit.cover,
+                        child: Center(
+                          child: SetUpVideoPlayer(
+                            videoUrl: ImagesPath.Video2,
+                            isAsset: true,
+                            autoPlay: true,
+                            looping: true,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(

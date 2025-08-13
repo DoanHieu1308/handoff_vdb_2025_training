@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
-import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 
 import '../../../../core/base_widget/images/set_up_asset_image.dart';
 import '../../../../core/helper/app_text.dart';
 import '../../../../core/helper/size_util.dart';
 import '../../../../core/utils/images_path.dart';
+import '../pages/profile_page/profile_store.dart';
 
 Widget buildDrawer(BuildContext context, ProfileStore store, UserModel userProfile) {
   return Align(

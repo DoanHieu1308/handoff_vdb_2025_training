@@ -63,6 +63,60 @@ mixin _$InfoFriendStore on _InfoFriendStore, Store {
     });
   }
 
+  late final _$postsAtom = Atom(
+    name: '_InfoFriendStore.posts',
+    context: context,
+  );
+
+  @override
+  ObservableList<PostOutputModel> get posts {
+    _$postsAtom.reportRead();
+    return super.posts;
+  }
+
+  @override
+  set posts(ObservableList<PostOutputModel> value) {
+    _$postsAtom.reportWrite(value, super.posts, () {
+      super.posts = value;
+    });
+  }
+
+  late final _$currentPageAtom = Atom(
+    name: '_InfoFriendStore.currentPage',
+    context: context,
+  );
+
+  @override
+  int get currentPage {
+    _$currentPageAtom.reportRead();
+    return super.currentPage;
+  }
+
+  @override
+  set currentPage(int value) {
+    _$currentPageAtom.reportWrite(value, super.currentPage, () {
+      super.currentPage = value;
+    });
+  }
+
+  late final _$hasMoreAtom = Atom(
+    name: '_InfoFriendStore.hasMore',
+    context: context,
+  );
+
+  @override
+  bool get hasMore {
+    _$hasMoreAtom.reportRead();
+    return super.hasMore;
+  }
+
+  @override
+  set hasMore(bool value) {
+    _$hasMoreAtom.reportWrite(value, super.hasMore, () {
+      super.hasMore = value;
+    });
+  }
+
   late final _$_InfoFriendStoreActionController = ActionController(
     name: '_InfoFriendStore',
     context: context,
@@ -85,7 +139,10 @@ mixin _$InfoFriendStore on _InfoFriendStore, Store {
     return '''
 profileFriend: ${profileFriend},
 selectedFolderIndex: ${selectedFolderIndex},
-isLSeeMore: ${isLSeeMore}
+isLSeeMore: ${isLSeeMore},
+posts: ${posts},
+currentPage: ${currentPage},
+hasMore: ${hasMore}
     ''';
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:handoff_vdb_2025/presentation/pages/camera/camera_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_page.dart';
@@ -7,88 +7,65 @@ import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_page
 import 'package:handoff_vdb_2025/presentation/pages/login/login_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/component/more_setting_info_friend.dart';
 import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_page.dart';
+import '../../../core/enums/auth_enums.dart';
+import '../../../data/model/post/post_output_model.dart';
+import '../../../presentation/pages/create_post_advanced_options_setting/component/status_post_page.dart';
+import '../../../presentation/pages/create_post_advanced_options_setting/component/tag_friends_page.dart';
+import '../../../presentation/pages/posts/components/show_all_image.dart';
+import '../../../presentation/pages/profile/pages/profile_picture_camera/profile_picture_camera.dart';
 
-import '../../../presentation/pages/create_post/component/post_advanced_options_setting/page/status_post_page.dart';
-import '../../../presentation/pages/create_post/component/post_advanced_options_setting/page/tag_friends_page.dart';
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
-mixin AuthRouters {
-  static const String DASH_BOARD = '/dash_board';
-  static const String FRIENDS = '/friends';
-  static const String INFO_FRIENDS = '/info_friends';
-  static const String LOGIN = '/login';
-  static const String SIGNUP = '/sign_up';
-  static const String MORE_SETTING_INFO_FRIEND = '/more_setting_info_friend';
-  static const String CAMERA = '/camera';
-  static const String CREATE_POST = '/create_post';
-  static const String STATUS_POST = '/status_post';
-  static const String TAG_FRIEND = '/tag_friend';
-
-  static Route<dynamic> routes(RouteSettings settings) {
-    if (settings.name == DASH_BOARD) {
-      return MaterialPageRoute(
-          builder: (context) => DashBoardPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == FRIENDS) {
-      return MaterialPageRoute(
-          builder: (context) => FriendsPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == INFO_FRIENDS) {
-      return MaterialPageRoute(
-          builder: (context) => InfoFriendPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == LOGIN) {
-      return MaterialPageRoute(
-          builder: (context) => LoginPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == SIGNUP) {
-      return MaterialPageRoute(
-          builder: (context) => SignUpPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == MORE_SETTING_INFO_FRIEND) {
-      return MaterialPageRoute(
-          builder: (context) => MoreSettingInfoFriend(),
-          settings: settings
-      );
-    }
-    else if (settings.name == CAMERA) {
-      return MaterialPageRoute(
-          builder: (context) => CameraPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == CREATE_POST) {
-      return MaterialPageRoute(
-          builder: (context) => CreatePostPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == STATUS_POST) {
-      return MaterialPageRoute(
-          builder: (context) => StatusPostPage(),
-          settings: settings
-      );
-    }
-    else if (settings.name == TAG_FRIEND) {
-      return MaterialPageRoute(
-          builder: (context) => TagFriendsPage(),
-          settings: settings
-      );
-    }
-    else {
-      return MaterialPageRoute(
-          builder: (context) => DashBoardPage(),
-          settings: settings
-      );
-    }
-  }
-}
+final GoRouter router = GoRouter(
+  initialLocation: AuthRoutes.SIGNUP,
+  routes: [
+    GoRoute(
+      path: AuthRoutes.DASH_BOARD,
+      builder: (context, state) => DashBoardPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.FRIENDS,
+      builder: (context, state) => FriendsPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.INFO_FRIENDS,
+      builder: (context, state) => InfoFriendPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.LOGIN,
+      builder: (context, state) => LoginPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.SIGNUP,
+      builder: (context, state) => SignUpPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.MORE_SETTING_INFO_FRIEND,
+      builder: (context, state) => MoreSettingInfoFriend(),
+    ),
+    GoRoute(
+      path: AuthRoutes.CAMERA,
+      builder: (context, state) => ProfilePictureCamera(),
+    ),
+    GoRoute(
+      path: AuthRoutes.CREATE_POST,
+      builder: (context, state) => CreatePostPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.STATUS_POST,
+      builder: (context, state) => StatusPostPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.TAG_FRIEND,
+      builder: (context, state) => TagFriendsPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.SHOW_ALL_IMAGE,
+      builder: (context, state) {
+        final postData = state.extra as PostOutputModel;
+        return ShowAllImage(postData: postData);
+      }
+    ),
+  ],
+  observers: [routeObserver]
+);

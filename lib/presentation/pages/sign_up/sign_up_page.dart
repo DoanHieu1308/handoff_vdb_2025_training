@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/color_resources.dart';
 import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_store.dart';
 
@@ -12,7 +15,7 @@ import '../../../core/utils/images_path.dart';
 import '../account/personal_information/widget/auth_input.dart';
 
 class SignUpPage extends StatefulWidget {
-  SignUpStore store = SignUpStore();
+
   SignUpPage({super.key});
 
   @override
@@ -20,6 +23,13 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final SignUpStore store = AppInit.instance.signUpStore;
+  @override
+  void initState() {
+    store.init();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,30 +78,30 @@ class _SignUpPageState extends State<SignUpPage> {
           children: [
             // name
             AuthInput(
-              controller: widget.store.name,
+              controller: store.name,
               hintText: 'Nhập họ và tên',
               fillColor: ColorResources.COLOR_A4A2A2.withValues(alpha: 0.1),
               prefixIcon: ImagesPath.icUser,
               onNext: () {
-                widget.store.focusNodeEmail.requestFocus();
+                store.focusNodeEmail.requestFocus();
               },
-              errorText: widget.store.nameError,
-              focusNode: widget.store.focusNodeName,
+              errorText: store.nameError,
+              focusNode:store.focusNodeName,
               onChange: (value) {},
             ),
             SizeUtil.SPACE_2X.verticalSpace,
 
             // SDT
             AuthInput(
-              controller: widget.store.email,
+              controller: store.email,
               hintText: 'Nhập email',
               fillColor: ColorResources.COLOR_A4A2A2.withValues(alpha: 0.1),
               prefixIcon: ImagesPath.icEmail,
               onNext: () {
-                widget.store.focusNodePassword.requestFocus();
+                store.focusNodePassword.requestFocus();
               },
-              errorText: widget.store.emailError,
-              focusNode: widget.store.focusNodeEmail,
+              errorText: store.emailError,
+              focusNode: store.focusNodeEmail,
             ),
 
             SizeUtil.SPACE_2X.verticalSpace,
@@ -99,13 +109,13 @@ class _SignUpPageState extends State<SignUpPage> {
             AuthInput(
               isPassword: true,
               fillColor: ColorResources.COLOR_F6F6F7,
-              controller: widget.store.password,
+              controller: store.password,
               hintText: 'Mật khẩu',
-              focusNode: widget.store.focusNodePassword,
+              focusNode: store.focusNodePassword,
               onNext: () {
-                widget.store.focusNodeConfirmPassword.requestFocus();
+                store.focusNodeConfirmPassword.requestFocus();
               },
-              errorText: widget.store.passwordError,
+              errorText: store.passwordError,
               prefixIcon: ImagesPath.icPassword,
             ),
 
@@ -114,10 +124,10 @@ class _SignUpPageState extends State<SignUpPage> {
             AuthInput(
               isPassword: true,
               fillColor: ColorResources.COLOR_F6F6F7,
-              controller: widget.store.confirmPassword,
+              controller: store.confirmPassword,
               hintText: 'Xác nhận mật khẩu',
-              focusNode: widget.store.focusNodeConfirmPassword,
-              errorText: widget.store.confirmPasswordError,
+              focusNode: store.focusNodeConfirmPassword,
+              errorText: store.confirmPasswordError,
               prefixIcon: ImagesPath.icPassword,
             ),
             SizedBox(height: 33.h),
@@ -129,9 +139,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _buttonSignUp(BuildContext context) => GestureDetector(
     onTap: (){
-      widget.store.signUp(onSuccess: (auth){
-        Navigator.of(context).pushNamed(AuthRouters.LOGIN);
-        widget.store.checkSavedData();
+      store.signUp(onSuccess: (auth){
+        context.push(AuthRoutes.LOGIN);
+        store.checkSavedData();
       }, onError: (error) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
       });
@@ -163,7 +173,7 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.of(context).pushNamed(AuthRouters.LOGIN);
+                context.push(AuthRoutes.LOGIN);
               },
               child: Text(
                 ' Đăng nhập ngay',

@@ -7,7 +7,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../../../core/utils/app_constants.dart';
 import '../../../../data/model/response/user_model.dart';
 import '../friends_store.dart';
-import '../widget/item_card_friend.dart';
+import 'item_card_friend.dart';
 
 class ListUserFriend extends StatefulWidget {
   final FriendsStore store;

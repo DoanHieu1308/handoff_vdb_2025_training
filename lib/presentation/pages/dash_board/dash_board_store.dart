@@ -1,8 +1,9 @@
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
-import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 import 'package:mobx/mobx.dart';
+
+import '../profile/pages/profile_page/profile_store.dart';
 part 'dash_board_store.g.dart';
 
 class DashBoardStore = _DashBoardStore with _$DashBoardStore;
@@ -18,10 +19,7 @@ abstract class _DashBoardStore with Store {
   ///
   /// Init
   ///
-  _DashBoardStore() {
-    _init();
-  }
-  Future<void> _init() async {
+  Future<void> init() async {
     friendsStore.getAllFriends();
     friendsStore.selectedCategoryName = ALL_FRIENDS;
     profileStore.getUserProfile();

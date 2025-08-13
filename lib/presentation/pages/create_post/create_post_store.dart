@@ -1,18 +1,34 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
+import 'package:handoff_vdb_2025/core/extensions/dynamic_extension.dart';
+import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
+import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
+import 'package:handoff_vdb_2025/data/model/post/post_input_model.dart';
+import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/link_preview_store/link_preview_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/media_store/media_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/text_store/text_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/home/home_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/profile/pages/profile_page/profile_store.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter/cupertino.dart';
-import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
-import 'package:handoff_vdb_2025/presentation/pages/camera/camera_store.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobx/mobx.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart' as ul;
 import 'package:video_player/video_player.dart';
 import '../../../core/utils/images_path.dart';
+import '../../../data/model/post/post_link_meta.dart';
+import '../../../data/model/post/post_output_model.dart';
 import '../../widget/custom_dialog.dart';
+import '../create_post_advanced_options_setting/create_post_advanced_options_setting_store.dart';
+import '../profile/pages/profile_picture_camera/profile_picture_camera_store.dart';
 
 part 'create_post_store.g.dart';
 
@@ -20,47 +36,39 @@ class CreatePostStore = _CreatePostStore with _$CreatePostStore;
 
 abstract class _CreatePostStore with Store {
   /// Store
-  final CameraStore cameraStore = AppInit.instance.cameraStore;
+  final HomeStore homeStore = AppInit.instance.homeStore;
+  final ProfileStore profileStore = AppInit.instance.profileStore;
+  CreatePostAdvancedOptionSettingStore get createPostAdvancedOptionSettingStore => AppInit.instance.createPostAdvancedOptionSettingStore;
+
+  /// Sub store
+   LinkPreviewStore get linkPreviewStore => AppInit.instance.linkPreviewStore;
+   MediaStore get mediaStore => AppInit.instance.mediaStore;
+   TextStore get textStore => AppInit.instance.textStore;
 
   /// Controller
-  final feelingEditingController = TextEditingController();
-  final DraggableScrollableController controllerDraggableScrollable =
-      DraggableScrollableController();
-  final ScrollController scrollController = ScrollController();
+  final DraggableScrollableController controllerDraggableScrollable = DraggableScrollableController();
+
+  /// Repository
+  final PostRepository postRepository = AppInit.instance.postRepository;
 
   /// Focus node
   final FocusNode feelingFocusNode = FocusNode();
 
-  /// Image / Video
-  final ImagePicker _picker = ImagePicker();
+  /// Edit post
   @observable
-  ObservableList<File> listFile = ObservableList.of([]);
-  @observable
-  bool isVideo = false;
-  @observable
-  VideoPlayerController? videoController;
+  bool isLoadingEditPost = false;
 
-  ///
+  /// Receive link from youtube
   @observable
-  String fellingText = '';
-  @observable
-  bool hasText = false;
+  String? _sharedText;
+
+  /// Value
   @observable
   double initialChildSize = 0.5;
 
-  /// Image/Video
-  @observable
-  bool hasImage = false;
-  @observable
-  bool hasVideo = false;
-
   /// Init
   Future<void> init() async {
-    feelingEditingController.addListener(() {
-      fellingText = feelingEditingController.text;
-      hasText = fellingText.isNotEmpty;
-    });
-
+    textStore.init();
     feelingFocusNode.addListener(() {
       if (feelingFocusNode.hasFocus) {
         initialChildSize = 0.2;
@@ -72,18 +80,11 @@ abstract class _CreatePostStore with Store {
 
   /// Dispose
   void dispose() {
-    videoController?.dispose();
+    linkPreviewStore.dispose();
+    mediaStore.dispose();
+    textStore.dispose();
   }
 
-  /// List item detail all
-  @observable
-  ObservableList<Map<String, dynamic>> listNameItemOption = ObservableList.of([
-    {'name': "Chỉ mình tôi", 'image': ImagesPath.icLock, 'valueNumber': 0},
-    {'name': "Album", 'image': ImagesPath.icAdd, 'valueNumber': 1},
-    {'name': "Đang tắt", 'image': ImagesPath.icInstagram, 'valueNumber': 2},
-    {'name': "Đang tắt ", 'image': ImagesPath.icThreads, 'valueNumber': 3},
-    {'name': "Nhãn AL đang tắt", 'image': ImagesPath.icAdd, 'valueNumber': 4},
-  ]);
 
   /// List item detail all
   @observable
@@ -115,211 +116,6 @@ abstract class _CreatePostStore with Store {
         {'name': "Nhạc", 'image': ImagesPath.icMusic, 'valueNumber': 8},
       ]);
 
-  /// Get image from gallery
-  @action
-  Future<void> pickImageFromGallery(BuildContext context) async {
-    try {
-      final picked = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1080,
-        maxHeight: 1920,
-        imageQuality: 85,
-      );
-      if (picked == null) return;
-
-      final pickedFile = File(picked.path);
-      if (!await pickedFile.exists()) return;
-
-      final croppedImage = await cameraStore.cropImage(pickedFile, context);
-      if (croppedImage != null) {
-        final cropImagePath = croppedImage.path;
-        final croppedFile = File(cropImagePath);
-        final imageResized = await resizeImage(croppedFile);
-        if (imageResized.existsSync()) {
-          final copiedFile = await copyToTempWithUniqueName(imageResized);
-
-          //
-          if (listFile.isEmpty) {
-            listFile = ObservableList.of([copiedFile]);
-          } else {
-            listFile.add(copiedFile);
-          }
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (scrollController.hasClients) {
-              scrollController.animateTo(
-                scrollController.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeOut,
-              );
-            }
-          });
-
-          isVideo = false;
-          hasImage = true;
-          hasVideo = false;
-
-          // Tìm video đầu tiên trong listFile
-          final videoFile = listFile.firstWhere(
-            (f) => _isVideoFile(f.path),
-            orElse: () => File(''),
-          );
-
-          // Nếu tồn tại video trong list thì khởi tạo lại controller
-          if (videoFile.path.isNotEmpty && await videoFile.exists()) {
-            await _initializeVideoController(videoFile);
-          }
-        }
-      }
-    } catch (e) {
-      _reset();
-    }
-  }
-
-  /// Get size of image
-  @action
-  Future<Size> getImageSize(File file) async {
-    final bytes = await file.readAsBytes();
-    final codec = await instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    return Size(frame.image.width.toDouble(), frame.image.height.toDouble());
-  }
-
-  /// Resize image
-  Future<File> resizeImage(File file) async {
-    final bytes = await file.readAsBytes();
-    final image = img.decodeImage(bytes);
-    final resized = img.copyResize(image!, width: 1080);
-
-    final tempDir = await getTemporaryDirectory();
-    final resizedPath = '${tempDir.path}/resized_image.jpg';
-    final resizedFile = File(resizedPath)
-      ..writeAsBytesSync(img.encodeJpg(resized, quality: 85));
-    return resizedFile;
-  }
-
-  /// copy path image
-  Future<File> copyToTempWithUniqueName(File file) async {
-    final tempDir = await getTemporaryDirectory();
-    final uniqueName =
-        'media_${DateTime.now().millisecondsSinceEpoch}${path.extension(file.path)}';
-    final newPath = path.join(tempDir.path, uniqueName);
-    return await file.copy(newPath);
-  }
-
-  /// Get video from gallery
-  @action
-  Future<void> pickVideoFromGallery() async {
-    try {
-      final picked = await _picker.pickVideo(source: ImageSource.gallery);
-      if (picked == null) return;
-
-      final pickedFile = File(picked.path);
-      if (!await pickedFile.exists()) return;
-
-
-      listFile.add(pickedFile);
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
-          scrollController.animateTo(
-            scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-
-      isVideo = true;
-      hasImage = false;
-      hasVideo = true;
-
-      await _initializeVideoController(pickedFile);
-    } catch (e) {
-      _reset();
-    }
-  }
-
-  /// Initialize video controller
-  Future<void> _initializeVideoController(File file) async {
-    videoController?.dispose();
-    videoController = VideoPlayerController.file(file);
-    await videoController!.initialize();
-    await videoController!.setLooping(true);
-    await videoController!.play();
-  }
-
-  /// check video
-  bool _isVideoFile(String path) {
-    final ext = path.toLowerCase();
-    return ext.endsWith('.mp4') || ext.endsWith('.mov') || ext.endsWith('.avi');
-  }
-
-  /// Reset
-  void _reset() {
-    listFile.clear();
-    isVideo = false;
-    hasImage = false;
-    hasVideo = false;
-    videoController?.dispose();
-    videoController = null;
-  }
-
-  /// Remove file
-  void removeFile(File target) {
-    listFile.removeWhere((f) => f.path == target.path);
-
-    // Nếu bạn muốn reset khi danh sách trống
-    if (listFile.isEmpty) {
-      _reset();
-    }
-  }
-
-  /// Show dialog select image or video
-  @action
-  void showDialogSelectImageOrVideo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return CustomDialog(
-          title: "Bạn muốn chọn ảnh hay video?",
-          message: "------------------",
-          textNumber1: "Ảnh",
-          textNumber2: "Video",
-          onTapNumber1: () {
-            Navigator.pop(context);
-            pickImageFromGallery(context);
-          },
-          onTapNumber2: () {
-            pickVideoFromGallery();
-            Navigator.pop(context);
-          },
-        );
-      },
-    );
-  }
-
-  /// Check file limits before adding
-  void checkFileLimit(BuildContext context){
-    if(listFile.length < 3){
-      showDialogSelectImageOrVideo(context);
-    }
-    else{
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Thông báo'),
-          content: Text('Bạn chỉ được chọn tối đa 3 ảnh hoặc video.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Đóng'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
 
   /// OnTap option draggable
   @action
@@ -329,10 +125,10 @@ abstract class _CreatePostStore with Store {
 
     switch (value) {
       case 1:
-        showDialogSelectImageOrVideo(context);
+        mediaStore.showDialogSelectImageOrVideo(context);
         break;
       case 2:
-        Navigator.of(context).pushNamed(AuthRouters.TAG_FRIEND);
+        context.push(AuthRoutes.TAG_FRIEND);
         break;
       case 3:
         break;
@@ -351,23 +147,189 @@ abstract class _CreatePostStore with Store {
     }
   }
 
-  /// OnTap option draggable
+
+  /// reset value
   @action
-  void onTapOptionPost(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        Navigator.of(context).pushNamed(AuthRouters.STATUS_POST);
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      case 3:
-        break;
-      case 4:
-        break;
-      default:
-        break;
+  void resetPostForm() {
+    // Temporarily remove listener to avoid triggering during reset
+    if (textStore.textListener != null) {
+      textStore.feelingEditingController.removeListener(textStore.textListener!);
+    }
+    
+    // Clear text input
+    textStore.feelingEditingController.text = '';
+    textStore.fellingText = '';
+    textStore.hasText = false;
+
+    // Clear hashtags
+    textStore.hashtags.clear();
+
+    // Clear images/videos
+    mediaStore.listFile.clear();
+    mediaStore.imageListUrl.clear();
+    mediaStore.videoListUrl.clear();
+    mediaStore.hasImage = false;
+    mediaStore.hasVideo = false;
+
+    // Clear video controller if used
+    try {
+      mediaStore.videoController?.dispose();
+    } catch (e) {
+      print('Error disposing video controller in reset: $e');
+    }
+    mediaStore.videoController = null;
+
+    // Clear link preview
+    linkPreviewStore.detectedLink = null;
+    linkPreviewStore.previewData = PostLinkMeta();
+    linkPreviewStore.hasLink = false;
+    linkPreviewStore.debounce?.cancel();
+    linkPreviewStore.debounce = null;
+    linkPreviewStore.isLoadingPreview = false;
+
+    // Reset scroll position
+    if (mediaStore.scrollController.hasClients) {
+      mediaStore.scrollController.jumpTo(0);
+    }
+    
+    if (controllerDraggableScrollable.isAttached) {
+      controllerDraggableScrollable.animateTo(
+        initialChildSize,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+
+    // Reset focus
+    feelingFocusNode.unfocus();
+    createPostAdvancedOptionSettingStore.reset();
+    
+    // Re-add listener after reset to ensure it works properly
+    if (textStore.textListener != null) {
+      textStore.feelingEditingController.addListener(textStore.textListener!);
     }
   }
+
+
+  /// Post status
+  Future<void> postCreate(BuildContext context) async {
+    // Set loading state immediately for better UX
+    homeStore.isLoadingPost = true;
+    homeStore.postMessage = '';
+
+    // Add a small delay to show loading UI
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    await mediaStore.uploadAllFilesAndSplit();
+
+    PostInputModel postInputModel = PostInputModel();
+    postInputModel.title = textStore.feelingEditingController.text;
+    postInputModel.content = "ahihi";
+    postInputModel.privacy = createPostAdvancedOptionSettingStore.currentStatus;
+    postInputModel.hashtags = textStore.hashtags;
+    postInputModel.friendsTagged = createPostAdvancedOptionSettingStore.tagFriendList
+        .map((u) => u.name?.trim())
+        .where((n) => n != null && n.isNotEmpty)
+        .map((n) => n!)
+        .toList();
+    postInputModel.images = mediaStore.imageListUrl;
+    postInputModel.videos = mediaStore.videoListUrl;
+    postInputModel.postLinkMeta = linkPreviewStore.previewData;
+
+    await postRepository.postStatus(
+        data: postInputModel,
+        onSuccess: (data) async {
+          homeStore.isLoadingPost = false;
+          homeStore.postMessage = "Đăng bài viết thành công!";
+          homeStore.isPostSuccess = true;
+          // Reload feed on Home
+          await homeStore.getALlPosts(type: PUBLIC);
+
+          resetPostForm();
+        },
+        onError: (error) async {
+          homeStore.isLoadingPost = false;
+          homeStore.postMessage = "Đăng bài viết thất bại!";
+          homeStore.isPostSuccess = false;
+
+          resetPostForm();
+          print("loi o preview link  $error");
+        }
+    );
+  }
+
+  /// Post status
+  Future<void> editPostStatus({
+    required PostOutputModel itemEdit,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+    feelingFocusNode.unfocus();
+    isLoadingEditPost = true;
+
+    // Chỉ cập nhật nếu có thay đổi
+    if (textStore.feelingEditingController.text.trim().isNotEmpty &&
+        textStore.feelingEditingController.text.trim() != itemEdit.title) {
+      itemEdit.title = textStore.feelingEditingController.text.trim();
+    }
+
+    if (createPostAdvancedOptionSettingStore.currentStatus != itemEdit.privacy) {
+      itemEdit.privacy = createPostAdvancedOptionSettingStore.currentStatus;
+    }
+
+    final newHashtags = textStore.hashtags;
+    if (newHashtags.isNotEmpty && newHashtags != itemEdit.hashtags) {
+      itemEdit.hashtags = newHashtags;
+    }
+
+    final newTaggedFriends = createPostAdvancedOptionSettingStore.tagFriendList
+        .map((u) => u.name?.trim())
+        .where((n) => n != null && n.isNotEmpty)
+        .map((n) => n!)
+        .toList();
+    if (newTaggedFriends.isNotEmpty && newTaggedFriends != itemEdit.friendsTagged) {
+      itemEdit.friendsTagged = newTaggedFriends;
+    }
+
+    await mediaStore.uploadAllFilesAndSplit();
+
+    if (mediaStore.imageListUrl.isNotEmpty && mediaStore.imageListUrl != itemEdit.images) {
+      itemEdit.images = mediaStore.imageListUrl;
+    }
+
+    if (mediaStore.videoListUrl.isNotEmpty && mediaStore.videoListUrl != itemEdit.videos) {
+      itemEdit.videos = mediaStore.videoListUrl;
+    }
+
+    if (linkPreviewStore.previewData != null && linkPreviewStore.previewData != itemEdit.postLinkMeta) {
+      itemEdit.postLinkMeta = linkPreviewStore.previewData;
+    }
+
+    await postRepository.editPostStatus(
+      data: itemEdit,
+      onSuccess: (data) async {
+        await profileStore.loadInitialPostsByUserId();
+
+        isLoadingEditPost = false;
+        onSuccess();
+      },
+      onError: (error) async {
+        print("Lỗi khi cập nhật bài viết: $error");
+
+        isLoadingEditPost = false;
+        onError(error);
+      },
+    );
+  }
+
+  /// Open Url
+  Future<void> openUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+
+    if (await ul.canLaunchUrl(uri)) {
+      await ul.launchUrl(uri, mode: ul.LaunchMode.externalApplication);
+    }
+  }
+
 }

@@ -18,6 +18,12 @@ class _SearchPageState extends State<SearchPage> {
   final SearchStore store = AppInit.instance.searchStore;
 
   @override
+  void initState() {
+    store.init();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {

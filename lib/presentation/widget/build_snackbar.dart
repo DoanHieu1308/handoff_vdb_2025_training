@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-SnackBar buildSnackBarNotify({required String textNotify}) {
+SnackBar buildSnackBarNotify({required String textNotify, Color? backgroundColor}) {
   return SnackBar(
     backgroundColor: Colors.transparent,
     elevation: 0,
@@ -9,7 +9,7 @@ SnackBar buildSnackBarNotify({required String textNotify}) {
     content: Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor ?? Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -21,15 +21,30 @@ SnackBar buildSnackBarNotify({required String textNotify}) {
       ),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 24),
+          Icon(
+            backgroundColor == Colors.red ? Icons.error : Icons.check_circle, 
+            color: backgroundColor == Colors.red ? Colors.red : Colors.green, 
+            size: 24
+          ),
           SizedBox(width: 12),
           Expanded(
             child: Text(
               textNotify,
-              style: TextStyle(fontSize: 15, color: Colors.black),
+              style: TextStyle(
+                fontSize: 15, 
+                color: backgroundColor == Colors.red ? Colors.white : Colors.black
+              ),
             ),
           ),
-          TextButton(onPressed: () {}, child: Text("Undo")),
+          TextButton(
+            onPressed: () {}, 
+            child: Text(
+              "Undo",
+              style: TextStyle(
+                color: backgroundColor == Colors.red ? Colors.white : Colors.black
+              )
+            )
+          ),
         ],
       ),
     ),

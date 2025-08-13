@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 
 import '../../../../core/helper/app_text.dart';
@@ -8,8 +10,10 @@ import '../../../../core/utils/color_resources.dart';
 import '../../account/personal_information/widget/auth_input.dart';
 
 class CreatePostText extends StatelessWidget {
-  CreatePostStore store;
-  CreatePostText({super.key, required this.store});
+  final TextEditingController feelingEditingController;
+  final bool hasText;
+  final FocusNode feelingFocusNode;
+  CreatePostText({super.key, required this.feelingEditingController, required this.hasText, required this.feelingFocusNode});
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +31,13 @@ class CreatePostText extends StatelessWidget {
           ),
         ),
         AuthInput(
-          controller: store.feelingEditingController,
+          controller: feelingEditingController,
           hintText: "Bạn đang nghĩ gì?",
-          maxLine: store.hasText ? 5 : 10,
+          maxLine: hasText ? 5 : 10,
           hintStyle: AppText.text22.copyWith(color: ColorResources.LIGHT_GREY),
           textStyle: AppText.text23_bold,
           fillColor: Colors.transparent,
-          focusNode: store.feelingFocusNode,
+          focusNode: feelingFocusNode,
         ),
       ],
     );

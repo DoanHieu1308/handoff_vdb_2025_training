@@ -199,44 +199,6 @@ class FriendRepository {
     }
   }
 
-  // ///
-  // /// Get followers
-  // ///
-  // Future<void> getAllFriendFollowers ({
-  //   required Function(List<FriendRequestModel> data) onSuccess,
-  //   required Function(dynamic error) onError
-  // }) async {
-  //
-  //   // Check if user is logged in
-  //   final accessToken = _sharedPreferenceHelper.getAccessToken;
-  //   if (accessToken == null || accessToken.isEmpty) {
-  //     onError("User not logged in");
-  //     return;
-  //   }
-  //
-  //   Response<dynamic> response;
-  //   try{
-  //     response = await _dio.get(EndPoint.ALL_FRIENDS_FOLLOWERS);
-  //   }catch (e) {
-  //     print("Error details: $e");
-  //     onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
-  //     return;
-  //   }
-  //   if (!Validate.nullOrEmpty(response.statusCode) &&
-  //       response.statusCode! >= 200 &&
-  //       response.statusCode! <= 300) {
-  //     final results = response.data as Map<String, dynamic>;
-  //     final metadata = results['metadata'] as Map<String, dynamic>;
-  //     final followers = metadata['followers'] as List<dynamic>;
-  //
-  //     final List<FriendRequestModel> friendRequestList = followers
-  //         .map((item) => FriendRequestModel.fromMap(item as Map<String, dynamic>))
-  //         .toList();
-  //
-  //     onSuccess(friendRequestList);
-  //   }
-  // }
-
   ///
   /// Accept friend
   ///

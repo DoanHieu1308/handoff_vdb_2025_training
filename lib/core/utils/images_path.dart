@@ -75,9 +75,24 @@ mixin ImagesPath {
   static String icGlobe = 'assets/features/ic_globe.svg';
   static String icCancel = 'assets/features/ic_cancel.svg';
   static String icAddImageVideo = 'assets/features/ic_add_image_video.svg';
-
+  static String icPin = 'assets/features/ic_pin.svg';
+  static String icSave = 'assets/features/ic_save.svg';
+  static String icBlackEdit = 'assets/features/ic_black_edit.svg';
+  static String icBoxSave = 'assets/features/ic_box_save.svg';
+  static String icTurnOffNotification = 'assets/features/ic_turn_off_notification.svg';
+  static String icBlackCopyLink = 'assets/features/ic_black_copy_link.svg';
+  static String icDelete = 'assets/features/ic_delete.svg';
+  static String icHandshake = 'assets/features/ic_handshake.svg';
 
   /// Video
   static String Video1 = 'assets/features/video1.mp4';
   static String Video2 = 'assets/features/video2.mp4';
+
+  /// Json
+  static String emojiLike = 'assets/features/emoji_like.json';
+  static String emojiLove = 'assets/features/emoji_love.json';
+  static String emojiHaha = 'assets/features/emoji_haha.json';
+  static String emojiWow = 'assets/features/emoji_wow.json';
+  static String emojiSad = 'assets/features/emoji_sad.json';
+  static String emojiAngry = 'assets/features/emoji_angry.json';
 }

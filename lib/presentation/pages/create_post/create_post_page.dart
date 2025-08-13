@@ -1,27 +1,27 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
-import 'package:handoff_vdb_2025/core/base_widget/video/set_up_video_player.dart';
-import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
+import 'package:go_router/go_router.dart';
+import 'package:handoff_vdb_2025/core/helper/app_divider.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
 import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/color_resources.dart';
-import 'package:handoff_vdb_2025/core/utils/images_path.dart';
-import 'package:handoff_vdb_2025/presentation/pages/create_post/component/draggable_option.dart';
+import 'package:handoff_vdb_2025/data/model/post/post_output_model.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/component/create_post_bottom_bar.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/component/create_post_link.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/component/create_post_draggable_options.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
-import 'package:handoff_vdb_2025/presentation/pages/create_post/component/widget_option.dart';
-import '../../../config/routes/route_path/auth_routers.dart';
-import 'component/bottom_bar_create_post.dart';
+import '../../widget/build_snackbar.dart';
+import '../create_post_advanced_options_setting/create_post_advanced_option_setting.dart';
+import 'component/button_post.dart';
 import 'component/create_post_image_or_video.dart';
 import 'component/create_post_text.dart';
 
 class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({super.key});
+  final PostOutputModel? initialPost;
+
+  const CreatePostPage({super.key, this.initialPost});
 
   @override
   State<CreatePostPage> createState() => _CreatePostPageState();
@@ -30,9 +30,43 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   CreatePostStore store = AppInit.instance.createPostStore;
 
+  bool get isEditPost => widget.initialPost != null;
+
+  // Trong Store
+  bool get hasAnyContent => store.textStore.hasText || store.linkPreviewStore.hasLink || store.mediaStore.hasImage || store.mediaStore.hasVideo;
+
+  void _mapPostData() {
+    store.textStore.feelingEditingController.text = widget.initialPost?.title ?? '';
+
+    store.createPostAdvancedOptionSettingStore.currentStatus =
+        widget.initialPost?.privacy ?? '';
+
+    if (widget.initialPost!.images!.isNotEmpty) {
+      store.mediaStore.hasImage = true;
+      store.mediaStore.listFile.addAll(widget.initialPost!.images!);
+    }
+    if (widget.initialPost!.videos!.isNotEmpty) {
+      store.mediaStore.hasVideo = true;
+      store.mediaStore.listFile.addAll(widget.initialPost!.videos!);
+    }
+    if (widget.initialPost!.postLinkMeta != null) {
+      store.linkPreviewStore.hasLink = true;
+      store.linkPreviewStore.previewData = widget.initialPost!.postLinkMeta!;
+    }
+  }
+
   @override
   void initState() {
     store.init();
+    if (isEditPost) {
+      _mapPostData();
+    } else {
+      store.resetPostForm();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(store.feelingFocusNode);
+    });
+
     super.initState();
   }
 
@@ -44,41 +78,106 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-              FocusScope.of(context).unfocus();
-            },
-            child: const Icon(Icons.arrow_back_ios_new_outlined, size: 22)),
-        title: Text("Tạo bài viết", style: AppText.text18),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 20.w),
-            child: Container(
-              height: 35.h,
-              width: 70.w,
-              decoration: BoxDecoration(
-                color: ColorResources.LIGHT_GREY.withValues(alpha: 0.7),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(
-                  "ĐĂNG",
-                  style: AppText.text14_bold.copyWith(
-                    color: Colors.black.withValues(alpha: 0.4),
+    return WillPopScope(
+      onWillPop: () async {
+        store.resetPostForm();
+        return true;
+      },
+      child: Observer(
+        builder: (context) {
+          return Stack(
+            children: [
+              Scaffold(
+                backgroundColor: Colors.white,
+                resizeToAvoidBottomInset: true,
+                appBar: AppBar(
+                  backgroundColor: Colors.white,
+                  leading: GestureDetector(
+                    onTap: () {
+                      store.resetPostForm();
+                      Navigator.pop(context);
+                      FocusScope.of(context).unfocus();
+                    },
+                    child: const Icon(
+                      Icons.arrow_back_ios_new_outlined,
+                      size: 22,
+                    ),
                   ),
+                  title: Text(
+                    isEditPost ? "Chỉnh sửa bài viết" : "Tạo bài viết",
+                    style: AppText.text18,
+                  ),
+                  actions: [
+                    Padding(
+                      padding: EdgeInsets.only(right: 20.w),
+                      child: Observer(
+                        builder: (context) {
+                          return GestureDetector(
+                            onTap: () async {
+                              if (isEditPost) {
+                                if (hasAnyContent) {
+                                  store.editPostStatus(
+                                    itemEdit: widget.initialPost!,
+                                    onSuccess: () {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        buildSnackBarNotify(
+                                          textNotify: "Thành công",
+                                          backgroundColor: null,
+                                        ),
+                                      );
+                                      if (mounted) {
+                                        if (!store.isLoadingEditPost)
+                                          context.pop();
+                                      }
+                                    },
+                                    onError: (error) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        buildSnackBarNotify(
+                                          textNotify: error,
+                                          backgroundColor: null,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                              } else {
+                                if (hasAnyContent) {
+                                  store.postCreate(context);
+                                  if (mounted) {
+                                    context.pop();
+                                  }
+                                }
+                              }
+                            },
+                            child:
+                                store.isLoadingEditPost
+                                    ? CircularProgressIndicator()
+                                    : ButtonPost(
+                                      name: isEditPost ? "LƯU" : "ĐĂNG",
+                                      hasdata: hasAnyContent,
+                                    ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
+                body: buildBody(),
               ),
-            ),
-          ),
-        ],
+              if (store.isLoadingEditPost)
+                Container(
+                  height: SizeUtil.getMaxHeight(),
+                  width: SizeUtil.getMaxWidth(),
+                  color: Colors.black26,
+                ),
+            ],
+          );
+        },
       ),
-      body: buildBody(),
     );
   }
 
@@ -86,24 +185,24 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return Observer(
       builder: (context) {
         return Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      buildBodyPost(),
-                      Visibility(
-                        visible:
-                            !store.hasText && !store.hasVideo && !store.hasImage,
-                        child: DraggableOption(store: store),
-                      ),
-                    ],
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  buildBodyPost(),
+                  Visibility(
+                    visible:
+                        !store.textStore.hasText && !store.mediaStore.hasVideo && !store.mediaStore.hasImage,
+                    child: CreatePostDraggableOptions(),
                   ),
-                ),
-                if (store.hasText || store.hasImage || store.hasVideo)
-                  buildBottomNavigationBar(),
-              ],
-            );
-      }
+                ],
+              ),
+            ),
+            if (store.textStore.hasText || store.mediaStore.hasImage || store.mediaStore.hasVideo)
+              CreatePostBottomBar(),
+          ],
+        );
+      },
     );
   }
 
@@ -114,131 +213,25 @@ class _CreatePostPageState extends State<CreatePostPage> {
           physics: const ClampingScrollPhysics(),
           child: Column(
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: 5.h),
-                height: 1.h,
-                decoration: const BoxDecoration(color: ColorResources.LIGHT_GREY),
-              ),
-              buildOptionPost(),
+              AppDivider.v5,
+              CreatePostAdvancedOptionSetting(),
               Visibility(
-                visible: store.hasImage || store.hasVideo,
-                child: CreatePostImageOrVideo(store: store),
+                visible: store.mediaStore.hasImage || store.mediaStore.hasVideo,
+                child: CreatePostImageOrVideo(listFile: store.mediaStore.listFile),
               ),
               Visibility(
-                visible: !store.hasImage && !store.hasVideo,
-                child: CreatePostText(store: store),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-
-  Widget buildBottomNavigationBar() {
-    return Observer(
-      builder: (context) {
-        return Container(
-          padding: EdgeInsets.symmetric(vertical: 10.h),
-          height: 50.h,
-          width: SizeUtil.getMaxWidth(),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: ColorResources.LIGHT_GREY.withValues(alpha: 0.5),
-              width: 1,
-            ),
-            color: ColorResources.WHITE.withValues(alpha: 0.2),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              BottomBarCreatePost(
-                onTap: () {
-                  store.checkFileLimit(context);
-                },
-                imagePath: ImagesPath.icPhotos,
-              ),
-              BottomBarCreatePost(
-                onTap: () {
-                  Navigator.of(context).pushNamed(AuthRouters.TAG_FRIEND);
-                },
-                imagePath: ImagesPath.icTag,
-              ),
-              BottomBarCreatePost(
-                onTap: () {
-
-                },
-                imagePath: ImagesPath.icFeeling,
-              ),
-              BottomBarCreatePost(
-                onTap: () {
-
-                },
-                imagePath: ImagesPath.icCheckIn,
-              ),
-              BottomBarCreatePost(
-                onTap: () {
-
-                },
-                imagePath: ImagesPath.icMore,
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Row buildOptionPost() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          flex: 2,
-          child: CircleAvatar(
-            radius: 25,
-            child: ClipOval(
-              child: SetUpAssetImage(
-                ImagesPath.icPerson,
-                height: 50.h,
-                width: 50.w,
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 7,
-          child: SizedBox(
-            height: 130.h,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Đoàn Hiếu", style: AppText.text16_bold),
-                SizedBox(height: 5.h),
-                Wrap(
-                  runSpacing: 7.h,
-                  spacing: 6.w,
-                  children:
-                      store.listNameItemOption.map<Widget>((option) {
-                        return WidgetOption(
-                          onTap: () {
-                            print(option["valueNumber"]);
-                            store.onTapOptionPost(
-                              context,
-                              option["valueNumber"],
-                            );
-                          },
-                          name: option['name'],
-                          icon: option['image'],
-                        );
-                      }).toList(),
+                visible: !store.mediaStore.hasImage && !store.mediaStore.hasVideo && !store.linkPreviewStore.hasLink,
+                child: CreatePostText(
+                  feelingEditingController: store.textStore.feelingEditingController,
+                  hasText: store.textStore.hasText,
+                  feelingFocusNode: store.feelingFocusNode,
                 ),
-              ],
-            ),
+              ),
+              Visibility(visible: store.linkPreviewStore.hasLink, child: CreatePostLink()),
+            ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

@@ -14,6 +14,10 @@ class SetUpAssetImage extends StatelessWidget {
   final double? height;
   final BoxFit? fit;
   final Color? color;
+  final FilterQuality? filterQuality;
+  final bool? gaplessPlayback;
+  final ImageErrorWidgetBuilder? errorBuilder;
+
 
   const SetUpAssetImage(
       this.urlImage, {
@@ -22,6 +26,9 @@ class SetUpAssetImage extends StatelessWidget {
         this.height,
         this.fit,
         this.color,
+        this.filterQuality,
+        this.gaplessPlayback,
+        this.errorBuilder,
       });
 
   @override
@@ -34,7 +41,7 @@ class SetUpAssetImage extends StatelessWidget {
         width: width,
         color: color,
         placeholder: (context, url) => _buildLoadingPlaceholder(),
-        errorWidget: (context, url, error) => _buildErrorPlaceholder(),
+        errorWidget:  (context, url, error) => _buildErrorPlaceholder(),
       );
     }
 
@@ -56,8 +63,9 @@ class SetUpAssetImage extends StatelessWidget {
         height: height,
         width: width,
         fit: fit ?? BoxFit.contain,
-        filterQuality: FilterQuality.high,
-        errorBuilder: (context, error, stackTrace) => _buildErrorPlaceholder(),
+        filterQuality: filterQuality ?? FilterQuality.high,
+        gaplessPlayback: gaplessPlayback ?? true,
+        errorBuilder: errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
       );
     }
 

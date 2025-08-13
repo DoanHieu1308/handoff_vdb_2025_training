@@ -24,3 +24,7 @@ enum InputType {
   MULTILINE,
   DATE,
 }
+
+enum PostOptionType { onlyMe, album, instagram, threads, label }
+
+enum MatchType { hashtag, link }

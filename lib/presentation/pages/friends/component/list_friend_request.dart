@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:handoff_vdb_2025/data/model/friend/friend_sent_model.dart';
-import 'package:handoff_vdb_2025/presentation/pages/friends/widget/item_card_friend_request.dart';
-import 'package:handoff_vdb_2025/presentation/pages/friends/widget/item_card_friend_sent.dart';
+import 'package:handoff_vdb_2025/presentation/pages/friends/component/item_card_friend_request.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../../../core/utils/app_constants.dart';
-import '../../../../core/utils/images_path.dart';
-import '../../../../data/model/friend/friend_request_model.dart';
 import '../friends_store.dart';
+import 'item_card_friend_sent.dart';
 
 class ListFriendRequest extends StatefulWidget {
   final FriendsStore store;

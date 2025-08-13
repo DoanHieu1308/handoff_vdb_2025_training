@@ -33,6 +33,10 @@ const String STRANGER = 'stranger';
 const String PENDING_SENT = 'pending_sent';
 const String PENDING_RECEIVED = 'pending_received';
 
+/// Post
+const String PUBLIC = 'public';
+const String FRIEND = 'friend';
+const String PRIVATE = 'private';
 
 /// [checkImageWithExtSvg] to check image form svg.
 const String checkImageWithExtSvg = '.svg';

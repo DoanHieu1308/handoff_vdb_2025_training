@@ -18,9 +18,17 @@ class Header extends StatelessWidget {
       ),
       child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
-          child: SizedBox(
+          child: Container(
+              padding: EdgeInsets.all(1),
               height: 50.h,
               width: SizeUtil.getMaxWidth(),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 0.5,
+                  color: Colors.grey.shade800
+                ),
+                borderRadius: BorderRadius.circular(12)
+              ),
               child: SearchPage()
           )
       ),

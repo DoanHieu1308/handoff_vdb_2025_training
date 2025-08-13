@@ -36,6 +36,7 @@ class AuthInput extends StatefulWidget {
   final TextStyle? hintStyle;
   final bool? enabled;
   final String? errorText;
+  final bool? showCursor;
 
   const AuthInput({
     super.key,
@@ -67,7 +68,8 @@ class AuthInput extends StatefulWidget {
     this.styleLable,
     this.hintStyle,
     this.enabled = true,
-    this.errorText
+    this.errorText,
+    this.showCursor
   });
 
   @override
@@ -140,13 +142,12 @@ class _AuthInputState extends State<AuthInput> {
         onTap: widget.onTap,
         focusNode: widget.focusNode,
         obscureText: obscureText,
+        showCursor: widget.showCursor,
         controller: widget.controller,
         cursorColor: ColorResources.PRIMARY_TEXT,
-        style:
-        widget.textStyle ??
-            TextStyle(color: ColorResources.BLACK, fontSize: 14.sp, fontWeight: FontWeight.w600),
+        style: widget.textStyle ?? TextStyle(color: ColorResources.BLACK, fontSize: 14.sp, fontWeight: FontWeight.w600),
         maxLength: widget.isPassword ? null : widget.maxLength,
-        keyboardType: widget.keyboardType,
+        keyboardType: widget.maxLine != null && widget.maxLine! > 1 ? TextInputType.multiline : widget.keyboardType,
         inputFormatters: widget.inputFormatters,
         textInputAction: widget.onNext != null ? TextInputAction.next : widget.textInputAction,
         maxLines: widget.isPassword ? 1 : widget.maxLine,
@@ -187,8 +188,8 @@ class _AuthInputState extends State<AuthInput> {
           ),
           fillColor: widget.fillColor,
           filled: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
-          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
+          isDense: false,
           hintText: widget.hintText,
           hintStyle: widget.hintStyle ?? AppText.text14.copyWith(color: ColorResources.LABEL),
           suffixIcon:

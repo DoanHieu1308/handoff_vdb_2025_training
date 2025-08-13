@@ -75,6 +75,7 @@ class _FriendsPageState extends State<FriendsPage> {
                   FocusScope.of(context).unfocus();
                 },
                 child: Scaffold(
+                  backgroundColor: Colors.grey.shade50,
                   resizeToAvoidBottomInset: false,
                   body: Column(
                 children: [

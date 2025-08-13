@@ -4,7 +4,7 @@ import '../../../core/helper/validate.dart';
 
 class FriendSentModel {
   String? id;
-  String? fromUser;
+  UserModel? fromUser;
   UserModel? toUser;
   String? type;
   DateTime? acceptedAt;
@@ -25,9 +25,9 @@ class FriendSentModel {
 
   FriendSentModel copyWith({
     String? id,
-    String? fromUser,
+    UserModel? fromUser,
     UserModel? toUser,
-    String? status,
+    String? type,
     DateTime? acceptedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -37,7 +37,7 @@ class FriendSentModel {
       id: id ?? this.id,
       fromUser: fromUser ?? this.fromUser,
       toUser: toUser ?? this.toUser,
-      type: status ?? this.type,
+      type: type ?? this.type,
       acceptedAt: acceptedAt ?? this.acceptedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -48,7 +48,7 @@ class FriendSentModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       if (!Validate.nullOrEmpty(id)) '_id': id,
-      if (!Validate.nullOrEmpty(fromUser)) 'fromUser': fromUser,
+      if (fromUser != null) 'fromUser': fromUser!.toMap(),
       if (toUser != null) 'toUser': toUser!.toMap(),
       if (!Validate.nullOrEmpty(type)) 'type': type,
       if (acceptedAt != null) 'acceptedAt': acceptedAt!.toIso8601String(),
@@ -61,7 +61,9 @@ class FriendSentModel {
   factory FriendSentModel.fromMap(Map<String, dynamic> map) {
     return FriendSentModel(
       id: map['_id'] as String?,
-      fromUser: map['fromUser'] as String?,
+      fromUser: map['fromUser'] != null
+          ? UserModel.fromMap(map['fromUser'] as Map<String, dynamic>)
+          : null,
       toUser: map['toUser'] != null
           ? UserModel.fromMap(map['toUser'] as Map<String, dynamic>)
           : null,

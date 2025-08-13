@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
+import 'package:go_router/go_router.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_model.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_request_model.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_sent_model.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
-import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/search/search_store.dart';
 import 'package:mobx/mobx.dart';
@@ -34,7 +34,7 @@ abstract class _FriendsStore with Store {
   InfoFriendStore get infoFriendStore => AppInit.instance.infoFriendStore;
 
   /// Repository
-  late final FriendRepository _friendRepository;
+  final _friendRepository = AppInit.instance.friendRepository;
 
   /// SharePreference
   final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
@@ -77,17 +77,6 @@ abstract class _FriendsStore with Store {
   /// Reject
   @observable
   FriendModel rejectFriend = FriendModel();
-
-  ///-------------------------------------------------------------
-  /// Init
-  ///
-  _FriendsStore() {
-     _init();
-  }
-  Future<void> _init() async {
-    // Get dependencies directly
-    _friendRepository = FriendRepository();
-  }
 
   ///------------------------------------------------------------
   /// Dispose
@@ -280,7 +269,7 @@ abstract class _FriendsStore with Store {
           final index = friendListPending.indexWhere(
                   (friend) => friend.fromUser?.id == friendId);
           if (index != -1) {
-            final updatedFriend = friendListPending[index].copyWith(status: "accepted");
+            final updatedFriend = friendListPending[index].copyWith(type: "accepted");
             friendListPending[index] = updatedFriend;
             print("Friend request accepted successfully");
           } else {
@@ -571,10 +560,9 @@ abstract class _FriendsStore with Store {
     required String friendId,
     required BuildContext context
   })async {
-    await infoFriendStore.getFriendProfile(friendId: friendId).then((_) {
-      Navigator.of(context).pushNamed(
-        AuthRouters.INFO_FRIENDS,
-      );
+    await infoFriendStore.getFriendProfile(friendId: friendId);
+    await infoFriendStore.getPostsOfFriendByUserId(userId: friendId).then((_) {
+      context.push(AuthRoutes.INFO_FRIENDS);
     });
   }
 

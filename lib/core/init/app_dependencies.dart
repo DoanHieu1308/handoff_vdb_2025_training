@@ -6,9 +6,10 @@ import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/login/login_store.dart';
-import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/search/search_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_store.dart';
+
+import '../../presentation/pages/profile/pages/profile_page/profile_store.dart';
 
 /// Global access to app dependencies
 class AppDependencies {

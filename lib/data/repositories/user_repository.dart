@@ -23,7 +23,6 @@ class UserRepository {
   }
 
   Future<void> _init() async {
-    /// TODO
     _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
   }
 
@@ -139,7 +138,7 @@ class UserRepository {
     try {
       response =
       await _dio.post(
-          EndPoint.UPLOAD,
+          EndPoint.UPLOAD_AVATAR,
           data: formData,
         options: Options(
           headers: {

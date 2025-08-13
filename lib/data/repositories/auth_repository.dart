@@ -5,11 +5,14 @@ import 'package:handoff_vdb_2025/data/exception/api_error_handler.dart';
 import 'package:handoff_vdb_2025/data/model/auth/auth_model.dart';
 import 'package:handoff_vdb_2025/data/model/base/api_response.dart';
 import 'package:handoff_vdb_2025/domain/end_points/end_point.dart';
+import '../../core/shared_pref/shared_preference_helper.dart';
 import '../data_source/dio/dio_client.dart';
 import '../model/response/user_model.dart';
 
 class AuthRepository {
   late final DioClient _dio;
+  final SharedPreferenceHelper _sharedPreferenceHelper = AppInit.instance
+      .sharedPreferenceHelper;
 
   AuthRepository() {
     _dio = AppInit.instance.dioClient;
@@ -105,8 +108,23 @@ class AuthRepository {
     required Function(dynamic error) onError
   }) async{
     Response<dynamic> response;
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
     try{
-      response = await _dio.post(EndPoint.LOGOUT);
+      response = await _dio.post(
+        EndPoint.LOGOUT,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
     } catch (e) {
       onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
       return;

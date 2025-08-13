@@ -18,12 +18,7 @@ abstract class _SearchStore with Store {
   ///
   /// Init
   ///
-  _SearchStore() {
-    _init();
-  }
-
-  Future<void> _init() async {
-    // Thêm listener để cập nhật searchText khi text thay đổi
+  Future<void> init() async {
     textEditingController.addListener(() {
       searchText = textEditingController.text;
       hasText = searchText.isNotEmpty;

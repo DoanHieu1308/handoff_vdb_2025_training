@@ -5,24 +5,26 @@ import 'package:handoff_vdb_2025/data/data_source/dio/dio_client.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/follow_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
+import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
-import 'package:handoff_vdb_2025/presentation/pages/camera/camera_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/link_preview_store/link_preview_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/media_store/media_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/text_store/text_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
-import 'package:handoff_vdb_2025/presentation/pages/home/home_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/home/home_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/item_detail/item_detail_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/login/login_store.dart';
-import 'package:handoff_vdb_2025/presentation/pages/post_status/post_status_page.dart';
-import 'package:handoff_vdb_2025/presentation/pages/post_status/post_status_store.dart';
-import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/search/search_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/video/video_store.dart';
+import '../../presentation/pages/create_post_advanced_options_setting/create_post_advanced_options_setting_store.dart';
+import '../../presentation/pages/posts/post_item_store.dart';
+import '../../presentation/pages/profile/pages/profile_page/profile_store.dart';
+import '../../presentation/pages/profile/pages/profile_picture_camera/profile_picture_camera_store.dart';
 
-import '../../presentation/pages/create_post/component/post_advanced_options_setting/post_options_setting_store.dart';
 
 class AppInit {
   static AppInit? _instance;
@@ -41,13 +43,14 @@ class AppInit {
   late final FriendRepository friendRepository;
   late final UserRepository userRepository;
   late final FollowRepository followRepository;
+  late final PostRepository postRepository;
 
   // Stores
   late final LoginStore loginStore;
   late final SignUpStore signUpStore;
   late final DashBoardStore dashBoardStore;
   late final VideoStore videoStore;
-  late final CameraStore cameraStore;
+  late final ProfilePictureCameraStore profilePictureCamera;
   late final ProfileStore profileStore;
   late final InfoFriendStore infoFriendStore;
   late final SearchStore searchStore;
@@ -55,8 +58,15 @@ class AppInit {
   late final ItemDetailStore itemDetailStore;
   late final HomeStore homeStore;
   late final CreatePostStore createPostStore;
-  late final PostOptionsSettingStore postOptionsSettingStore;
-  late final PostStatusStore postStatusStore;
+  late final CreatePostAdvancedOptionSettingStore createPostAdvancedOptionSettingStore;
+  late final PostItemStore postStatusStore;
+
+  /// sub store
+  // Create store
+  late final MediaStore mediaStore;
+  late final LinkPreviewStore linkPreviewStore;
+  late final TextStore textStore;
+
 
   /// Initialize all dependencies
   Future<void> init() async {
@@ -111,6 +121,7 @@ class AppInit {
       friendRepository = FriendRepository();
       userRepository = UserRepository();
       followRepository = FollowRepository();
+      postRepository = PostRepository();
       debugPrint('Repositories initialized');
     } catch (e) {
       debugPrint('Repositories initialization failed: $e');
@@ -134,17 +145,23 @@ class AppInit {
 
       // 4. Khởi tạo các store phụ thuộc vào FriendsStore
       profileStore = ProfileStore();
-      postStatusStore = PostStatusStore();
+
       homeStore = HomeStore();
       dashBoardStore = DashBoardStore();
-      cameraStore = CameraStore();
+      profilePictureCamera = ProfilePictureCameraStore();
+
       createPostStore = CreatePostStore();
-      postOptionsSettingStore = PostOptionsSettingStore();
-
-
+      postStatusStore = PostItemStore();
+      createPostAdvancedOptionSettingStore = CreatePostAdvancedOptionSettingStore();
 
       // 5. Khởi tạo ItemDetailStore cuối cùng (phụ thuộc vào FriendsStore qua constructor)
       itemDetailStore = ItemDetailStore(friendsStore);
+
+      /// Sub store
+      mediaStore = MediaStore(createPostStore);
+      linkPreviewStore = LinkPreviewStore(createPostStore);
+      textStore = TextStore(createPostStore);
+
       
       debugPrint('Stores initialized');
     } catch (e) {

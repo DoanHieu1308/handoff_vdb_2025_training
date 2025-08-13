@@ -5,7 +5,7 @@ import '../../../core/helper/validate.dart';
 class FriendRequestModel {
   String? id;
   UserModel? fromUser;
-  String? toUser;
+  UserModel? toUser;
   String? type;
   DateTime? acceptedAt;
   DateTime? createdAt;
@@ -26,8 +26,8 @@ class FriendRequestModel {
   FriendRequestModel copyWith({
     String? id,
     UserModel? fromUser,
-    String? toUser,
-    String? status,
+    UserModel? toUser,
+    String? type,
     DateTime? acceptedAt,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -37,7 +37,7 @@ class FriendRequestModel {
       id: id ?? this.id,
       fromUser: fromUser ?? this.fromUser,
       toUser: toUser ?? this.toUser,
-      type: status ?? this.type,
+      type: type ?? this.type,
       acceptedAt: acceptedAt ?? this.acceptedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -49,7 +49,7 @@ class FriendRequestModel {
     return <String, dynamic>{
       if (!Validate.nullOrEmpty(id)) '_id': id,
       if (fromUser != null) 'fromUser': fromUser!.toMap(),
-      if (!Validate.nullOrEmpty(toUser)) 'toUser': toUser,
+      if (toUser != null) 'toUser': toUser!.toMap(),
       if (!Validate.nullOrEmpty(type)) 'type': type,
       if (acceptedAt != null) 'acceptedAt': acceptedAt!.toIso8601String(),
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
@@ -64,7 +64,9 @@ class FriendRequestModel {
       fromUser: map['fromUser'] != null
           ? UserModel.fromMap(map['fromUser'] as Map<String, dynamic>)
           : null,
-      toUser: map['toUser'] as String?,
+      toUser: map['toUser'] != null
+          ? UserModel.fromMap(map['toUser'] as Map<String, dynamic>)
+          : null,
       type: map['type'] as String?,
       acceptedAt: map['acceptedAt'] != null
           ? DateTime.tryParse(map['acceptedAt'] as String)
