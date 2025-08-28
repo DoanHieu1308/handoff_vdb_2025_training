@@ -44,6 +44,14 @@ class SharedPreferenceHelper {
   Future<void> setPassword(String password) async =>
       await _sharedPreference.setString(Preferences.password, password);
 
+  // value received
+  List<String>? get getReceivedValues => _sharedPreference.getStringList(Preferences.receivedValues);
+  Future<void> setReceivedValue(List<String> receivedValues) async =>
+      await _sharedPreference.setStringList(Preferences.receivedValues, receivedValues);
+  Future<void> clearReceivedValue() async =>
+      await _sharedPreference.remove(Preferences.receivedValues);
+
+
   ///
   /// Set id user.
   ///

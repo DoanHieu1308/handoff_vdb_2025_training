@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/extensions/dynamic_extension.dart';
+import 'package:handoff_vdb_2025/core/helper/app_sitebox.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/component/show_image.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/component/show_video.dart';
@@ -76,11 +77,24 @@ class CreatePostImageOrVideo extends StatelessWidget {
                     ),
                     Positioned(
                       top: 20.h,
-                      left: SizeUtil.getMaxWidth() - 40.w,
-                      child: buildDeleteButton(
-                        onTap: () {
-                          store.mediaStore.removeFile(file);
-                        },
+                      left: SizeUtil.getMaxWidth() - (isVideoFile ? 50.w : 80.w),
+                      child: Row(
+                        children: [
+                          if(!isVideoFile)
+                          buildDeleteButton(
+                            onTap: () {
+                              store.mediaStore.cropImageAtIndex(context, index);
+                            },
+                            image: ImagesPath.icBlackEdit
+                          ),
+                          AppSiteBox.w15,
+                          buildDeleteButton(
+                            image: ImagesPath.icCancel,
+                            onTap: () {
+                              store.mediaStore.removeFile(file);
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -91,6 +105,7 @@ class CreatePostImageOrVideo extends StatelessWidget {
             GestureDetector(
               onTap: (){
                   store.mediaStore.checkFileLimit(context);
+                  store.isReceivedValue = false;
               },
               child: SizedBox(
                 height: 130.h,
@@ -124,7 +139,7 @@ class CreatePostImageOrVideo extends StatelessWidget {
     );
   }
 
-  GestureDetector buildDeleteButton({required VoidCallback onTap}) {
+  Widget buildDeleteButton({required VoidCallback onTap, required String image}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -138,7 +153,7 @@ class CreatePostImageOrVideo extends StatelessWidget {
           child: SetUpAssetImage(
             height: 13.h,
             width: 13.w,
-            ImagesPath.icCancel,
+            image,
             color: Colors.black54,
           ),
         ),

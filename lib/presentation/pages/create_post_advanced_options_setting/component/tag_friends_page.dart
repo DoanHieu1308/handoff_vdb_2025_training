@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
 import 'package:handoff_vdb_2025/core/helper/size_util.dart';
@@ -63,7 +64,12 @@ class _TagFriendsPageState extends State<TagFriendsPage> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10.w),
-            child: ButtonPost(name: "XONG", hasdata: true),
+            child: GestureDetector(
+                onTap: (){
+                  router.pop();
+                },
+                child: ButtonPost(name: "XONG", hasdata: true)
+            ),
           ),
         ],
       ),

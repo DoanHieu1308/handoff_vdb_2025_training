@@ -12,47 +12,46 @@ class CustomReactionLikeButton extends StatefulWidget {
   const CustomReactionLikeButton({super.key, required this.itemPost});
 
   @override
-  State<CustomReactionLikeButton> createState() => _CustomReactionLikeButtonState();
+  State<CustomReactionLikeButton> createState() =>
+      _CustomReactionLikeButtonState();
 }
 
 class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
-  PostItemStore store = AppInit.instance.postStatusStore;
-  final List<String> reactions = [
-    ImagesPath.emojiLike,
-    ImagesPath.emojiLove,
-    ImagesPath.emojiHaha,
-    ImagesPath.emojiWow,
-    ImagesPath.emojiSad,
-    ImagesPath.emojiAngry,
-  ];
+  PostItemStore postItemStore = AppInit.instance.postItemStore;
 
-  // Map emoji => text name
-  final Map<String, String> reactionNames = {
-    ImagesPath.icLike : "unLike",
-    ImagesPath.emojiLike : "Like",
-    ImagesPath.emojiLove : "Love",
-    ImagesPath.emojiHaha : "Haha",
-    ImagesPath.emojiWow : "Wow",
-    ImagesPath.emojiSad : "Sad",
-    ImagesPath.emojiAngry : "Angry",
-  };
+  String selectedReaction = "";
 
-  String selectedReaction = ImagesPath.icLike;
+  @override
+  void initState() {
+    super.initState();
+    selectedReaction = widget.itemPost.myFeel ?? "";
+  }
 
   OverlayEntry? overlayEntry;
   int hoveredIndex = -1;
 
+  final List<String> reactionKeys = [
+    "like",
+    "love",
+    "haha",
+    "wow",
+    "sad",
+    "angry",
+  ];
+
   void showReactions(BuildContext context, Offset globalPosition) {
     final screenSize = MediaQuery.of(context).size;
-    const double popupHeight = 60; // chiều cao container reactions
-    const double popupWidth = 50; // chiều rộng reactions
-    const double offsetY = 20; // khoảng cách so với icon
+    const double popupHeight = 60;
+    const double popupWidth = 50;
+    const double offsetY = 20;
 
     overlayEntry = OverlayEntry(
       builder: (context) {
         return Positioned(
-          left: (globalPosition.dx - popupWidth / 2)
-              .clamp(0.0, screenSize.width - popupWidth),
+          left: (globalPosition.dx - popupWidth / 2).clamp(
+            0.0,
+            screenSize.width - popupWidth,
+          ),
           top: globalPosition.dy - popupHeight - offsetY,
           child: Material(
             color: Colors.transparent,
@@ -63,13 +62,16 @@ class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                      blurRadius: 8, color: Colors.black.withOpacity(0.2))
+                    blurRadius: 8,
+                    color: Colors.black.withOpacity(0.2),
+                  ),
                 ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: List.generate(reactions.length, (index) {
+                children: List.generate(reactionKeys.length, (index) {
                   final isHovered = index == hoveredIndex;
+                  final key = reactionKeys[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6),
                     child: AnimatedScale(
@@ -78,9 +80,7 @@ class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
                       child: SizedBox(
                         height: 35,
                         width: 35,
-                        child: Lottie.asset(
-                          reactions[index],
-                        ),
+                        child: Lottie.asset(postItemStore.reactionNames[key]!),
                       ),
                     ),
                   );
@@ -97,11 +97,11 @@ class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
   void updateHoveredIcon(Offset globalPosition) {
     final screenWidth = MediaQuery.of(context).size.width;
     final startX = screenWidth / 2 - 150;
-    final iconWidth = 40.0;
+    const iconWidth = 40.0;
     final dx = globalPosition.dx - startX;
 
     int newIndex = (dx / (iconWidth + 12)).floor();
-    if (newIndex >= 0 && newIndex < reactions.length) {
+    if (newIndex >= 0 && newIndex < reactionKeys.length) {
       setState(() {
         hoveredIndex = newIndex;
       });
@@ -109,14 +109,51 @@ class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
     }
   }
 
+  void handleReactionUpdate({
+    required String selectedReaction,
+  }) {
+    // Cập nhật trong homeStore.allPostsPublic
+    postItemStore.updateReactionInPostsList(
+      postId: widget.itemPost.id ?? "",
+      selectedReaction: selectedReaction,
+      postsList: postItemStore.homeStore.allPostsPublic,
+    );
+
+    // Cập nhật trong profileStore.posts
+    postItemStore.updateReactionInPostsList(
+      postId: widget.itemPost.id ?? "",
+      selectedReaction: selectedReaction,
+      postsList: postItemStore.profileStore.posts,
+    );
+
+    // Cập nhật trong infoFriendStore.posts (nếu có)
+    try {
+      final infoFriendStore = AppInit.instance.infoFriendStore;
+      if (infoFriendStore.posts.isNotEmpty) {
+        postItemStore.updateReactionInPostsList(
+          postId: widget.itemPost.id ?? "",
+          selectedReaction: selectedReaction,
+          postsList: infoFriendStore.posts,
+        );
+      }
+    } catch (e) {
+      // Bỏ qua nếu infoFriendStore chưa được khởi tạo
+    }
+  }
+
   void hideReactions() {
     if (hoveredIndex != -1) {
       setState(() {
-        selectedReaction = reactions[hoveredIndex];
-        print("${reactionNames[selectedReaction]}");
-        store.dropEmoji(
-            postId: widget.itemPost.id ?? "",
-            iconName: reactionNames[selectedReaction] ?? ""
+        selectedReaction = reactionKeys[hoveredIndex];
+        postItemStore.dropEmoji(
+          postId: widget.itemPost.id ?? "",
+          iconName: selectedReaction,
+          onSuccess: () {
+            handleReactionUpdate(
+              selectedReaction: selectedReaction,
+            );
+          },
+          onError: (error) {},
         );
       });
     }
@@ -127,27 +164,30 @@ class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
 
   void oneTapReactions() {
     setState(() {
-      if (selectedReaction == ImagesPath.icLike) {
-        selectedReaction = ImagesPath.emojiLike;
-      } else if (selectedReaction == ImagesPath.emojiLike) {
-        selectedReaction = ImagesPath.icLike;
+      if (selectedReaction == "") {
+        selectedReaction = "like";
       } else {
-        selectedReaction = ImagesPath.icLike;
+        selectedReaction = "";
       }
     });
 
-    store.dropEmoji(
+    postItemStore.dropEmoji(
       postId: widget.itemPost.id ?? "",
-      iconName: reactionNames[selectedReaction] ?? "",
+      iconName: selectedReaction,
+      onSuccess: () {
+        handleReactionUpdate(
+          selectedReaction: selectedReaction,
+        );
+      },
+      onError: (error) {},
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final iconPath = postItemStore.reactionNames[selectedReaction] ?? ImagesPath.icLike;
     return GestureDetector(
-      onTap: () {
-        oneTapReactions();
-      },
+      onTap: oneTapReactions,
       onLongPressStart: (details) {
         showReactions(context, details.globalPosition);
       },
@@ -164,20 +204,18 @@ class _CustomReactionLikeButtonState extends State<CustomReactionLikeButton> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if(selectedReaction == ImagesPath.icLike)
+            if (selectedReaction == "")
               SetUpAssetImage(
-                  height: 23,
-                  width: 23,
-                  ImagesPath.icLike,
-                  fit: BoxFit.cover,
+                height: 23,
+                width: 23,
+                iconPath,
+                fit: BoxFit.cover,
               )
-            else SizedBox(
-                height: 25,
-                width: 25,
-                child: Lottie.asset(selectedReaction)
-            ),
+            else
+              SizedBox(height: 25, width: 25, child: Lottie.asset(iconPath)),
             const SizedBox(width: 6),
-            Text(selectedReaction == ImagesPath.icLike ?  "Like" : reactionNames[selectedReaction] ?? "Like",
+            Text(
+              selectedReaction == "" ? "like" : selectedReaction,
               style: AppText.text10,
             ),
           ],

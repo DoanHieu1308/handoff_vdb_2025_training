@@ -111,6 +111,8 @@ class SentAndAcceptFriend extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SetUpAssetImage(
+                        height: 20.h,
+                        width: 20.w,
                         ImagesPath.icMessenger,
                         color:
                         store.profileFriend.relation == ACCEPTED

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:handoff_vdb_2025/data/model/post/post_feels.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_link_meta.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 
@@ -14,14 +16,43 @@ class PostOutputModel {
   PostLinkMeta? postLinkMeta;
   List<String>? hashtags;
   String? content;
-  List<String>? friendsTagged;
-  Map<String, dynamic>? feel;
-  Map<String, dynamic>? feelCount;
+  List<UserModel>? friendsTagged;
+  List<PostFeel>? feels;
+  Map<String, dynamic>? feelCount; // ✅ sửa key ở toMap / fromMap
+  String? myFeel;
   int? comments;
   int? views;
+
   DateTime? createdAt;
   DateTime? updatedAt;
   int? v;
+
+  int get totalFeel {
+    if (feelCount == null) return 0;
+
+    return feelCount!.values
+        .whereType<int>()
+        .fold(0, (sum, value) => sum + value);
+  }
+
+  List<String>? get top2 {
+    if (feelCount == null || feelCount!.isEmpty) return [];
+
+    // Lọc chỉ các entry có giá trị > 0
+    final filtered = feelCount!.entries
+        .where((entry) => entry.value > 0)
+        .toList();
+
+    // Nếu không có cảm xúc nào > 0, trả về []
+    if (filtered.isEmpty) return [];
+
+    // Sắp xếp giảm dần theo giá trị
+    filtered.sort((a, b) => b.value.compareTo(a.value));
+
+    // Trả về tối đa 2 key (tên cảm xúc)
+    return filtered.take(2).map((entry) => entry.key).toList();
+  }
+
 
   PostOutputModel({
     this.id,
@@ -34,8 +65,9 @@ class PostOutputModel {
     this.hashtags,
     this.content,
     this.friendsTagged,
-    this.feel,
+    this.feels,
     this.feelCount,
+    this.myFeel,
     this.comments,
     this.views,
     this.createdAt,
@@ -53,11 +85,14 @@ class PostOutputModel {
     PostLinkMeta? postLinkMeta,
     List<String>? hashtags,
     String? content,
-    List<String>? friendsTagged,
-    Map<String, dynamic>? feel,
+    List<UserModel>? friendsTagged,
+    List<PostFeel>? feels,
     Map<String, dynamic>? feelCount,
+    String? myFeel,
     int? comments,
     int? views,
+    int? totalFeel,
+    List<String>? top2,
     DateTime? createdAt,
     DateTime? updatedAt,
     int? v,
@@ -73,8 +108,9 @@ class PostOutputModel {
       hashtags: hashtags ?? this.hashtags,
       content: content ?? this.content,
       friendsTagged: friendsTagged ?? this.friendsTagged,
-      feel: feel ?? this.feel,
+      feels: feels ?? this.feels,
       feelCount: feelCount ?? this.feelCount,
+      myFeel: myFeel ?? this.myFeel,
       comments: comments ?? this.comments,
       views: views ?? this.views,
       createdAt: createdAt ?? this.createdAt,
@@ -94,11 +130,16 @@ class PostOutputModel {
       if (postLinkMeta != null) 'post_link_meta': postLinkMeta!.toMap(),
       if (hashtags != null && hashtags!.isNotEmpty) 'hashtags': hashtags,
       if (!Validate.nullOrEmpty(content)) 'content': content,
-      if (friendsTagged != null && friendsTagged!.isNotEmpty) 'friends_tagged': friendsTagged,
-      if (feel != null) 'feel': feel,
-      if (feelCount != null) 'feelCount': feelCount,
+      if (friendsTagged != null && friendsTagged!.isNotEmpty)
+        'friends_tagged': friendsTagged!.map((f) => f.toMap()).toList(),
+      if (feels != null && feels!.isNotEmpty)
+        'feels': feels!.map((f) => f.toMap()).toList(),
+      if (feelCount != null) 'feel_count': feelCount, // ✅ sửa key
+      if (!Validate.nullOrEmpty(myFeel)) 'my_feel': myFeel,
       if (comments != null) 'comments': comments,
       if (views != null) 'views': views,
+      if (totalFeel != null) 'totalFeel': totalFeel,
+      if (top2 != null && top2!.isNotEmpty) 'top2': top2,
       if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
       if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
       if (v != null) '__v': v,
@@ -106,13 +147,11 @@ class PostOutputModel {
   }
 
   factory PostOutputModel.fromMap(Map<String, dynamic> map) {
-    // Handle userId which can be either a String or Map<String, dynamic>
     UserModel? userIdModel;
     if (map['userId'] != null) {
       if (map['userId'] is Map<String, dynamic>) {
         userIdModel = UserModel.fromMap(map['userId'] as Map<String, dynamic>);
       } else if (map['userId'] is String) {
-        // If userId is a string, create a minimal UserModel with just the id
         userIdModel = UserModel(id: map['userId'] as String);
       }
     }
@@ -130,12 +169,19 @@ class PostOutputModel {
       hashtags: map['hashtags'] != null ? List<String>.from(map['hashtags'] as List) : null,
       content: map['content'] as String?,
       friendsTagged: map['friends_tagged'] != null
-          ? List<String>.from(map['friends_tagged'] as List)
+          ? (map['friends_tagged'] as List)
+          .map((f) => UserModel.fromMap(f as Map<String, dynamic>))
+          .toList()
           : null,
-      feel: map['feel'] != null ? Map<String, dynamic>.from(map['feel'] as Map) : null,
-      feelCount: map['feelCount'] != null
-          ? Map<String, dynamic>.from(map['feelCount'] as Map)
+      feels: map['feels'] != null
+          ? (map['feels'] as List)
+          .map((f) => PostFeel.fromMap(f as Map<String, dynamic>))
+          .toList()
           : null,
+      feelCount: map['feel_count'] != null // ✅ sửa key
+          ? Map<String, dynamic>.from(map['feel_count'] as Map)
+          : null,
+      myFeel: map['my_feel'] as String?,
       comments: map['comments'] is int ? map['comments'] as int : null,
       views: map['views'] is int ? map['views'] as int : null,
       createdAt: map['createdAt'] != null
@@ -148,38 +194,8 @@ class PostOutputModel {
     );
   }
 
-  String toJson() => json.encode(toMap());
-
-  factory PostOutputModel.fromJson(String source) =>
-      PostOutputModel.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'PostOutputModel(id: $id, userId: $userId, title: $title, privacy: $privacy, images: $images, videos: $videos, postLinkMeta: $postLinkMeta, hashtags: $hashtags, content: $content, friendsTagged: $friendsTagged, feel: $feel, feelCount: $feelCount, comments: $comments, views: $views, createdAt: $createdAt, updatedAt: $updatedAt, v: $v)';
-  }
-
   @override
   bool operator ==(covariant PostOutputModel other) {
-    bool listEquals(List<dynamic>? a, List<dynamic>? b) {
-      if (a == null && b == null) return true;
-      if (a == null || b == null) return false;
-      if (a.length != b.length) return false;
-      for (int i = 0; i < a.length; i++) {
-        if (a[i] != b[i]) return false;
-      }
-      return true;
-    }
-
-    bool mapEquals(Map? a, Map? b) {
-      if (a == null && b == null) return true;
-      if (a == null || b == null) return false;
-      if (a.length != b.length) return false;
-      for (final key in a.keys) {
-        if (!b.containsKey(key) || a[key] != b[key]) return false;
-      }
-      return true;
-    }
-
     return other.id == id &&
         other.userId == userId &&
         other.title == title &&
@@ -190,43 +206,39 @@ class PostOutputModel {
         listEquals(other.hashtags, hashtags) &&
         other.content == content &&
         listEquals(other.friendsTagged, friendsTagged) &&
-        mapEquals(other.feel, feel) &&
+        listEquals(other.feels, feels) &&
         mapEquals(other.feelCount, feelCount) &&
+        other.myFeel == myFeel &&
         other.comments == comments &&
         other.views == views &&
+        other.totalFeel == totalFeel &&
+        listEquals(other.top2, top2) &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
         other.v == v;
   }
 
   @override
-  int get hashCode {
-    int listHash(List? list) {
-      if (list == null) return 0;
-      return list.fold(0, (prev, e) => prev ^ e.hashCode);
-    }
-
-    int mapHash(Map? map) {
-      if (map == null) return 0;
-      return map.entries.fold(0, (prev, e) => prev ^ e.key.hashCode ^ e.value.hashCode);
-    }
-
-    return id.hashCode ^
-    userId.hashCode ^
-    title.hashCode ^
-    privacy.hashCode ^
-    listHash(images) ^
-    listHash(videos) ^
-    (postLinkMeta?.hashCode ?? 0) ^
-    listHash(hashtags) ^
-    content.hashCode ^
-    listHash(friendsTagged) ^
-    mapHash(feel) ^
-    mapHash(feelCount) ^
-    (comments ?? 0).hashCode ^
-    (views ?? 0).hashCode ^
-    (createdAt?.hashCode ?? 0) ^
-    (updatedAt?.hashCode ?? 0) ^
-    (v ?? 0).hashCode;
-  }
+  int get hashCode => Object.hashAll([
+    id,
+    userId,
+    title,
+    privacy,
+    images,
+    videos,
+    postLinkMeta,
+    hashtags,
+    content,
+    friendsTagged,
+    feels,
+    feelCount,
+    myFeel,
+    comments,
+    views,
+    totalFeel,
+    top2,
+    createdAt,
+    updatedAt,
+    v,
+  ]);
 }

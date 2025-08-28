@@ -1,6 +1,8 @@
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/posts/post_item_store.dart';
 import 'package:mobx/mobx.dart';
 
 import '../profile/pages/profile_page/profile_store.dart';
@@ -12,6 +14,8 @@ abstract class _DashBoardStore with Store {
   /// Store
   final FriendsStore friendsStore = AppInit.instance.friendsStore;
   final ProfileStore profileStore = AppInit.instance.profileStore;
+  final CreatePostStore createPostStore = AppInit.instance.createPostStore;
+  PostItemStore get postItemStore => AppInit.instance.postItemStore;
 
   @observable
   int currentIndex = 0;
@@ -30,7 +34,6 @@ abstract class _DashBoardStore with Store {
   /// Dispose
   ///
   void disposeAll() {
-    friendsStore.disposeAll();
   }
 
 

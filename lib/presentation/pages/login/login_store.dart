@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/profile/pages/profile_page/profile_store.dart';
 import 'package:mobx/mobx.dart';
+import '../../../core/enums/auth_enums.dart';
 import '../../../data/data_source/dio/dio_client.dart';
 import '../../../data/model/auth/auth_model.dart';
 import '../../../data/model/response/user_model.dart';
@@ -18,6 +21,7 @@ class LoginStore = _LoginStore with _$LoginStore;
 abstract class _LoginStore with Store {
   /// store
   HomeStore get homeStore => AppInit.instance.homeStore;
+  ProfileStore get profileStore => AppInit.instance.profileStore;
 
   /// controller.
   final PageController pageController = PageController(initialPage: 0);
@@ -29,7 +33,7 @@ abstract class _LoginStore with Store {
   final emailFocusNode= FocusNode();
 
   /// SharePreference
-  final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
+  final sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
 
   /// Repository
   final _authRepository = AppInit.instance.authRepository;
@@ -55,7 +59,6 @@ abstract class _LoginStore with Store {
 
   /// Timer
   Timer? _autoScrollTimer;
-
   @observable
   bool isLoading = false;
 
@@ -64,8 +67,8 @@ abstract class _LoginStore with Store {
   /// Init
   ///
   Future<void> init() async {
-    emailSaved = _sharedPreferenceHelper.getEmail ?? "";
-    passwordSaved = _sharedPreferenceHelper.getPassword ?? "";
+    emailSaved = sharedPreferenceHelper.getEmail ?? "";
+    passwordSaved = sharedPreferenceHelper.getPassword ?? "";
     setTextControl();
   }
 
@@ -150,6 +153,7 @@ abstract class _LoginStore with Store {
 
   @action
   Future<void> logIn({
+    required BuildContext context,
     required Function(AuthModel auth) onSuccess,
     required Function(String error) onError,
   }) async {
@@ -169,7 +173,15 @@ abstract class _LoginStore with Store {
           isLoading = false;
           _saveLocalData(auth, user);
 
-          await homeStore.getALlPosts(type: PUBLIC);
+          final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
+
+          if (args != null && args['redirectTo'] == AuthRoutes.CREATE_POST) {
+            await profileStore.getUserProfile();
+            context.go(args['redirectTo'], extra: args['files']);
+          } else {
+            await homeStore.getALlPosts(type: PUBLIC);
+            context.go(AuthRoutes.DASH_BOARD);
+          }
 
           onSuccess(auth);
         },
@@ -182,7 +194,7 @@ abstract class _LoginStore with Store {
   }
 
   Future<void> _saveLocalData(AuthModel auth, UserModel user) async {
-    final instance = _sharedPreferenceHelper;
+    final instance = sharedPreferenceHelper;
 
     final List<Future<void>?> futures = [
       instance.setAccessToken(auth.accessToken!),
@@ -207,11 +219,11 @@ abstract class _LoginStore with Store {
 
   @action
   void checkSavedData() {
-    final accessToken = _sharedPreferenceHelper.getAccessToken;
-    final refreshToken = _sharedPreferenceHelper.getRefreshToken;
-    final email = _sharedPreferenceHelper.getEmail;
-    final password = _sharedPreferenceHelper.getPassword;
-    final idUser = _sharedPreferenceHelper.getIdUser;
+    final accessToken = sharedPreferenceHelper.getAccessToken;
+    final refreshToken = sharedPreferenceHelper.getRefreshToken;
+    final email = sharedPreferenceHelper.getEmail;
+    final password = sharedPreferenceHelper.getPassword;
+    final idUser = sharedPreferenceHelper.getIdUser;
     print("accessToken $accessToken");
     print("refreshToken $refreshToken");
     print("email $email");

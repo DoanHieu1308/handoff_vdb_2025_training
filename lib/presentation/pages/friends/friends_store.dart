@@ -28,8 +28,10 @@ abstract class _FriendsStore with Store {
     return _refreshController!;
   }
 
-  /// Store
-  final SearchStore searchCtrl = AppInit.instance.searchStore;
+  /// Store - Lazy initialization to avoid circular dependency
+  SearchStore? _searchCtrl;
+  SearchStore get searchCtrl => _searchCtrl ??= AppInit.instance.searchStore;
+  
   // Lazy initialization to break circular dependency
   InfoFriendStore get infoFriendStore => AppInit.instance.infoFriendStore;
 

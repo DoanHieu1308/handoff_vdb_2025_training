@@ -11,9 +11,8 @@ part of 'create_post_advanced_options_setting_store.dart';
 mixin _$CreatePostAdvancedOptionSettingStore
     on _CreatePostAdvancedOptionSettingStore, Store {
   late final _$tagFriendListAtom = Atom(
-    name: '_CreatePostAdvancedOptionSettingStore.tagFriendList',
-    context: context,
-  );
+      name: '_CreatePostAdvancedOptionSettingStore.tagFriendList',
+      context: context);
 
   @override
   ObservableList<UserModel> get tagFriendList {
@@ -29,9 +28,8 @@ mixin _$CreatePostAdvancedOptionSettingStore
   }
 
   late final _$friendListSearchAtom = Atom(
-    name: '_CreatePostAdvancedOptionSettingStore.friendListSearch',
-    context: context,
-  );
+      name: '_CreatePostAdvancedOptionSettingStore.friendListSearch',
+      context: context);
 
   @override
   List<UserModel> get friendListSearch {
@@ -47,9 +45,8 @@ mixin _$CreatePostAdvancedOptionSettingStore
   }
 
   late final _$currentStatusAtom = Atom(
-    name: '_CreatePostAdvancedOptionSettingStore.currentStatus',
-    context: context,
-  );
+      name: '_CreatePostAdvancedOptionSettingStore.currentStatus',
+      context: context);
 
   @override
   String get currentStatus {
@@ -65,9 +62,8 @@ mixin _$CreatePostAdvancedOptionSettingStore
   }
 
   late final _$listNameItemOptionAtom = Atom(
-    name: '_CreatePostAdvancedOptionSettingStore.listNameItemOption',
-    context: context,
-  );
+      name: '_CreatePostAdvancedOptionSettingStore.listNameItemOption',
+      context: context);
 
   @override
   ObservableList<PostOptionItem> get listNameItemOption {
@@ -84,67 +80,58 @@ mixin _$CreatePostAdvancedOptionSettingStore
 
   late final _$_CreatePostAdvancedOptionSettingStoreActionController =
       ActionController(
-        name: '_CreatePostAdvancedOptionSettingStore',
-        context: context,
-      );
+          name: '_CreatePostAdvancedOptionSettingStore', context: context);
 
   @override
   void onChangedStatus({required String status}) {
-    final _$actionInfo = _$_CreatePostAdvancedOptionSettingStoreActionController
-        .startAction(
-          name: '_CreatePostAdvancedOptionSettingStore.onChangedStatus',
-        );
+    final _$actionInfo =
+        _$_CreatePostAdvancedOptionSettingStoreActionController.startAction(
+            name: '_CreatePostAdvancedOptionSettingStore.onChangedStatus');
     try {
       return super.onChangedStatus(status: status);
     } finally {
-      _$_CreatePostAdvancedOptionSettingStoreActionController.endAction(
-        _$actionInfo,
-      );
+      _$_CreatePostAdvancedOptionSettingStoreActionController
+          .endAction(_$actionInfo);
     }
   }
 
   @override
   NameAndIcon nameAndIconFromStatus(String status) {
-    final _$actionInfo = _$_CreatePostAdvancedOptionSettingStoreActionController
-        .startAction(
-          name: '_CreatePostAdvancedOptionSettingStore.nameAndIconFromStatus',
-        );
+    final _$actionInfo =
+        _$_CreatePostAdvancedOptionSettingStoreActionController.startAction(
+            name:
+                '_CreatePostAdvancedOptionSettingStore.nameAndIconFromStatus');
     try {
       return super.nameAndIconFromStatus(status);
     } finally {
-      _$_CreatePostAdvancedOptionSettingStoreActionController.endAction(
-        _$actionInfo,
-      );
+      _$_CreatePostAdvancedOptionSettingStoreActionController
+          .endAction(_$actionInfo);
     }
   }
 
   @override
   void onTapOptionPost(BuildContext context, PostOptionType type) {
-    final _$actionInfo = _$_CreatePostAdvancedOptionSettingStoreActionController
-        .startAction(
-          name: '_CreatePostAdvancedOptionSettingStore.onTapOptionPost',
-        );
+    final _$actionInfo =
+        _$_CreatePostAdvancedOptionSettingStoreActionController.startAction(
+            name: '_CreatePostAdvancedOptionSettingStore.onTapOptionPost');
     try {
       return super.onTapOptionPost(context, type);
     } finally {
-      _$_CreatePostAdvancedOptionSettingStoreActionController.endAction(
-        _$actionInfo,
-      );
+      _$_CreatePostAdvancedOptionSettingStoreActionController
+          .endAction(_$actionInfo);
     }
   }
 
   @override
   void getItemSearch() {
-    final _$actionInfo = _$_CreatePostAdvancedOptionSettingStoreActionController
-        .startAction(
-          name: '_CreatePostAdvancedOptionSettingStore.getItemSearch',
-        );
+    final _$actionInfo =
+        _$_CreatePostAdvancedOptionSettingStoreActionController.startAction(
+            name: '_CreatePostAdvancedOptionSettingStore.getItemSearch');
     try {
       return super.getItemSearch();
     } finally {
-      _$_CreatePostAdvancedOptionSettingStoreActionController.endAction(
-        _$actionInfo,
-      );
+      _$_CreatePostAdvancedOptionSettingStoreActionController
+          .endAction(_$actionInfo);
     }
   }
 
@@ -155,9 +142,8 @@ mixin _$CreatePostAdvancedOptionSettingStore
     try {
       return super.reset();
     } finally {
-      _$_CreatePostAdvancedOptionSettingStoreActionController.endAction(
-        _$actionInfo,
-      );
+      _$_CreatePostAdvancedOptionSettingStoreActionController
+          .endAction(_$actionInfo);
     }
   }
 

@@ -6,7 +6,7 @@ import '../../../../core/enums/enums.dart';
 import '../../../../core/extensions/string_extension.dart';
 import '../../../../core/helper/app_text.dart';
 
-class PostTextContent extends StatelessWidget {
+class PostTextContent extends StatefulWidget {
   final String text;
   final void Function(String hashtag)? onTapHashtag;
 
@@ -17,14 +17,61 @@ class PostTextContent extends StatelessWidget {
   });
 
   @override
+  State<PostTextContent> createState() => _PostTextContentState();
+}
+
+class _PostTextContentState extends State<PostTextContent> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w),
-      child: RichText(
-        text: TextSpan(
-          style: AppText.text16.copyWith(color: Colors.black),
-          children: _buildTextSpans(text),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final textSpan = TextSpan(
+            style: AppText.text16.copyWith(color: Colors.black),
+            children: _buildTextSpans(widget.text),
+          );
+
+          // Đo chiều cao để kiểm tra có quá 10 dòng không
+          final tp = TextPainter(
+            text: textSpan,
+            maxLines: _expanded ? null : 10,
+            textDirection: TextDirection.ltr,
+          )..layout(maxWidth: constraints.maxWidth);
+
+          final exceedsMaxLines = tp.didExceedMaxLines;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RichText(
+                text: TextSpan(
+                  style: AppText.text16.copyWith(color: Colors.black),
+                  children: _buildTextSpans(widget.text),
+                ),
+                maxLines: _expanded ? null : 10,
+                overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
+              ),
+              if (!_expanded && exceedsMaxLines)
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _expanded = true;
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "xem thêm",
+                      style: AppText.text14.copyWith(color: Colors.blue),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -33,15 +80,21 @@ class PostTextContent extends StatelessWidget {
     final List<TextSpan> spans = [];
     final matches = <MatchData>[];
 
-    // Tìm hashtag và link theo thứ tự xuất hiện
     for (final m in StringExtension.hashtagRegExp.allMatches(input)) {
-      matches.add(MatchData(start: m.start, end: m.end, text: m.group(0)!, type: MatchType.hashtag));
+      matches.add(MatchData(
+          start: m.start,
+          end: m.end,
+          text: m.group(0)!,
+          type: MatchType.hashtag));
     }
     for (final m in StringExtension.linkRegex.allMatches(input)) {
-      matches.add(MatchData(start: m.start, end: m.end, text: m.group(0)!, type: MatchType.link));
+      matches.add(MatchData(
+          start: m.start,
+          end: m.end,
+          text: m.group(0)!,
+          type: MatchType.link));
     }
 
-    // Sắp xếp theo thứ tự xuất hiện trong đoạn text
     matches.sort((a, b) => a.start.compareTo(b.start));
 
     int currentIndex = 0;
@@ -59,48 +112,14 @@ class PostTextContent extends StatelessWidget {
           style: AppText.text16.copyWith(color: Colors.blue),
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
-              try {
-                final url = match.text.trim();
-                print("Attempting to launch URL: $url");
-                
-                // Thử parse URL trực tiếp
-                Uri? uri = Uri.tryParse(url);
-                
-                // Nếu không có scheme, thêm https://
-                if (uri == null || uri.scheme.isEmpty) {
-                  final urlWithScheme = url.startsWith('http') ? url : 'https://$url';
-                  uri = Uri.tryParse(urlWithScheme);
+              final url = match.text.trim();
+              Uri? uri = Uri.tryParse(
+                  url.startsWith('http') ? url : 'https://$url');
+              if (uri != null) {
+                if (await canLaunchUrl(uri)) {
+                  await launchUrl(uri,
+                      mode: LaunchMode.externalApplication);
                 }
-                
-                if (uri != null) {
-                  print("Parsed URI: $uri");
-
-                  final canLaunch = await canLaunchUrl(uri);
-                  print("Can launch URL: $canLaunch");
-                  
-                  if (canLaunch) {
-                    await launchUrl(uri, mode: LaunchMode.externalApplication);
-                    print("Successfully launched URL");
-                  } else {
-                    try {
-                      await launchUrl(uri, mode: LaunchMode.platformDefault);
-                      print("Launched with platform default mode");
-                    } catch (e) {
-                      print("Failed to launch URL with platform default: $e");
-                      try {
-                        await launchUrl(uri, mode: LaunchMode.inAppWebView);
-                        print("Launched with inAppWebView mode");
-                      } catch (e2) {
-                        print("Failed to launch URL with inAppWebView: $e2");
-                        print("Cannot launch: $url");
-                      }
-                    }
-                  }
-                } else {
-                  print("Failed to parse URL: $url");
-                }
-              } catch (e) {
-                print("Error launching URL: $e");
               }
             },
         ));
@@ -111,11 +130,10 @@ class PostTextContent extends StatelessWidget {
           style: AppText.text16.copyWith(color: Colors.blue),
           recognizer: TapGestureRecognizer()
             ..onTap = () {
-              onTapHashtag?.call(tag);
+              widget.onTapHashtag?.call(tag);
             },
         ));
       }
-
       currentIndex = match.end;
     }
 
@@ -128,7 +146,6 @@ class PostTextContent extends StatelessWidget {
 
     return spans;
   }
-
 }
 
 class MatchData {

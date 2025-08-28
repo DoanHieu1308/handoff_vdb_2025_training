@@ -1,18 +1,44 @@
 import 'dart:convert';
-
+import 'package:hive/hive.dart';
 import 'package:handoff_vdb_2025/core/helper/validate.dart';
-import 'package:handoff_vdb_2025/data/model/post/post_link_meta.dart';
+import 'post_link_meta.dart';
 
+part 'post_input_model.g.dart';
+
+@HiveType(typeId: 0)
 class PostInputModel {
+  @HiveField(0)
   String? id;
+
+  @HiveField(1)
   String? title;
+
+  @HiveField(2)
   String? content;
+
+  @HiveField(3)
   String? privacy; // "public" | "friend" | "private"
+
+  @HiveField(4)
   List<String>? hashtags;
-  List<String>? friendsTagged;
+
+  @HiveField(5)
+  List<String>? friends_tagged;
+
+  @HiveField(6)
   List<String>? images;
+
+  @HiveField(7)
   List<String>? videos;
+
+  @HiveField(8)
   PostLinkMeta? postLinkMeta;
+
+  @HiveField(9)
+  String? userId;
+
+  @HiveField(10)
+  DateTime? createdAt;
 
   PostInputModel({
     this.id,
@@ -20,11 +46,13 @@ class PostInputModel {
     this.content,
     this.privacy,
     this.hashtags,
-    this.friendsTagged,
+    this.friends_tagged,
     this.images,
     this.videos,
     this.postLinkMeta,
-  });
+    this.userId,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   PostInputModel copyWith({
     String? id,
@@ -32,10 +60,12 @@ class PostInputModel {
     String? content,
     String? privacy,
     List<String>? hashtags,
-    List<String>? friendsTagged,
+    List<String>? friends_tagged,
     List<String>? images,
     List<String>? videos,
     PostLinkMeta? postLinkMeta,
+    String? userId,
+    DateTime? createdAt,
   }) {
     return PostInputModel(
       id: id ?? this.id,
@@ -43,10 +73,12 @@ class PostInputModel {
       content: content ?? this.content,
       privacy: privacy ?? this.privacy,
       hashtags: hashtags ?? this.hashtags,
-      friendsTagged: friendsTagged ?? this.friendsTagged,
+      friends_tagged: friends_tagged ?? this.friends_tagged,
       images: images ?? this.images,
       videos: videos ?? this.videos,
       postLinkMeta: postLinkMeta ?? this.postLinkMeta,
+      userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -57,10 +89,12 @@ class PostInputModel {
       if (!Validate.nullOrEmpty(content)) 'content': content,
       if (!Validate.nullOrEmpty(privacy)) 'privacy': privacy,
       if (hashtags != null && hashtags!.isNotEmpty) 'hashtags': hashtags,
-      if (friendsTagged != null && friendsTagged!.isNotEmpty) 'friends_tagged': friendsTagged,
+      if (friends_tagged != null && friends_tagged!.isNotEmpty) 'friends_tagged': friends_tagged,
       if (images != null && images!.isNotEmpty) 'images': images,
       if (videos != null && videos!.isNotEmpty) 'videos': videos,
       if (postLinkMeta != null) 'post_link_meta': postLinkMeta!.toMap(),
+      if (!Validate.nullOrEmpty(userId)) 'user_id': userId,
+      if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
     };
   }
 
@@ -70,74 +104,34 @@ class PostInputModel {
       title: map['title'] as String?,
       content: map['content'] as String?,
       privacy: map['privacy'] as String?,
-      hashtags: map['hashtags'] != null
-          ? List<String>.from(map['hashtags'] as List)
-          : null,
-      friendsTagged: map['friends_tagged'] != null
-          ? List<String>.from(map['friends_tagged'] as List)
-          : null,
-      images: map['images'] != null
-          ? List<String>.from(map['images'] as List)
-          : null,
-      videos: map['videos'] != null
-          ? List<String>.from(map['videos'] as List)
-          : null,
+      hashtags: map['hashtags'] != null ? List<String>.from(map['hashtags']) : null,
+      friends_tagged: map['friends_tagged'] != null ? List<String>.from(map['friends_tagged']) : null,
+      images: map['images'] != null ? List<String>.from(map['images']) : null,
+      videos: map['videos'] != null ? List<String>.from(map['videos']) : null,
       postLinkMeta: map['post_link_meta'] != null
-          ? PostLinkMeta.fromMap(map['post_link_meta'] as Map<String, dynamic>)
+          ? PostLinkMeta.fromMap(map['post_link_meta'])
           : null,
+      userId: map['user_id'] as String?,
+      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at']) : null,
     );
   }
 
   String toJson() => json.encode(toMap());
 
   factory PostInputModel.fromJson(String source) =>
-      PostInputModel.fromMap(json.decode(source) as Map<String, dynamic>);
+      PostInputModel.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'PostModel(id: $id, title: $title, content: $content, privacy: $privacy, hashtags: $hashtags, friendsTagged: $friendsTagged, images: $images, videos: $videos, postLinkMeta: $postLinkMeta)';
+    return 'PostInputModel(id: $id, title: $title, userId: $userId, createdAt: $createdAt)';
   }
 
   @override
-  bool operator ==(covariant PostInputModel other) {
+  bool operator ==(Object other) {
     if (identical(this, other)) return true;
-
-    bool listEquals(List<String>? a, List<String>? b) {
-      if (a == null && b == null) return true;
-      if (a == null || b == null) return false;
-      if (a.length != b.length) return false;
-      for (int i = 0; i < a.length; i++) {
-        if (a[i] != b[i]) return false;
-      }
-      return true;
-    }
-
-    return other.id == id &&
-        other.title == title &&
-        other.content == content &&
-        other.privacy == privacy &&
-        listEquals(other.hashtags, hashtags) &&
-        listEquals(other.friendsTagged, friendsTagged) &&
-        listEquals(other.images, images) &&
-        listEquals(other.videos, videos) &&
-        other.postLinkMeta == postLinkMeta;
+    return other is PostInputModel && other.id == id && other.userId == userId;
   }
 
   @override
-  int get hashCode {
-    int listHash(List<String>? list) {
-      if (list == null) return 0;
-      return list.fold(0, (prev, e) => prev ^ e.hashCode);
-    }
-
-    return id.hashCode ^
-    title.hashCode ^
-    content.hashCode ^
-    privacy.hashCode ^
-    listHash(hashtags) ^
-    listHash(friendsTagged) ^
-    listHash(images) ^
-    listHash(videos) ^
-    (postLinkMeta?.hashCode ?? 0);
-  }
+  int get hashCode => id.hashCode ^ (userId?.hashCode ?? 0);
 }

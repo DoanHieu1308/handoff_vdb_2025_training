@@ -17,7 +17,9 @@ class SetUpAssetImage extends StatelessWidget {
   final FilterQuality? filterQuality;
   final bool? gaplessPlayback;
   final ImageErrorWidgetBuilder? errorBuilder;
-
+  final bool enableMemoryCache;
+  final int? memCacheWidth;
+  final int? memCacheHeight;
 
   const SetUpAssetImage(
       this.urlImage, {
@@ -29,6 +31,9 @@ class SetUpAssetImage extends StatelessWidget {
         this.filterQuality,
         this.gaplessPlayback,
         this.errorBuilder,
+        this.enableMemoryCache = true,
+        this.memCacheWidth,
+        this.memCacheHeight,
       });
 
   @override
@@ -40,8 +45,14 @@ class SetUpAssetImage extends StatelessWidget {
         height: height,
         width: width,
         color: color,
+        memCacheWidth: _getSafeIntValue(width, memCacheWidth),
+        memCacheHeight: _getSafeIntValue(height, memCacheHeight),
         placeholder: (context, url) => _buildLoadingPlaceholder(),
-        errorWidget:  (context, url, error) => _buildErrorPlaceholder(),
+        errorWidget: (context, url, error) => _buildErrorPlaceholder(),
+        fadeInDuration: const Duration(milliseconds: 200),
+        fadeOutDuration: const Duration(milliseconds: 200),
+        maxWidthDiskCache: 1920, // Limit disk cache size
+        maxHeightDiskCache: 1920,
       );
     }
 
@@ -63,9 +74,11 @@ class SetUpAssetImage extends StatelessWidget {
         height: height,
         width: width,
         fit: fit ?? BoxFit.contain,
-        filterQuality: filterQuality ?? FilterQuality.high,
+        filterQuality: filterQuality ?? FilterQuality.medium, // Changed from high to medium for better performance
         gaplessPlayback: gaplessPlayback ?? true,
         errorBuilder: errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
+        cacheWidth: _getSafeIntValue(width, memCacheWidth),
+        cacheHeight: _getSafeIntValue(height, memCacheHeight),
       );
     }
 
@@ -76,8 +89,20 @@ class SetUpAssetImage extends StatelessWidget {
       width: width,
       fit: fit ?? BoxFit.contain,
       color: color,
-      errorBuilder: (context, error, stackTrace) => _buildErrorPlaceholder(),
+      filterQuality: filterQuality ?? FilterQuality.medium, // Changed from high to medium
+      cacheWidth: _getSafeIntValue(width, memCacheWidth),
+      cacheHeight: _getSafeIntValue(height, memCacheHeight),
+      errorBuilder: errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
     );
+  }
+
+  /// Helper method to safely convert double to int, handling infinity and NaN
+  int? _getSafeIntValue(double? value, int? fallback) {
+    if (fallback != null) return fallback;
+    if (value == null) return null;
+    if (value.isInfinite || value.isNaN) return null;
+    if (value < 0) return null;
+    return value.toInt();
   }
 
   bool _isSvg(String url) => url.toLowerCase().endsWith('.svg');
@@ -102,11 +127,31 @@ class SetUpAssetImage extends StatelessWidget {
   }
 
   Widget _buildErrorPlaceholder() {
-    return Image.asset(
-      ImagesPath.placeHolder,
+    return Container(
       height: height ?? 100,
       width: width ?? 100,
-      fit: fit ?? BoxFit.contain,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.broken_image,
+            color: Colors.grey[400],
+            size: (height ?? 100) * 0.3,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Lỗi tải ảnh',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

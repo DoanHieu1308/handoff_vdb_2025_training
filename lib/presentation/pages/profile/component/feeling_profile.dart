@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 
 import '../../../../core/base_widget/images/set_up_asset_image.dart';
 import '../../../../core/helper/app_text.dart';
@@ -35,39 +37,44 @@ class FeelingProfile extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10.h),
-            Row(
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: ClipOval(
-                      child: SizedBox(
-                        height: 40.h,
-                        width: 41.w,
-                        child: SetUpAssetImage(
-                          store.userProfile.avatar ?? ImagesPath.icPerson,
-                          fit: BoxFit.cover,
+            GestureDetector(
+              onTap: (){
+                router.push(AuthRoutes.CREATE_POST);
+              },
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 4,
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: ClipOval(
+                        child: SizedBox(
+                          height: 40.h,
+                          width: 41.w,
+                          child: SetUpAssetImage(
+                            store.userProfile.avatar ?? ImagesPath.icPerson,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: 5.w),
-                Expanded(
-                  flex: 16,
-                  child: Text("Bạn đang nghĩ gì?", style: AppText.text15),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Icon(
-                    Icons.image_search,
-                    color: Colors.green,
-                    size: 25,
+                  SizedBox(width: 5.w),
+                  Expanded(
+                    flex: 16,
+                    child: Text("Bạn đang nghĩ gì?", style: AppText.text15),
                   ),
-                ),
-              ],
+                  Expanded(
+                    flex: 4,
+                    child: Icon(
+                      Icons.image_search,
+                      color: Colors.green,
+                      size: 25,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         );

@@ -7,6 +7,9 @@ import 'package:handoff_vdb_2025/data/repositories/follow_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/chat_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/conversation_store.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/link_preview_store/link_preview_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/media_store/media_store.dart';
@@ -32,10 +35,8 @@ class AppInit {
 
   AppInit._init();
 
-  // Dio Client
+  // Core dependencies
   late final DioClient dioClient;
-
-  // Shared Preferences
   late final SharedPreferenceHelper sharedPreferenceHelper;
 
   // Repositories
@@ -45,43 +46,36 @@ class AppInit {
   late final FollowRepository followRepository;
   late final PostRepository postRepository;
 
-  // Stores
-  late final LoginStore loginStore;
-  late final SignUpStore signUpStore;
-  late final DashBoardStore dashBoardStore;
-  late final VideoStore videoStore;
-  late final ProfilePictureCameraStore profilePictureCamera;
-  late final ProfileStore profileStore;
-  late final InfoFriendStore infoFriendStore;
-  late final SearchStore searchStore;
-  late final FriendsStore friendsStore;
-  late final ItemDetailStore itemDetailStore;
-  late final HomeStore homeStore;
-  late final CreatePostStore createPostStore;
-  late final CreatePostAdvancedOptionSettingStore createPostAdvancedOptionSettingStore;
-  late final PostItemStore postStatusStore;
-
-  /// sub store
-  // Create store
-  late final MediaStore mediaStore;
-  late final LinkPreviewStore linkPreviewStore;
-  late final TextStore textStore;
-
+  // Store instances - lazy initialized
+  LoginStore? _loginStore;
+  SignUpStore? _signUpStore;
+  DashBoardStore? _dashBoardStore;
+  VideoStore? _videoStore;
+  ProfilePictureCameraStore? _profilePictureCamera;
+  ProfileStore? _profileStore;
+  InfoFriendStore? _infoFriendStore;
+  SearchStore? _searchStore;
+  FriendsStore? _friendsStore;
+  ItemDetailStore? _itemDetailStore;
+  HomeStore? _homeStore;
+  CreatePostStore? _createPostStore;
+  CreatePostAdvancedOptionSettingStore? _createPostAdvancedOptionSettingStore;
+  PostItemStore? _postItemStore;
+  MediaStore? _mediaStore;
+  LinkPreviewStore? _linkPreviewStore;
+  TextStore? _textStore;
+  ChatStore? _chatStore;
+  MessengerStore? _messengerStore;
+  ConversationStore? _conversationStore;
 
   /// Initialize all dependencies
   Future<void> init() async {
     try {
-      // Initialize SharedPreferences first
-      await _initSharedPreferences();
-
-      // Initialize Dio Client
-      await _initDioClient();
-
-      // Initialize Repositories
+      // Initialize core dependencies first
+      await _initCoreDependencies();
+      
+      // Initialize repositories
       await _initRepositories();
-
-      // Initialize Stores
-      await _initStores();
 
       debugPrint('App initialization completed successfully');
     } catch (e) {
@@ -90,25 +84,19 @@ class AppInit {
     }
   }
 
-  /// Initialize SharedPreferences
-  Future<void> _initSharedPreferences() async {
+  /// Initialize core dependencies
+  Future<void> _initCoreDependencies() async {
     try {
+      // Initialize SharedPreferences first
       await SharedPreferenceHelper.init();
       sharedPreferenceHelper = SharedPreferenceHelper.instance;
       debugPrint('SharedPreferences initialized');
-    } catch (e) {
-      debugPrint('SharedPreferences initialization failed: $e');
-      rethrow;
-    }
-  }
 
-  /// Initialize Dio Client
-  Future<void> _initDioClient() async {
-    try {
+      // Initialize Dio Client
       dioClient = DioClient();
       debugPrint('Dio Client initialized');
     } catch (e) {
-      debugPrint('Dio Client initialization failed: $e');
+      debugPrint('Core dependencies initialization failed: $e');
       rethrow;
     }
   }
@@ -129,45 +117,90 @@ class AppInit {
     }
   }
 
-  Future<void> _initStores() async {
-    try {
-      // 1. Khởi tạo các store độc lập trước
-      signUpStore = SignUpStore();
-      loginStore = LoginStore();
-      searchStore = SearchStore();
-      videoStore = VideoStore();
+  /// Lazy getter for stores - only initialize when needed
+  LoginStore get loginStore => _loginStore ??= LoginStore();
+  SignUpStore get signUpStore => _signUpStore ??= SignUpStore();
+  SearchStore get searchStore => _searchStore ??= SearchStore();
+  VideoStore get videoStore => _videoStore ??= VideoStore();
+  
+  FriendsStore get friendsStore {
+    _friendsStore ??= FriendsStore();
+    return _friendsStore!;
+  }
+  
+  InfoFriendStore get infoFriendStore {
+    _infoFriendStore ??= InfoFriendStore();
+    return _infoFriendStore!;
+  }
+  
+  ProfileStore get profileStore {
+    _profileStore ??= ProfileStore();
+    return _profileStore!;
+  }
+  
+  HomeStore get homeStore {
+    _homeStore ??= HomeStore();
+    return _homeStore!;
+  }
+  
+  DashBoardStore get dashBoardStore {
+    _dashBoardStore ??= DashBoardStore();
+    return _dashBoardStore!;
+  }
+  
+  ProfilePictureCameraStore get profilePictureCamera {
+    _profilePictureCamera ??= ProfilePictureCameraStore();
+    return _profilePictureCamera!;
+  }
+  
+  CreatePostStore get createPostStore {
+    _createPostStore ??= CreatePostStore();
+    return _createPostStore!;
+  }
+  
+  PostItemStore get postItemStore {
+    _postItemStore ??= PostItemStore();
+    return _postItemStore!;
+  }
 
-      // 2. Khởi tạo FriendsStore (phụ thuộc vào SearchStore)
-      friendsStore = FriendsStore();
+  MessengerStore get messengerStore {
+    _messengerStore ??= MessengerStore();
+    return _messengerStore!;
+  }
 
-      // 3. Khởi tạo InfoFriendStore (phụ thuộc vào FriendsStore qua lazy getter)
-      infoFriendStore = InfoFriendStore();
+  ConversationStore get conversationStore {
+    _conversationStore ??= ConversationStore();
+    return _conversationStore!;
+  }
 
-      // 4. Khởi tạo các store phụ thuộc vào FriendsStore
-      profileStore = ProfileStore();
-
-      homeStore = HomeStore();
-      dashBoardStore = DashBoardStore();
-      profilePictureCamera = ProfilePictureCameraStore();
-
-      createPostStore = CreatePostStore();
-      postStatusStore = PostItemStore();
-      createPostAdvancedOptionSettingStore = CreatePostAdvancedOptionSettingStore();
-
-      // 5. Khởi tạo ItemDetailStore cuối cùng (phụ thuộc vào FriendsStore qua constructor)
-      itemDetailStore = ItemDetailStore(friendsStore);
-
-      /// Sub store
-      mediaStore = MediaStore(createPostStore);
-      linkPreviewStore = LinkPreviewStore(createPostStore);
-      textStore = TextStore(createPostStore);
-
-      
-      debugPrint('Stores initialized');
-    } catch (e) {
-      debugPrint('Stores initialization failed: $e');
-      rethrow;
-    }
+  ChatStore get chatStore {
+    _chatStore ??= ChatStore();
+    return _chatStore!;
+  }
+  
+  CreatePostAdvancedOptionSettingStore get createPostAdvancedOptionSettingStore {
+    _createPostAdvancedOptionSettingStore ??= CreatePostAdvancedOptionSettingStore();
+    return _createPostAdvancedOptionSettingStore!;
+  }
+  
+  MediaStore get mediaStore {
+    _mediaStore ??= MediaStore(createPostStore);
+    return _mediaStore!;
+  }
+  
+  LinkPreviewStore get linkPreviewStore {
+    _linkPreviewStore ??= LinkPreviewStore(createPostStore);
+    return _linkPreviewStore!;
+  }
+  
+  TextStore get textStore {
+    _textStore ??= TextStore(createPostStore);
+    return _textStore!;
+  }
+  
+  ItemDetailStore get itemDetailStore {
+    _itemDetailStore ??= ItemDetailStore(friendsStore);
+    return _itemDetailStore!;
   }
 
   /// Initialize ScreenUtil
@@ -183,10 +216,18 @@ class AppInit {
   /// Dispose all resources
   void dispose() {
     try {
-      // Dispose stores if needed
-      dashBoardStore.disposeAll();
-      profileStore.disposeAll();
-      searchStore.disposeAll();
+      // Dispose stores if they exist
+      _dashBoardStore?.disposeAll();
+      _profileStore?.disposeAll();
+      _searchStore?.dispose(); // Use dispose() instead of disposeAll() for SearchStore
+      _friendsStore?.disposeAll();
+      _homeStore?.disposeAll();
+      _createPostStore?.disposeAll();
+      _postItemStore?.disposeAll();
+      _mediaStore?.dispose();
+      _linkPreviewStore?.dispose();
+      _textStore?.dispose();
+      _chatStore?.disposeAll();
       
       debugPrint('App resources disposed');
     } catch (e) {
@@ -213,4 +254,4 @@ class AppInit {
       'userRepository': userRepository,
     };
   }
-} 
+}

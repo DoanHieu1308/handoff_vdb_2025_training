@@ -103,7 +103,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
     required UserModel friend,
     required BuildContext context,
   }) {
-    return Observer(builder: (_) => AutoScrollTag(
+    return AutoScrollTag(
       key: ValueKey(index),
       controller: store.scrollController,
       index: index,
@@ -143,7 +143,7 @@ class _ItemDetailPageState extends State<ItemDetailPage> {
           ),
         ),
       ),
-    ));
+    );
   }
 }
 

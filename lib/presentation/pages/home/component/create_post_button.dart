@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:handoff_vdb_2025/core/helper/app_custom_circle_avatar.dart';
 
 import '../../../../core/base_widget/images/set_up_asset_image.dart';
 import '../../../../core/enums/auth_enums.dart';
@@ -23,17 +24,11 @@ class CreatePostButton extends StatelessWidget {
             children: [
               Expanded(
                 flex: 4,
-                child: CircleAvatar(
-                  radius: 23,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: SetUpAssetImage(
-                      height: 44.h,
-                      width: 44.w,
-                      store.profileStore.userProfile.avatar ?? ImagesPath.icPerson,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                child: AppCustomCircleAvatar(
+                    radius: 23,
+                    height: 44,
+                    width: 44,
+                    image: store.profileStore.userProfile.avatar ?? ImagesPath.icPerson,
                 ),
               ),
               GestureDetector(

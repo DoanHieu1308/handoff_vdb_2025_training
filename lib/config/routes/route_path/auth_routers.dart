@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:handoff_vdb_2025/core/shared_pref/auth_helper.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/chat_page.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/conversation_page.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/login/login_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/component/more_setting_info_friend.dart';
+import 'package:handoff_vdb_2025/presentation/pages/profile/component/show_all_friend_in_profile.dart';
 import 'package:handoff_vdb_2025/presentation/pages/sign_up/sign_up_page.dart';
 import '../../../core/enums/auth_enums.dart';
 import '../../../data/model/post/post_output_model.dart';
@@ -16,8 +21,27 @@ import '../../../presentation/pages/profile/pages/profile_picture_camera/profile
 
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
+
 final GoRouter router = GoRouter(
   initialLocation: AuthRoutes.SIGNUP,
+    redirect: (context, state) {
+      final bool isLoggedIn = AuthHelper.isUserLoggedIn();
+
+      final bool goingToLogin = state.matchedLocation == AuthRoutes.LOGIN;
+      final bool goingToSignup = state.matchedLocation == AuthRoutes.SIGNUP;
+
+      // Nếu chưa đăng nhập và không ở login/signup thì chuyển về login
+      if (!isLoggedIn && !goingToLogin && !goingToSignup) {
+        return AuthRoutes.LOGIN;
+      }
+
+      // Nếu đã login mà lại vào login/signup thì về dashboard
+      if (isLoggedIn && (goingToLogin || goingToSignup)) {
+        return AuthRoutes.DASH_BOARD;
+      }
+
+      return null; // Không redirect
+    },
   routes: [
     GoRoute(
       path: AuthRoutes.DASH_BOARD,
@@ -33,7 +57,9 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: AuthRoutes.LOGIN,
-      builder: (context, state) => LoginPage(),
+      builder: (context, state) {
+        return LoginPage();
+      },
     ),
     GoRoute(
       path: AuthRoutes.SIGNUP,
@@ -49,7 +75,9 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: AuthRoutes.CREATE_POST,
-      builder: (context, state) => CreatePostPage(),
+      builder: (context, state) {
+        return CreatePostPage();
+      },
     ),
     GoRoute(
       path: AuthRoutes.STATUS_POST,
@@ -58,6 +86,22 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AuthRoutes.TAG_FRIEND,
       builder: (context, state) => TagFriendsPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.CHAT,
+      builder: (context, state) => ChatPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.MESSENGER,
+      builder: (context, state) => MessengerPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.CONVERSATION,
+      builder: (context, state) => ConversationPage(),
+    ),
+    GoRoute(
+      path: AuthRoutes.ALL_FRIEND,
+      builder: (context, state) => ShowAllFriendInProfile(),
     ),
     GoRoute(
       path: AuthRoutes.SHOW_ALL_IMAGE,

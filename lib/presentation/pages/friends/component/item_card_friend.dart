@@ -22,96 +22,91 @@ class FriendItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (context) {
-        return GestureDetector(
-          onTap:() => store.goToInfoFriend(context: context, friendId: friend.id ?? ''),
+    return GestureDetector(
+      onTap:() => store.goToInfoFriend(context: context, friendId: friend.id ?? ''),
+      child: Padding(
+        padding: EdgeInsets.only(top: 10.h),
+        child: Container(
+          height: 70.h,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.r),
+          ),
           child: Padding(
-            padding: EdgeInsets.only(top: 10.h),
-            child: Container(
-              height: 70.h,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(15.r),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 27.h,
-                      backgroundColor: Colors.grey.withValues(alpha: 0.2),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: SetUpAssetImage(
-                          friend.avatar ?? ImagesPath.icPerson,
-                          height: 65.h,
-                          width: 65.h,
-                          fit: BoxFit.cover,
-                        ),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 27.h,
+                  child: ClipOval(
+                    child: SizedBox(
+                      height: 65.h,
+                      width: 65.h,
+                      child: SetUpAssetImage(
+                        friend.avatar ?? ImagesPath.icPerson,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    SizedBox(width: 10.w),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(friend.name ?? "", style: AppText.text14_Inter),
-                          SizedBox(height: 5.h),
-                          Text("3 mutual friends", style: AppText.text12_Inter.copyWith(color: Colors.grey)),
-                        ],
-                      ),
-                    ),
-                    if(categoryName == ALL_FRIENDS)
-                      Row(
-                        children: [
-                          BuildMessageButton(),
-                          SizedBox(width: 10.w),
-                          BuildMoreButton(friend: friend, categoryName: ALL_FRIENDS,),
-                        ],
-                      )
-                    else
-                      store.getStatusForFriend(friend.id ?? '') != "send"
-                      ? Row(
-                        children: [
-                          BuildActionButton(
-                              onTap: (){
-                                  store.handleSentFriendRequest(
-                                      friendId: friend.id ?? '',
-                                      onSuccess: (){}
-                                  );
-                              },
-                              name: "Thêm bạn bè"
-                          ),
-                          SizedBox(width: 10.w),
-                          // Text("${store.getStatusForFriend(friend.id ?? '')}"),
-                          BuildMoreButton(friend: friend, categoryName: SUGGESTIONS_FRIENDS,),
-                        ],
-                      )
-                      : Row(
-                        children: [
-                          BuildActionButton(
-                              onTap: (){
-                                store.handleCancelFriendRequest(
-                                    friendId: friend.id ?? '',
-                                    onSuccess: (){}
-                                );
-                              },
-                              name: "Hủy yêu cầu",
-                              widthSize: 33.w,
-                              colorContainer: ColorResources.LIGHT_GREY,
-                              colorText: Colors.black,
-                          ),
-                        ],
-                      )
-                  ],
+                  ),
                 ),
-              ),
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(friend.name ?? "", style: AppText.text14_Inter),
+                      SizedBox(height: 5.h),
+                      Text("3 mutual friends", style: AppText.text12_Inter.copyWith(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+                if(categoryName == ALL_FRIENDS)
+                  Row(
+                    children: [
+                      BuildMessageButton(),
+                      SizedBox(width: 10.w),
+                      BuildMoreButton(friend: friend, categoryName: ALL_FRIENDS,),
+                    ],
+                  )
+                else
+                  store.getStatusForFriend(friend.id ?? '') != "send"
+                      ? Row(
+                    children: [
+                      BuildActionButton(
+                          onTap: (){
+                            store.handleSentFriendRequest(
+                                friendId: friend.id ?? '',
+                                onSuccess: (){}
+                            );
+                          },
+                          name: "Thêm bạn bè"
+                      ),
+                      SizedBox(width: 10.w),
+                      BuildMoreButton(friend: friend, categoryName: SUGGESTIONS_FRIENDS,),
+                    ],
+                  )
+                      : Row(
+                    children: [
+                      BuildActionButton(
+                        onTap: (){
+                          store.handleCancelFriendRequest(
+                              friendId: friend.id ?? '',
+                              onSuccess: (){}
+                          );
+                        },
+                        name: "Hủy yêu cầu",
+                        widthSize: 33.w,
+                        colorContainer: ColorResources.LIGHT_GREY,
+                        colorText: Colors.black,
+                      ),
+                    ],
+                  )
+              ],
             ),
           ),
-        );
-      }
+        ),
+      ),
     );
   }
 }

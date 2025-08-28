@@ -71,7 +71,7 @@ mixin ImagesPath {
   static String icMusic = 'assets/features/ic_music.svg';
   static String icMore = 'assets/features/ic_more_horiz.svg';
   static String icLockOutsize = 'assets/features/ic_clock_outsize.png';
-  static String icFriendOutsize = 'assets/features/ic_friend_outsize.png';
+  static String icFriendOutsize = 'assets/features/ic_friend_outsize.svg';
   static String icGlobe = 'assets/features/ic_globe.svg';
   static String icCancel = 'assets/features/ic_cancel.svg';
   static String icAddImageVideo = 'assets/features/ic_add_image_video.svg';
@@ -83,6 +83,16 @@ mixin ImagesPath {
   static String icBlackCopyLink = 'assets/features/ic_black_copy_link.svg';
   static String icDelete = 'assets/features/ic_delete.svg';
   static String icHandshake = 'assets/features/ic_handshake.svg';
+  static String icSend = 'assets/features/ic_send.svg';
+  static String icSendNoFocus = 'assets/features/ic_send_no_focus.svg';
+  static String icMic = 'assets/features/ic_mic.svg';
+
+  static String icLikePost = 'assets/features/ic_like_post.svg';
+  static String icLovePost = 'assets/features/ic_love_post.svg';
+  static String icHahaPost = 'assets/features/ic_haha_post.svg';
+  static String icWowPost = 'assets/features/ic_wow_post.svg';
+  static String icSadPost = 'assets/features/ic_sad_post.svg';
+  static String icAngryPost = 'assets/features/ic_angry_post.svg';
 
   /// Video
   static String Video1 = 'assets/features/video1.mp4';
@@ -95,4 +105,11 @@ mixin ImagesPath {
   static String emojiWow = 'assets/features/emoji_wow.json';
   static String emojiSad = 'assets/features/emoji_sad.json';
   static String emojiAngry = 'assets/features/emoji_angry.json';
+
+  /// Chat
+  static String icNewNoteChat = 'assets/features/ic_new_note_chat.svg';
+  static String icChat = 'assets/features/ic_chat.svg';
+  static String icStories = 'assets/features/ic_stories.svg';
+  static String icPhone = 'assets/features/ic_phone.svg';
+  static String icCameraBlack = 'assets/features/ic_camera_black.svg';
 }

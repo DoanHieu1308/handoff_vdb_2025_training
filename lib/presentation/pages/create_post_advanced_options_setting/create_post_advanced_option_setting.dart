@@ -55,7 +55,32 @@ class _CreatePostAdvancedOptionSettingState extends State<CreatePostAdvancedOpti
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(store.profileStore.userProfile.name ?? "", style: AppText.text16_bold),
+                      Row(
+                        children: [
+                          Text(
+                            store.profileStore.userProfile.name ?? "",
+                            style: AppText.text16_bold,
+                          ),
+                          if (store.tagFriendList.isNotEmpty) ...[
+                            const SizedBox(width: 4),
+                            Text(
+                              "- với ",
+                              style: AppText.text16,
+                            ),
+                            Text(
+                              store.tagFriendList.first.name ?? "",
+                              style: AppText.text16_bold,
+                            ),
+                            if (store.tagFriendList.length > 1) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                "và ${store.tagFriendList.length - 1} người khác",
+                                style: AppText.text16,
+                              ),
+                            ],
+                          ],
+                        ],
+                      ),
                       SizedBox(height: 5.h),
                       Wrap(
                         runSpacing: 7.h,

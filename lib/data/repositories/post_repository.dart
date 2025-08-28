@@ -16,6 +16,7 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as path;
 
 import '../../domain/end_points/end_point.dart';
+import '../model/post/post_comment_model.dart';
 import '../model/post/post_list_response_model.dart';
 
 class PostRepository {
@@ -76,9 +77,9 @@ class PostRepository {
   ///
   /// Post status
   ///
-  Future<void> postStatus({
+  Future<void> createPost({
     required PostInputModel data,
-    required void Function(PostOutputModel data) onSuccess,
+    required void Function() onSuccess,
     required void Function(dynamic error) onError,
   }) async {
     final accessToken = _sharedPreferenceHelper.getAccessToken;
@@ -90,13 +91,19 @@ class PostRepository {
     Response<dynamic> response;
     try {
       final payload = <String, dynamic>{};
-      if (!Validate.nullOrEmpty(data.title)) payload['title'] = data.title;
-      if (!Validate.nullOrEmpty(data.content)) payload['content'] = data.content;
-      if (!Validate.nullOrEmpty(data.privacy)) payload['privacy'] = data.privacy;
-      if (data.hashtags != null && data.hashtags!.isNotEmpty) payload['hashtags'] = data.hashtags;
-      if (data.images != null && data.images!.isNotEmpty) payload['images'] = data.images;
-      if (data.videos != null && data.videos!.isNotEmpty) payload['videos'] = data.videos;
-      if (data.postLinkMeta != null) payload['post_link_meta'] = data.postLinkMeta!.toMap();
+
+      payload['title'] = data.title ?? "";
+      payload['content'] = data.content ?? "";
+      payload['privacy'] = data.privacy ?? "";
+
+      payload['hashtags'] = data.hashtags ?? [];
+      payload['friends_tagged'] = data.friends_tagged ?? [];
+      payload['images'] = data.images ?? [];
+      payload['videos'] = data.videos ?? [];
+
+      if (data.postLinkMeta != null) {
+        payload['post_link_meta'] = data.postLinkMeta!.toMap();
+      }
 
       response = await _dio.post(
         EndPoint.POST_CREATE,
@@ -114,22 +121,7 @@ class PostRepository {
     }
 
     if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
-      final results = response.data;
-      print("PostItem response: $results"); // Debug log
-      
-      if (results is Map<String, dynamic>) {
-        try {
-          final post = PostOutputModel.fromMap(results);
-          onSuccess(post);
-        } catch (e) {
-          print("Error parsing PostOutputModel: $e");
-          print("Response data: $results");
-          onError("Failed to parse post response: $e");
-        }
-      } else {
-        print("Unexpected response format: ${results.runtimeType}");
-        onError("Unexpected response format");
-      }
+      onSuccess();
     }else {
       final message = response.data != null ? ApiErrorHandler.getMessage(response.data) : 'Request failed with status ${response.statusCode}';
       onError(ApiResponse.withError(message).error);
@@ -347,14 +339,15 @@ class PostRepository {
     Response<dynamic> response;
     try{
       response = await _dio.post(
-          "${EndPoint.POSTS}/$postId/feel",
+          EndPoint.FEEL,
           options: Options(
             headers: {
               'Authorization': 'Bearer $accessToken',
             },
           ),
           data: {
-            'feel' : iconName,
+            "postId" : postId,
+            'type' : iconName,
           }
       );
     }catch (e) {
@@ -420,12 +413,18 @@ class PostRepository {
     try {
       final payload = <String, dynamic>{};
       if (!Validate.nullOrEmpty(data.title)) payload['title'] = data.title;
-      if (!Validate.nullOrEmpty(data.content)) payload['content'] = data.content;
+      if (!Validate.nullOrEmpty(data.content)) payload['content'] = "ahihi";
       if (!Validate.nullOrEmpty(data.privacy)) payload['privacy'] = data.privacy;
       if (data.hashtags != null && data.hashtags!.isNotEmpty) payload['hashtags'] = data.hashtags;
       if (data.images != null && data.images!.isNotEmpty) payload['images'] = data.images;
       if (data.videos != null && data.videos!.isNotEmpty) payload['videos'] = data.videos;
       if (data.postLinkMeta != null) payload['post_link_meta'] = data.postLinkMeta!.toMap();
+      payload['friends_tagged'] = data.friendsTagged
+          ?.map((f) => f.id?.trim())
+          .whereType<String>()
+          .where((id) => id.isNotEmpty)
+          .toList() ??
+          [];
 
       response = await _dio.patch(
         "${EndPoint.POSTS}/${data.id}",
@@ -462,6 +461,133 @@ class PostRepository {
     }else {
       final message = response.data != null ? ApiErrorHandler.getMessage(response.data) : 'Request failed with status ${response.statusCode}';
       onError(ApiResponse.withError(message).error);
+    }
+  }
+
+  /// Create comment post
+  Future<void> createCommentPost ({
+    required String commentPostId,
+    required String commentUserId,
+    required String commentContent,
+    required String commentParentId,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    Response<dynamic> response;
+    try{
+      response = await _dio.post(
+          "${EndPoint.COMMENT}/create",
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $accessToken',
+            },
+          ),
+          data: {
+            'commentPostId' : commentPostId,
+            'commentUserId' : commentUserId,
+            'commentContent' : commentContent,
+            'commentParentId' : commentParentId,
+          }
+      );
+    }catch (e) {
+      print("Error details: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      onSuccess();
+    }
+  }
+
+  /// Get comment by postId
+  Future<void> getCommentByPostId ({
+    required String commentPostId,
+    required int page,
+    required Function(List<PostCommentModel>) onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    Response<dynamic> response;
+    try{
+      response = await _dio.get(
+        "${EndPoint.COMMENT}/$commentPostId",
+        queryParameters: {
+          'page': page,
+          'limit' : 10,
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+    }catch (e) {
+      print("Error details: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      final results = response.data as Map<String, dynamic>;
+      final metadata = results['metadata'] as Map<String, dynamic>;
+
+      final data = metadata['data'] as List<dynamic>;
+      final commentList = data
+          .map((json) => PostCommentModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+      print(commentList);
+      onSuccess(commentList);
+    }
+  }
+
+  /// Delete comment
+  Future<void> deleteComment({
+    required String commentId,
+    required Function() onSuccess,
+    required Function(dynamic error) onError
+  }) async {
+
+    // Check if user is logged in
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    Response<dynamic> response;
+    try{
+      response = await _dio.post(
+        "${EndPoint.COMMENT}/delete",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+        data: {
+          "commentId" : commentId
+        }
+      );
+    }catch (e) {
+      print("Error details: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+      return;
+    }
+    if(!Validate.nullOrEmpty(response.statusCode) && response.statusCode! >= 200 && response.statusCode! <= 300){
+      onSuccess();
     }
   }
 }

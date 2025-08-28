@@ -10,9 +10,7 @@ part of 'profile_picture_camera_store.dart';
 
 mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
   late final _$cameraControllerAtom = Atom(
-    name: '_ProfilePictureCameraStore.cameraController',
-    context: context,
-  );
+      name: '_ProfilePictureCameraStore.cameraController', context: context);
 
   @override
   CameraController? get cameraController {
@@ -28,9 +26,7 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
   }
 
   late final _$_camerasDescriptionAtom = Atom(
-    name: '_ProfilePictureCameraStore._camerasDescription',
-    context: context,
-  );
+      name: '_ProfilePictureCameraStore._camerasDescription', context: context);
 
   @override
   List<CameraDescription> get _camerasDescription {
@@ -46,9 +42,8 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
   }
 
   late final _$selectedCameraDescriptionAtom = Atom(
-    name: '_ProfilePictureCameraStore.selectedCameraDescription',
-    context: context,
-  );
+      name: '_ProfilePictureCameraStore.selectedCameraDescription',
+      context: context);
 
   @override
   CameraDescription? get selectedCameraDescription {
@@ -58,19 +53,14 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
 
   @override
   set selectedCameraDescription(CameraDescription? value) {
-    _$selectedCameraDescriptionAtom.reportWrite(
-      value,
-      super.selectedCameraDescription,
-      () {
-        super.selectedCameraDescription = value;
-      },
-    );
+    _$selectedCameraDescriptionAtom
+        .reportWrite(value, super.selectedCameraDescription, () {
+      super.selectedCameraDescription = value;
+    });
   }
 
   late final _$isCameraInitializedAtom = Atom(
-    name: '_ProfilePictureCameraStore.isCameraInitialized',
-    context: context,
-  );
+      name: '_ProfilePictureCameraStore.isCameraInitialized', context: context);
 
   @override
   bool get isCameraInitialized {
@@ -85,10 +75,8 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
     });
   }
 
-  late final _$flashModeAtom = Atom(
-    name: '_ProfilePictureCameraStore.flashMode',
-    context: context,
-  );
+  late final _$flashModeAtom =
+      Atom(name: '_ProfilePictureCameraStore.flashMode', context: context);
 
   @override
   FlashMode get flashMode {
@@ -103,10 +91,8 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
     });
   }
 
-  late final _$imageFileAtom = Atom(
-    name: '_ProfilePictureCameraStore.imageFile',
-    context: context,
-  );
+  late final _$imageFileAtom =
+      Atom(name: '_ProfilePictureCameraStore.imageFile', context: context);
 
   @override
   XFile? get imageFile {
@@ -121,10 +107,8 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
     });
   }
 
-  late final _$isToggleCameraAtom = Atom(
-    name: '_ProfilePictureCameraStore.isToggleCamera',
-    context: context,
-  );
+  late final _$isToggleCameraAtom =
+      Atom(name: '_ProfilePictureCameraStore.isToggleCamera', context: context);
 
   @override
   bool get isToggleCamera {
@@ -140,9 +124,8 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
   }
 
   late final _$_isAllowInitCameraResumedAtom = Atom(
-    name: '_ProfilePictureCameraStore._isAllowInitCameraResumed',
-    context: context,
-  );
+      name: '_ProfilePictureCameraStore._isAllowInitCameraResumed',
+      context: context);
 
   @override
   bool get _isAllowInitCameraResumed {
@@ -152,19 +135,14 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
 
   @override
   set _isAllowInitCameraResumed(bool value) {
-    _$_isAllowInitCameraResumedAtom.reportWrite(
-      value,
-      super._isAllowInitCameraResumed,
-      () {
-        super._isAllowInitCameraResumed = value;
-      },
-    );
+    _$_isAllowInitCameraResumedAtom
+        .reportWrite(value, super._isAllowInitCameraResumed, () {
+      super._isAllowInitCameraResumed = value;
+    });
   }
 
-  late final _$imageGalleryAtom = Atom(
-    name: '_ProfilePictureCameraStore.imageGallery',
-    context: context,
-  );
+  late final _$imageGalleryAtom =
+      Atom(name: '_ProfilePictureCameraStore.imageGallery', context: context);
 
   @override
   String get imageGallery {
@@ -179,10 +157,8 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
     });
   }
 
-  late final _$isLoadingAtom = Atom(
-    name: '_ProfilePictureCameraStore.isLoading',
-    context: context,
-  );
+  late final _$isLoadingAtom =
+      Atom(name: '_ProfilePictureCameraStore.isLoading', context: context);
 
   @override
   bool get isLoading {
@@ -198,102 +174,81 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
   }
 
   late final _$getCameraDescriptionAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore.getCameraDescription',
-    context: context,
-  );
+      '_ProfilePictureCameraStore.getCameraDescription',
+      context: context);
 
   @override
   Future<void> getCameraDescription() {
-    return _$getCameraDescriptionAsyncAction.run(
-      () => super.getCameraDescription(),
-    );
+    return _$getCameraDescriptionAsyncAction
+        .run(() => super.getCameraDescription());
   }
 
   late final _$onNewCameraSelectedAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore.onNewCameraSelected',
-    context: context,
-  );
+      '_ProfilePictureCameraStore.onNewCameraSelected',
+      context: context);
 
   @override
-  Future<void> onNewCameraSelected({
-    required CameraDescription cameraDescription,
-  }) {
+  Future<void> onNewCameraSelected(
+      {required CameraDescription cameraDescription}) {
     return _$onNewCameraSelectedAsyncAction.run(
-      () => super.onNewCameraSelected(cameraDescription: cameraDescription),
-    );
+        () => super.onNewCameraSelected(cameraDescription: cameraDescription));
   }
 
   late final _$_initializeCameraControllerAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore._initializeCameraController',
-    context: context,
-  );
+      '_ProfilePictureCameraStore._initializeCameraController',
+      context: context);
 
   @override
   Future<void> _initializeCameraController(
-    CameraDescription cameraDescription,
-  ) {
-    return _$_initializeCameraControllerAsyncAction.run(
-      () => super._initializeCameraController(cameraDescription),
-    );
+      CameraDescription cameraDescription) {
+    return _$_initializeCameraControllerAsyncAction
+        .run(() => super._initializeCameraController(cameraDescription));
   }
 
   late final _$_setCameraDescriptionAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore._setCameraDescription',
-    context: context,
-  );
+      '_ProfilePictureCameraStore._setCameraDescription',
+      context: context);
 
   @override
-  Future<void> _setCameraDescription({
-    required CameraDescription cameraDescription,
-  }) {
-    return _$_setCameraDescriptionAsyncAction.run(
-      () => super._setCameraDescription(cameraDescription: cameraDescription),
-    );
+  Future<void> _setCameraDescription(
+      {required CameraDescription cameraDescription}) {
+    return _$_setCameraDescriptionAsyncAction.run(() =>
+        super._setCameraDescription(cameraDescription: cameraDescription));
   }
 
-  late final _$disposeCameraAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore.disposeCamera',
-    context: context,
-  );
+  late final _$disposeCameraAsyncAction =
+      AsyncAction('_ProfilePictureCameraStore.disposeCamera', context: context);
 
   @override
   Future<void> disposeCamera() {
     return _$disposeCameraAsyncAction.run(() => super.disposeCamera());
   }
 
-  late final _$capturePhotoAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore.capturePhoto',
-    context: context,
-  );
+  late final _$capturePhotoAsyncAction =
+      AsyncAction('_ProfilePictureCameraStore.capturePhoto', context: context);
 
   @override
   Future<void> capturePhoto() {
     return _$capturePhotoAsyncAction.run(() => super.capturePhoto());
   }
 
-  late final _$upLoadImageAsyncAction = AsyncAction(
-    '_ProfilePictureCameraStore.upLoadImage',
-    context: context,
-  );
+  late final _$upLoadImageAsyncAction =
+      AsyncAction('_ProfilePictureCameraStore.upLoadImage', context: context);
 
   @override
   Future<void> upLoadImage(BuildContext context, String imageGallery) {
-    return _$upLoadImageAsyncAction.run(
-      () => super.upLoadImage(context, imageGallery),
-    );
+    return _$upLoadImageAsyncAction
+        .run(() => super.upLoadImage(context, imageGallery));
   }
 
-  late final _$_ProfilePictureCameraStoreActionController = ActionController(
-    name: '_ProfilePictureCameraStore',
-    context: context,
-  );
+  late final _$_ProfilePictureCameraStoreActionController =
+      ActionController(name: '_ProfilePictureCameraStore', context: context);
 
   @override
   void disposeCameraController() {
-    final _$actionInfo = _$_ProfilePictureCameraStoreActionController
-        .startAction(
-          name: '_ProfilePictureCameraStore.disposeCameraController',
-        );
+    final _$actionInfo =
+        _$_ProfilePictureCameraStoreActionController.startAction(
+            name: '_ProfilePictureCameraStore.disposeCameraController');
     try {
       return super.disposeCameraController();
     } finally {
@@ -303,10 +258,9 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    final _$actionInfo = _$_ProfilePictureCameraStoreActionController
-        .startAction(
-          name: '_ProfilePictureCameraStore.didChangeAppLifecycleState',
-        );
+    final _$actionInfo =
+        _$_ProfilePictureCameraStoreActionController.startAction(
+            name: '_ProfilePictureCameraStore.didChangeAppLifecycleState');
     try {
       return super.didChangeAppLifecycleState(state);
     } finally {
@@ -315,19 +269,16 @@ mixin _$ProfilePictureCameraStore on _ProfilePictureCameraStore, Store {
   }
 
   @override
-  CameraDescription _getTypeOfCameraDescription({
-    required List<CameraDescription> cameraDescriptionList,
-    required bool isBackCamera,
-  }) {
-    final _$actionInfo = _$_ProfilePictureCameraStoreActionController
-        .startAction(
-          name: '_ProfilePictureCameraStore._getTypeOfCameraDescription',
-        );
+  CameraDescription _getTypeOfCameraDescription(
+      {required List<CameraDescription> cameraDescriptionList,
+      required bool isBackCamera}) {
+    final _$actionInfo =
+        _$_ProfilePictureCameraStoreActionController.startAction(
+            name: '_ProfilePictureCameraStore._getTypeOfCameraDescription');
     try {
       return super._getTypeOfCameraDescription(
-        cameraDescriptionList: cameraDescriptionList,
-        isBackCamera: isBackCamera,
-      );
+          cameraDescriptionList: cameraDescriptionList,
+          isBackCamera: isBackCamera);
     } finally {
       _$_ProfilePictureCameraStoreActionController.endAction(_$actionInfo);
     }

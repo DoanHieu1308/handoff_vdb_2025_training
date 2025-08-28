@@ -61,6 +61,7 @@ class _VideoPageState extends State<VideoPage> {
                             videoUrl: ImagesPath.Video2,
                             isAsset: true,
                             autoPlay: true,
+                            startPaused: false,
                             looping: true,
                             fit: BoxFit.cover,
                           ),

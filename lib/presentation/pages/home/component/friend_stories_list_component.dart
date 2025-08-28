@@ -14,7 +14,6 @@ class FriendStoriesListComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// TODO
     return Container(
       height: 170.h,
       width: double.infinity,
@@ -30,28 +29,29 @@ class FriendStoriesListComponent extends StatelessWidget {
             return Stack(
               children: [
                 Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.w),
-                  width: 105.w,
-                  height: 170.h,
+                  margin: EdgeInsets.only(left: 10.w),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
                     color: Colors.grey,
                   ),
-                  child: ClipRect(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
                     child: Observer(
                       builder: (context) {
-                        return SetUpAssetImage(
+                        return SizedBox(
                           width: 105.w,
                           height: 170.h,
-                          store.profileStore.userProfile.avatar ?? ImagesPath.imgAnhNen,
-                          fit: BoxFit.cover,
+                          child: SetUpAssetImage(
+                            store.profileStore.userProfile.avatar ?? ImagesPath.imgAnhNen,
+                            fit: BoxFit.cover,
+                          ),
                         );
                       }
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 10.w, top: 5.h),
+                  padding: EdgeInsets.only(left: 12.w, top: 3.h),
                   child: CircleAvatar(
                     radius: 18,
                     backgroundColor: Colors.indigo,
@@ -64,7 +64,7 @@ class FriendStoriesListComponent extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 10.w, top: 145.h),
+                  padding: EdgeInsets.only(left: 12.w, top: 145.h),
                   child: Text(
                     "Hanh Dieu",
                     style: AppText.text13_bold.copyWith(color: Colors.white),

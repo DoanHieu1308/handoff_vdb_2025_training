@@ -9,10 +9,8 @@ part of 'link_preview_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$LinkPreviewStore on _LinkPreviewStore, Store {
-  late final _$detectedLinkAtom = Atom(
-    name: '_LinkPreviewStore.detectedLink',
-    context: context,
-  );
+  late final _$detectedLinkAtom =
+      Atom(name: '_LinkPreviewStore.detectedLink', context: context);
 
   @override
   String? get detectedLink {
@@ -27,10 +25,8 @@ mixin _$LinkPreviewStore on _LinkPreviewStore, Store {
     });
   }
 
-  late final _$isLoadingPreviewAtom = Atom(
-    name: '_LinkPreviewStore.isLoadingPreview',
-    context: context,
-  );
+  late final _$isLoadingPreviewAtom =
+      Atom(name: '_LinkPreviewStore.isLoadingPreview', context: context);
 
   @override
   bool get isLoadingPreview {
@@ -45,10 +41,8 @@ mixin _$LinkPreviewStore on _LinkPreviewStore, Store {
     });
   }
 
-  late final _$debounceAtom = Atom(
-    name: '_LinkPreviewStore.debounce',
-    context: context,
-  );
+  late final _$debounceAtom =
+      Atom(name: '_LinkPreviewStore.debounce', context: context);
 
   @override
   Timer? get debounce {
@@ -63,10 +57,8 @@ mixin _$LinkPreviewStore on _LinkPreviewStore, Store {
     });
   }
 
-  late final _$previewDataAtom = Atom(
-    name: '_LinkPreviewStore.previewData',
-    context: context,
-  );
+  late final _$previewDataAtom =
+      Atom(name: '_LinkPreviewStore.previewData', context: context);
 
   @override
   PostLinkMeta get previewData {
@@ -81,10 +73,8 @@ mixin _$LinkPreviewStore on _LinkPreviewStore, Store {
     });
   }
 
-  late final _$hasLinkAtom = Atom(
-    name: '_LinkPreviewStore.hasLink',
-    context: context,
-  );
+  late final _$hasLinkAtom =
+      Atom(name: '_LinkPreviewStore.hasLink', context: context);
 
   @override
   bool get hasLink {
@@ -99,16 +89,13 @@ mixin _$LinkPreviewStore on _LinkPreviewStore, Store {
     });
   }
 
-  late final _$_LinkPreviewStoreActionController = ActionController(
-    name: '_LinkPreviewStore',
-    context: context,
-  );
+  late final _$_LinkPreviewStoreActionController =
+      ActionController(name: '_LinkPreviewStore', context: context);
 
   @override
   void detectAndPreviewFirstLink(String text) {
     final _$actionInfo = _$_LinkPreviewStoreActionController.startAction(
-      name: '_LinkPreviewStore.detectAndPreviewFirstLink',
-    );
+        name: '_LinkPreviewStore.detectAndPreviewFirstLink');
     try {
       return super.detectAndPreviewFirstLink(text);
     } finally {

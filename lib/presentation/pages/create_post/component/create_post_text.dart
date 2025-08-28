@@ -20,7 +20,7 @@ class CreatePostText extends StatelessWidget {
     return Stack(
       children: [
         Container(
-          height: 270.h,
+          height: 280.h,
           width: SizeUtil.getMaxWidth(),
           decoration:const BoxDecoration(
             gradient: LinearGradient(
@@ -33,7 +33,7 @@ class CreatePostText extends StatelessWidget {
         AuthInput(
           controller: feelingEditingController,
           hintText: "Bạn đang nghĩ gì?",
-          maxLine: hasText ? 5 : 10,
+          maxLine: hasText ? 7 : 10,
           hintStyle: AppText.text22.copyWith(color: ColorResources.LIGHT_GREY),
           textStyle: AppText.text23_bold,
           fillColor: Colors.transparent,

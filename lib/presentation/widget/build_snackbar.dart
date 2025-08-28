@@ -5,7 +5,7 @@ SnackBar buildSnackBarNotify({required String textNotify, Color? backgroundColor
     backgroundColor: Colors.transparent,
     elevation: 0,
     behavior: SnackBarBehavior.floating,
-    duration: Duration(milliseconds: 500),
+    duration: Duration(milliseconds: 1500),
     content: Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(

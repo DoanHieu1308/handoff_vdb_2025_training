@@ -9,10 +9,8 @@ part of 'login_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$LoginStore on _LoginStore, Store {
-  late final _$currentPageIndexAtom = Atom(
-    name: '_LoginStore.currentPageIndex',
-    context: context,
-  );
+  late final _$currentPageIndexAtom =
+      Atom(name: '_LoginStore.currentPageIndex', context: context);
 
   @override
   int get currentPageIndex {
@@ -27,10 +25,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$isRememberAtom = Atom(
-    name: '_LoginStore.isRemember',
-    context: context,
-  );
+  late final _$isRememberAtom =
+      Atom(name: '_LoginStore.isRemember', context: context);
 
   @override
   bool get isRemember {
@@ -45,10 +41,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$emailSavedAtom = Atom(
-    name: '_LoginStore.emailSaved',
-    context: context,
-  );
+  late final _$emailSavedAtom =
+      Atom(name: '_LoginStore.emailSaved', context: context);
 
   @override
   String get emailSaved {
@@ -63,10 +57,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$passwordSavedAtom = Atom(
-    name: '_LoginStore.passwordSaved',
-    context: context,
-  );
+  late final _$passwordSavedAtom =
+      Atom(name: '_LoginStore.passwordSaved', context: context);
 
   @override
   String get passwordSaved {
@@ -81,10 +73,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$emailErrorAtom = Atom(
-    name: '_LoginStore.emailError',
-    context: context,
-  );
+  late final _$emailErrorAtom =
+      Atom(name: '_LoginStore.emailError', context: context);
 
   @override
   String? get emailError {
@@ -99,10 +89,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$passwordErrorAtom = Atom(
-    name: '_LoginStore.passwordError',
-    context: context,
-  );
+  late final _$passwordErrorAtom =
+      Atom(name: '_LoginStore.passwordError', context: context);
 
   @override
   String? get passwordError {
@@ -117,10 +105,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$errorMessageAtom = Atom(
-    name: '_LoginStore.errorMessage',
-    context: context,
-  );
+  late final _$errorMessageAtom =
+      Atom(name: '_LoginStore.errorMessage', context: context);
 
   @override
   String? get errorMessage {
@@ -135,10 +121,8 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$isLoadingAtom = Atom(
-    name: '_LoginStore.isLoading',
-    context: context,
-  );
+  late final _$isLoadingAtom =
+      Atom(name: '_LoginStore.isLoading', context: context);
 
   @override
   bool get isLoading {
@@ -153,31 +137,25 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
-  late final _$logInAsyncAction = AsyncAction(
-    '_LoginStore.logIn',
-    context: context,
-  );
+  late final _$logInAsyncAction =
+      AsyncAction('_LoginStore.logIn', context: context);
 
   @override
-  Future<void> logIn({
-    required dynamic Function(AuthModel) onSuccess,
-    required dynamic Function(String) onError,
-  }) {
-    return _$logInAsyncAction.run(
-      () => super.logIn(onSuccess: onSuccess, onError: onError),
-    );
+  Future<void> logIn(
+      {required BuildContext context,
+      required dynamic Function(AuthModel) onSuccess,
+      required dynamic Function(String) onError}) {
+    return _$logInAsyncAction.run(() =>
+        super.logIn(context: context, onSuccess: onSuccess, onError: onError));
   }
 
-  late final _$_LoginStoreActionController = ActionController(
-    name: '_LoginStore',
-    context: context,
-  );
+  late final _$_LoginStoreActionController =
+      ActionController(name: '_LoginStore', context: context);
 
   @override
   void onChangePageIndex({required int index}) {
     final _$actionInfo = _$_LoginStoreActionController.startAction(
-      name: '_LoginStore.onChangePageIndex',
-    );
+        name: '_LoginStore.onChangePageIndex');
     try {
       return super.onChangePageIndex(index: index);
     } finally {
@@ -188,8 +166,7 @@ mixin _$LoginStore on _LoginStore, Store {
   @override
   void setRemember() {
     final _$actionInfo = _$_LoginStoreActionController.startAction(
-      name: '_LoginStore.setRemember',
-    );
+        name: '_LoginStore.setRemember');
     try {
       return super.setRemember();
     } finally {
@@ -200,8 +177,7 @@ mixin _$LoginStore on _LoginStore, Store {
   @override
   void goToForgotPassword() {
     final _$actionInfo = _$_LoginStoreActionController.startAction(
-      name: '_LoginStore.goToForgotPassword',
-    );
+        name: '_LoginStore.goToForgotPassword');
     try {
       return super.goToForgotPassword();
     } finally {
@@ -211,9 +187,8 @@ mixin _$LoginStore on _LoginStore, Store {
 
   @override
   bool validate() {
-    final _$actionInfo = _$_LoginStoreActionController.startAction(
-      name: '_LoginStore.validate',
-    );
+    final _$actionInfo =
+        _$_LoginStoreActionController.startAction(name: '_LoginStore.validate');
     try {
       return super.validate();
     } finally {
@@ -224,8 +199,7 @@ mixin _$LoginStore on _LoginStore, Store {
   @override
   void checkSavedData() {
     final _$actionInfo = _$_LoginStoreActionController.startAction(
-      name: '_LoginStore.checkSavedData',
-    );
+        name: '_LoginStore.checkSavedData');
     try {
       return super.checkSavedData();
     } finally {

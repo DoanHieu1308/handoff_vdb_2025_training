@@ -27,23 +27,33 @@ class _StatusPostPageState extends State<StatusPostPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: GestureDetector(
             onTap: (){
-              Navigator.pop(context);
+              router.pop();
             },
             child: Icon(Icons.arrow_back_ios_new_outlined, size: 22)
         ),
         title: Text("Đối tượng của bài viết", style: AppText.text18),
       ),
-      body: Column(
+      body: SafeArea(
+        child: Column(
           children: [
-            buildIntro(),
-            Expanded(child: buildObject()),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    buildIntro(),
+                    buildObject(),
+                  ],
+                ),
+              ),
+            ),
+            // Button "Xong" luôn ở dưới cùng
             GestureDetector(
               onTap: (){
                 final index = store.listNameItemOption.indexWhere((e) => e.type == PostOptionType.onlyMe);
@@ -58,18 +68,20 @@ class _StatusPostPageState extends State<StatusPostPage> {
                 router.pop();
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
+                margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 10.h),
                 height: 50,
                 width: SizeUtil.getMaxWidth(),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
                   color: Colors.indigoAccent.shade400
                 ),
-                child: Center(child: Text("Xong", style: AppText.text18.copyWith(color: Colors.white),)),
+                child: Center(
+                  child: Text("Xong", style: AppText.text18.copyWith(color: Colors.white)),
+                ),
               ),
             ),
-            SizedBox(height: 20.h,),
-          ]
+          ],
+        ),
       ),
     );
   }
@@ -107,9 +119,10 @@ class _StatusPostPageState extends State<StatusPostPage> {
     return Observer(
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.only(left: 5.w),
+          padding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               AppDivider.v5,
               Text("Chọn đối tượng", style: AppText.text16_Inter),
@@ -155,39 +168,57 @@ class _StatusPostPageState extends State<StatusPostPage> {
     required String subTitle,
     required bool isSelected,
   }) {
-    /// TODO
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
           onTap: onTap,
           child: Container(
-            height: 47.h,
+            constraints: BoxConstraints(
+              minHeight: 47.h,
+              maxHeight: 60.h,
+            ),
             width: SizeUtil.getMaxWidth(),
             color: Colors.transparent,
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
             child: Row(
               children: [
                 Container(
+                  width: 20.w,
+                  height: 20.w,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(width: 0.2, color: Colors.grey),
                   ),
                   child: Center(
-                    child: Icon(Icons.check_circle, color: isSelected ? Colors.blue : Colors.white),
+                    child: Icon(
+                      Icons.check_circle, 
+                      color: isSelected ? Colors.blue : Colors.white,
+                      size: 18.w,
+                    ),
                   ),
                 ),
                 SizedBox(width: 20.w),
                 SetUpAssetImage(height: 25.h, width: 25.w, image),
                 SizedBox(width: 10.w),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: AppText.text14),
-                    Text(
-                      subTitle,
-                      style: AppText.text12.copyWith(color: Colors.grey),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title, 
+                        style: AppText.text14,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 2.h),
+                      Text(
+                        subTitle,
+                        style: AppText.text12.copyWith(color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -202,3 +233,4 @@ class _StatusPostPageState extends State<StatusPostPage> {
     );
   }
 }
+

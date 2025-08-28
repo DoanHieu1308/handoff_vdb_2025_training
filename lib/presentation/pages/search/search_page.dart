@@ -42,37 +42,40 @@ class _SearchPageState extends State<SearchPage> {
                 Icon(Icons.search, size: 20),
                 SizedBox(width: 10.w),
                 Expanded(
-                  child: Observer(builder: (context) => TextFormField(
-                    controller: store.textEditingController,
-                    decoration: InputDecoration(
-                      hintText: "Tìm kiếm bạn bè",
-                      hintStyle: AppText.text14.copyWith(
-                        color: ColorResources.COLOR_D2D6DE,
-                        fontFamily: 'Inter-Regular',
-                      ),
-                      suffixIcon:
-                      store.searchText.isNotEmpty
-                          ? GestureDetector(
-                        onTap: () {
-                          store.textEditingController.clear();
-                          store.searchText = '';
-                        },
-                        child: const Icon(
-                          Icons.close,
-                          color: ColorResources.GREY,
+                  child: Observer(
+                    builder:
+                        (context) => TextFormField(
+                          controller: store.textEditingController,
+                          decoration: InputDecoration(
+                            hintText: "Tìm kiếm bạn bè",
+                            hintStyle: AppText.text14.copyWith(
+                              color: ColorResources.COLOR_D2D6DE,
+                              fontFamily: 'Inter-Regular',
+                            ),
+                            suffixIcon:
+                                store.searchText.isNotEmpty
+                                    ? GestureDetector(
+                                      onTap: () {
+                                        store.textEditingController.clear();
+                                        store.searchText = '';
+                                      },
+                                      child: const Icon(
+                                        Icons.close,
+                                        color: ColorResources.GREY,
+                                      ),
+                                    )
+                                    : null,
+                            border: InputBorder.none,
+                          ),
+                          style: AppText.text14.copyWith(
+                            color: ColorResources.PRIMARY_TEXT,
+                          ),
+                          onChanged: (value) {
+                            store.searchText = value;
+                          },
+                          onEditingComplete: () {},
                         ),
-                      )
-                          : null,
-                      border: InputBorder.none,
-                    ),
-                    style: AppText.text14.copyWith(
-                      color: ColorResources.PRIMARY_TEXT,
-                    ),
-                    onChanged: (value) {
-                      store.searchText = value;
-                    },
-                    onEditingComplete: () {},
-                  ),)
+                  ),
                 ),
               ],
             ),

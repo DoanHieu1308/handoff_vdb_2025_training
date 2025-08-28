@@ -36,51 +36,66 @@ class _FriendsPageState extends State<FriendsPage> {
 
     store.searchCtrl.searchText = '';
 
-    // Thêm listener cho search text thay đổi
-    searchListener = () {
+    // Initialize search store and add listener
+    _initializeSearchStore();
+  }
+
+  Future<void> _initializeSearchStore() async {
+    try {
+      await store.searchCtrl.init();
+      
       if (mounted) {
-        store.getItemSearch();
-        // Tắt bàn phím khi search text rỗng
-        if (store.searchCtrl.searchText.isEmpty) {
-          FocusScope.of(context).unfocus();
-        }
+        // Add listener for search text changes
+        searchListener = () {
+          if (mounted) {
+            store.getItemSearch();
+            // Hide keyboard when search text is empty
+            if (store.searchCtrl.searchText.isEmpty) {
+              FocusScope.of(context).unfocus();
+            }
+          }
+        };
+        store.searchCtrl.textEditingController.addListener(searchListener);
       }
-    };
-    store.searchCtrl.textEditingController.addListener(searchListener);
+    } catch (e) {
+      print('Error initializing search store: $e');
+    }
   }
 
   @override
   void dispose() {
+    // Remove listener first if it exists
+    if (searchListener != null && store.searchCtrl.textEditingController.hasListeners) {
+      store.searchCtrl.textEditingController.removeListener(searchListener);
+    }
+    
     store.disposeAll();
     searchRefreshController.dispose();
     
-    // Remove listener
-    store.searchCtrl.textEditingController.removeListener(searchListener);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder:
-          (_) => WillPopScope(
-            onWillPop: () async {
+      builder: (_) => WillPopScope(
+        onWillPop: () async {
+          FocusScope.of(context).unfocus();
+          return true;
+        },
+        child: SafeArea(
+          child: GestureDetector(
+            onTap: () {
+              // Hide keyboard when tapping on screen
               FocusScope.of(context).unfocus();
-              return true;
             },
-            child: SafeArea(
-              child: GestureDetector(
-                onTap: () {
-                  // Tắt bàn phím khi tap vào màn hình
-                  FocusScope.of(context).unfocus();
-                },
-                child: Scaffold(
-                  backgroundColor: Colors.grey.shade50,
-                  resizeToAvoidBottomInset: false,
-                  body: Column(
+            child: Scaffold(
+              backgroundColor: Colors.grey.shade50,
+              resizeToAvoidBottomInset: false,
+              body: Column(
                 children: [
-                  SizedBox(height: 30.h,),
-                  Header(),
+                  SizedBox(height: 30.h),
+                  const Header(),
                   Container(
                     margin: EdgeInsets.only(top: 10.h),
                     height: 1.h,
@@ -90,7 +105,7 @@ class _FriendsPageState extends State<FriendsPage> {
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.2),
-                          offset: Offset(0, 2),
+                          offset: const Offset(0, 2),
                           blurRadius: 4,
                           spreadRadius: 0,
                         ),
@@ -102,7 +117,7 @@ class _FriendsPageState extends State<FriendsPage> {
                       children: [
                         SizedBox(height: 20.h),
                         if (store.searchCtrl.searchText.isNotEmpty)
-                          _buildData()
+                          _buildSearchResults()
                         else
                           Expanded(child: _buildBodyFriend()),
                       ],
@@ -112,41 +127,52 @@ class _FriendsPageState extends State<FriendsPage> {
               ),
             ),
           ),
-    )));
+        ),
+      ),
+    );
   }
 
-  Widget _buildData() {
+  Widget _buildSearchResults() {
     return Expanded(
-        child: Observer(builder: (context){
-          if(store.friendListSearch.isNotEmpty) {
+      child: Observer(
+        builder: (context) {
+          if (store.friendListSearch.isNotEmpty) {
             return ListItemFriendSearch(
-              friendList:store.friendListSearch,
+              friendList: store.friendListSearch,
               icon: ImagesPath.icMessenger,
               numberFriend: "${store.friendListSearch.length} friends",
               store: store,
             );
           } else {
-            return Center(child: Text("No friends found"));
+            return const Center(
+              child: Text(
+                "Không tìm thấy bạn bè",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            );
           }
-        })
+        },
+      ),
     );
   }
 
   /// Body
   Widget _buildBodyFriend() {
     return Observer(
-      builder:
-          (_) => Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCategoryFriends(),
-              SizedBox(height: 10.h),
-              Expanded(
-                  child: _buildFriendList()
-              ),
-            ],
+      builder: (_) => Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCategoryFriends(),
+          SizedBox(height: 10.h),
+          Expanded(
+            child: _buildFriendList(),
           ),
+        ],
+      ),
     );
   }
 
@@ -155,13 +181,14 @@ class _FriendsPageState extends State<FriendsPage> {
     final category = store.selectedCategoryName;
 
     if (store.isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
     if (category == ALL_FRIENDS || category == SUGGESTIONS_FRIENDS) {
       return ListUserFriend(store: store);
-    }
-    else {
+    } else {
       return ListFriendRequest(store: store);
     }
   }
@@ -169,24 +196,24 @@ class _FriendsPageState extends State<FriendsPage> {
   /// Category Friends Page
   Widget _buildCategoryFriends() {
     return Observer(
-      builder:
-          (_) => Padding(
-            padding: EdgeInsets.only(top: 10.h),
-            child: Container(
-              constraints: BoxConstraints(maxHeight: 35.h),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildCategoryButton(ALL_FRIENDS),
-                    _buildCategoryButton(SUGGESTIONS_FRIENDS),
-                    _buildCategoryButton(FRIEND_REQUESTS),
-                    _buildCategoryButton(FRIEND_SEND),
-                  ],
-                ),
-              ),
+      builder: (_) => Padding(
+        padding: EdgeInsets.only(top: 10.h),
+        child: Container(
+          constraints: BoxConstraints(maxHeight: 35.h),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildCategoryButton(ALL_FRIENDS),
+                _buildCategoryButton(SUGGESTIONS_FRIENDS),
+                _buildCategoryButton(FRIEND_REQUESTS),
+                _buildCategoryButton(FRIEND_SEND),
+              ],
             ),
           ),
+        ),
+      ),
     );
   }
 

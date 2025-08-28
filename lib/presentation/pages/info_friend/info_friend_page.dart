@@ -38,65 +38,49 @@ class _InfoFriendPageState extends State<InfoFriendPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (_) => WillPopScope(
-        onWillPop: () async {
-          FocusScope.of(context).unfocus();
-          store.isLSeeMore = false;
-          return true;
-        },
-        child: Scaffold(
-          appBar: AppBar(),
-          body: SmartRefresher(
-            controller: store.refreshController,
-            enablePullDown: true,
-            enablePullUp: true,
-            onRefresh: onRefresh,
-            onLoading: onLoading,
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: LeadFriendProfile(),
+    return WillPopScope(
+      onWillPop: () async {
+        FocusScope.of(context).unfocus();
+        store.isLSeeMore = false;
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(),
+        body: SmartRefresher(
+          controller: store.refreshController,
+          enablePullDown: true,
+          enablePullUp: true,
+          onRefresh: onRefresh,
+          onLoading: onLoading,
+          child: CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: LeadFriendProfile(),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                  child: SentAndAcceptFriend(),
                 ),
-            
-                // Nút kết bạn / chấp nhận
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.h),
-                    child: SentAndAcceptFriend(),
-                  ),
-                ),
-            
-                // Divider
-                _sliverDivider(3.h),
-            
-                // Danh mục
-                SliverToBoxAdapter(child: CategoryFriendProfile()),
-            
-                _sliverDivider(1.h),
-            
-                // Thông tin cá nhân
-                SliverToBoxAdapter(child: InfoFriendProfile()),
-            
-                SliverToBoxAdapter(child: SizedBox(height: 10.h)),
-            
-                // Cảm xúc
-                SliverToBoxAdapter(child: FeelingFriendProfile()),
-            
-                SliverToBoxAdapter(child: SizedBox(height: 10.h)),
-                _sliverDivider(1.h),
-                // Bài viết
-                Observer(
-                    builder: (context) {
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return PostItem(itemPost: store.posts[index]);
-                        }, childCount: store.posts.length),
-                      );
-                    }
-                ),
-              ],
-            ),
+              ),
+              _sliverDivider(3.h),
+              SliverToBoxAdapter(child: CategoryFriendProfile()),
+              _sliverDivider(1.h),
+              SliverToBoxAdapter(child: InfoFriendProfile()),
+              SliverToBoxAdapter(child: SizedBox(height: 10.h)),
+              SliverToBoxAdapter(child: FeelingFriendProfile()),
+              SliverToBoxAdapter(child: SizedBox(height: 10.h)),
+              _sliverDivider(1.h),
+              Observer(
+                  builder: (context) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return PostItem(itemPost: store.posts[index]);
+                      }, childCount: store.posts.length),
+                    );
+                  }
+              ),
+            ],
           ),
         ),
       ),

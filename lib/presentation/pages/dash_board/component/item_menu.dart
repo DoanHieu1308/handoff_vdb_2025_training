@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
+import 'package:handoff_vdb_2025/core/helper/app_tap_animation.dart';
 import '../../../../core/utils/color_resources.dart';
 import '../../../../core/utils/images_path.dart';
 
@@ -17,12 +18,13 @@ class ItemMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        onTap?.call();
-      },
-      child: Padding(
-        padding: EdgeInsets.only(right: 10.w),
+    return Padding(
+      padding: EdgeInsets.only(right: 10.w),
+      child: AppTapAnimation(
+        enabled: true,
+        onTap: (){
+          onTap?.call();
+        },
         child: Stack(
           children: [
             SizedBox(
@@ -30,7 +32,7 @@ class ItemMenu extends StatelessWidget {
               width: 35.w,
               child: CircleAvatar(
                 radius: 18,
-                backgroundColor: ColorResources.COLOR_F4F5F6,
+                backgroundColor: Colors.transparent,
                 child: SetUpAssetImage(
                   height: 22.h,
                   width: 22.w,

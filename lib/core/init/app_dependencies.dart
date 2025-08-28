@@ -2,6 +2,7 @@ import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/chat_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/info_friend/info_friend_store.dart';
@@ -31,6 +32,7 @@ class AppDependencies {
   static FriendsStore get friendStore => _appInit.friendsStore;
   static SearchStore get searchStore => _appInit.searchStore;
   static InfoFriendStore get infoFriendStore => _appInit.infoFriendStore;
+  static ChatStore get chatStore => _appInit.chatStore;
 
   // Dio Client
   static get dioClient => _appInit.dioClient;

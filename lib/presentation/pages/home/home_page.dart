@@ -21,20 +21,23 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>{
   final HomeStore store = AppInit.instance.homeStore;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
+    super.initState();
+    
     // Listen to post message changes
-    reaction((_) => store.postMessage, (String message) {
+    reaction((_) => store.createPostStore.postMessage, (String message) {
       if (message.isNotEmpty) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               buildSnackBarNotify(
                 textNotify: message,
-                backgroundColor: store.isPostSuccess ? null : Colors.red,
+                backgroundColor: store.createPostStore.isPostSuccess ? Colors.green : Colors.red,
               ),
             );
             store.clearPostMessage();
@@ -44,7 +47,12 @@ class _HomePageState extends State<HomePage> {
     });
 
     store.init();
-    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   void onRefresh() {
@@ -71,6 +79,8 @@ class _HomePageState extends State<HomePage> {
               builder: (context, mode) => buildLoadMoreFooter(mode),
             ),
             child: CustomScrollView(
+              controller: _scrollController,
+              physics: const BouncingScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(child: SizedBox(height: 20.h)),
                 SliverToBoxAdapter(child: CreatePostButton()),
@@ -118,18 +128,60 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildLineSpacing(){
-    /// [TODO] 3, color
-    return Divider();
-  }
-
   Widget _buildPostList() {
     return Observer(
       builder: (context) {
-        return SliverList(
-          delegate: SliverChildBuilderDelegate((context, index) {
-            return PostItem(itemPost: store.allPostsPublic[index]);
-          }, childCount: store.allPostsPublic.length),
+        if (store.allPostsPublic.isEmpty) {
+          return const SliverToBoxAdapter(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                  'Không có bài viết nào',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return SliverToBoxAdapter(
+          child: ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: store.allPostsPublic.length,
+            itemBuilder: (context, index) {
+              try {
+                final post = store.allPostsPublic[index];
+                if (post == null) return const SizedBox(height: 100);
+                return Container(
+                  key: ValueKey('post_${post.id ?? index}'),
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: PostItem(itemPost: post),
+                );
+              } catch (e) {
+                // Fallback widget if there's an error
+                return Container(
+                  height: 100,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Lỗi hiển thị bài viết',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
         );
       },
     );
@@ -140,13 +192,43 @@ class _HomePageState extends State<HomePage> {
       case LoadStatus.idle:
         return const SizedBox();
       case LoadStatus.loading:
-        return const Center(child: CircularProgressIndicator());
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
       case LoadStatus.failed:
-        return const Center(child: Text("Load Failed! Click retry!"));
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text("Tải thêm thất bại!"),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () => store.getMorePosts(type: PUBLIC),
+                child: const Text("Thử lại"),
+              ),
+            ],
+          ),
+        );
       case LoadStatus.canLoading:
-        return const Center(child: Text("Release to load more"));
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: const Center(
+            child: Text("Thả để tải thêm"),
+          ),
+        );
       case LoadStatus.noMore:
-        return const SizedBox();
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: const Center(
+            child: Text(
+              "Đã hết bài viết",
+              style: TextStyle(color: Colors.grey),
+            ),
+          ),
+        );
       default:
         return const SizedBox();
     }

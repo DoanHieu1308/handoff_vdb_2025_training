@@ -1,11 +1,24 @@
 import 'dart:convert';
+import 'package:hive/hive.dart';
 import '../../../core/helper/validate.dart';
 
+part 'post_link_meta.g.dart';
+
+@HiveType(typeId: 1) // đảm bảo typeId khác nhau
 class PostLinkMeta {
+  @HiveField(0)
   final String? id;
+
+  @HiveField(1)
   final String? postLinkUrl;
+
+  @HiveField(2)
   final String? postLinkTitle;
+
+  @HiveField(3)
   final String? postLinkDescription;
+
+  @HiveField(4)
   final String? postLinkImage;
 
   PostLinkMeta({
@@ -56,29 +69,4 @@ class PostLinkMeta {
 
   factory PostLinkMeta.fromJson(String source) =>
       PostLinkMeta.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'PostLinkMeta(id: $id, postLinkUrl: $postLinkUrl, postLinkTitle: $postLinkTitle, postLinkDescription: $postLinkDescription, postLinkImage: $postLinkImage)';
-  }
-
-  @override
-  bool operator ==(covariant PostLinkMeta other) {
-    if (identical(this, other)) return true;
-
-    return other.id == id &&
-        other.postLinkUrl == postLinkUrl &&
-        other.postLinkTitle == postLinkTitle &&
-        other.postLinkDescription == postLinkDescription &&
-        other.postLinkImage == postLinkImage;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-    postLinkUrl.hashCode ^
-    postLinkTitle.hashCode ^
-    postLinkDescription.hashCode ^
-    postLinkImage.hashCode;
-  }
 }

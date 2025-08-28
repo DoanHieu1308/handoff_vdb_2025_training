@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// A widget that displays a [IndexedStack] with lazy loaded children.
+/// A widget that displays a [IndexedStack] with truly lazy loaded children.
+/// Widgets are only built when they are first accessed, improving memory usage.
 class LazyIndexedStack extends StatefulWidget {
   /// {@macro lazy_indexed_stack}
   const LazyIndexedStack({
@@ -10,6 +11,7 @@ class LazyIndexedStack extends StatefulWidget {
     this.alignment = AlignmentDirectional.topStart,
     this.textDirection,
     this.sizing = StackFit.loose,
+    this.preloadCount = 1, // Number of adjacent pages to preload
   });
 
   /// The index of the child to display.
@@ -27,38 +29,81 @@ class LazyIndexedStack extends StatefulWidget {
   /// How to size the non-positioned children in the stack.
   final StackFit sizing;
 
+  /// Number of adjacent pages to preload for better UX
+  final int preloadCount;
+
   @override
   State<LazyIndexedStack> createState() => _LazyIndexedStackState();
 }
 
 class _LazyIndexedStackState extends State<LazyIndexedStack> {
   late final List<bool> _activatedChildren;
+  late final List<Widget?> _builtChildren;
 
   @override
   void initState() {
     super.initState();
     _activatedChildren = List.generate(
       widget.children.length,
-          (i) => i == widget.index,
+      (i) => false,
     );
+    _builtChildren = List.generate(
+      widget.children.length,
+      (i) => null,
+    );
+    
+    // Activate initial page and adjacent pages
+    _activateInitialPages();
+  }
+
+  void _activateInitialPages() {
+    final startIndex = (widget.index - widget.preloadCount).clamp(0, widget.children.length - 1);
+    final endIndex = (widget.index + widget.preloadCount).clamp(0, widget.children.length - 1);
+    
+    for (int i = startIndex; i <= endIndex; i++) {
+      _activateChild(i);
+    }
   }
 
   @override
   void didUpdateWidget(LazyIndexedStack oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.index != widget.index) _activateChild(widget.index);
+    if (oldWidget.index != widget.index) {
+      _activateChild(widget.index);
+      _activateAdjacentPages();
+    }
   }
 
   void _activateChild(int? index) {
-    if (index == null) return;
-    if (!_activatedChildren[index]) _activatedChildren[index] = true;
+    if (index == null || index < 0 || index >= widget.children.length) return;
+    if (!_activatedChildren[index]) {
+      _activatedChildren[index] = true;
+    }
+  }
+
+  void _activateAdjacentPages() {
+    final startIndex = (widget.index - widget.preloadCount).clamp(0, widget.children.length - 1);
+    final endIndex = (widget.index + widget.preloadCount).clamp(0, widget.children.length - 1);
+    
+    for (int i = startIndex; i <= endIndex; i++) {
+      _activateChild(i);
+    }
   }
 
   List<Widget> get children {
     return List.generate(
       widget.children.length,
-          (i) {
-        return _activatedChildren[i] ? widget.children[i] : const SizedBox.shrink();
+      (i) {
+        if (_activatedChildren[i]) {
+          // Build widget if not already built
+          if (_builtChildren[i] == null) {
+            _builtChildren[i] = widget.children[i];
+          }
+          return _builtChildren[i]!;
+        } else {
+          // Return placeholder for non-activated children
+          return const SizedBox.shrink();
+        }
       },
     );
   }
@@ -72,5 +117,12 @@ class _LazyIndexedStackState extends State<LazyIndexedStack> {
       index: widget.index,
       children: children,
     );
+  }
+
+  @override
+  void dispose() {
+    // Clear built children to free memory
+    _builtChildren.clear();
+    super.dispose();
   }
 }

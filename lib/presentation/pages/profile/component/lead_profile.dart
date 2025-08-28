@@ -131,7 +131,9 @@ class LeadProfile extends StatelessWidget {
           height: 200.h,
           width: SizeUtil.getMaxWidth(),
           color: Colors.transparent,
-          child: SetUpAssetImage(ImagesPath.imgAnhNen, fit: BoxFit.cover),
+          child: SetUpAssetImage(
+              "https://picsum.photos/300/200?random=2",
+              fit: BoxFit.cover),
         ),
         Positioned(
           right: 15.w,

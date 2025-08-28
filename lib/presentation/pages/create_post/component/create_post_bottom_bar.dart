@@ -17,7 +17,6 @@ class CreatePostBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /// TODO
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10.h),
       height: 50.h,

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/component/create_post_text.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
+import '../../../../core/base_widget/video/set_up_video_player.dart';
 import '../../../../core/helper/app_text.dart';
 import '../../account/personal_information/widget/auth_input.dart';
 
@@ -152,7 +154,38 @@ class _CreatePostLinkState extends State<CreatePostLink> {
               ),
             ),
           ),
-          if (data.postLinkImage != null && data.postLinkImage!.isNotEmpty)
+          // if (data.postLinkImage != null && data.postLinkImage!.isNotEmpty)
+          //   Padding(
+          //     padding: const EdgeInsets.only(top: 8),
+          //     child: SizedBox(
+          //       width: SizeUtil.getMaxWidth(),
+          //       height: 200,
+          //       child: Image.network(
+          //         data.postLinkImage!,
+          //         fit: BoxFit.cover,
+          //         errorBuilder: (_, __, ___) => Container(
+          //           color: Colors.grey,
+          //           child: const Icon(Icons.broken_image),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          if (data.postLinkUrl != null && data.postLinkUrl!.isYoutubeUrl)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: SizedBox(
+                width: SizeUtil.getMaxWidth(),
+                height: 200,
+                child: SetUpVideoPlayer(
+                  videoUrl: data.postLinkUrl!,
+                  autoPlay: true,
+                  startPaused: false,
+                  looping: false,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+          else if (data.postLinkImage != null && data.postLinkImage!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: SizedBox(
@@ -167,7 +200,9 @@ class _CreatePostLinkState extends State<CreatePostLink> {
                   ),
                 ),
               ),
-            ),
+            )
+          else
+            const SizedBox(),
         ],
       ),
     );

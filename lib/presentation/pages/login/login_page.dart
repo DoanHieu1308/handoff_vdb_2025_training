@@ -17,6 +17,7 @@ import 'component/intro_widget.dart';
 
 class LoginPage extends StatefulWidget {
   late LoginStore store = LoginStore();
+  
   LoginPage({super.key});
 
   @override
@@ -206,9 +207,21 @@ class _LoginPageState extends State<LoginPage> {
                     GestureDetector(
                           onTap: () {
                         widget.store.logIn(
+                            context: context,
                             onSuccess: (auth) {
                               AppInit.instance.dashBoardStore.onChangedDashboardPage(index: 0);
-                              context.go(AuthRoutes.DASH_BOARD);
+                              
+                              // Kiểm tra xem có shared files từ SharedPreferences không
+                              final hasSharedFiles = (widget.store.sharedPreferenceHelper.getReceivedValues?.length ?? 0) != 0;
+                              
+                              if (hasSharedFiles) {
+                                // Có shared values từ SharedPreferences, redirect đến create post
+                                context.go(AuthRoutes.CREATE_POST);
+                              } else {
+                                // Đăng nhập bình thường, vào dashboard
+                                context.go(AuthRoutes.DASH_BOARD);
+                              }
+                              
                               widget.store.checkSavedData();
                             },
                             onError: (error) {

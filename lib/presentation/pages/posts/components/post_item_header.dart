@@ -42,7 +42,37 @@ class PostItemHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(postData.userId?.name ?? "", style: AppText.text16_bold),
+                Row(
+                  children: [
+                    Text(
+                      postData.userId?.name ?? "",
+                      style: AppText.text16_bold,
+                    ),
+
+                    if (postData.friendsTagged != null && postData.friendsTagged!.isNotEmpty) ...[
+                      const SizedBox(width: 4),
+                      Text(
+                        "- với ",
+                        style: AppText.text16,
+                      ),
+
+                      // người đầu tiên
+                      Text(
+                        postData.friendsTagged!.first.name ?? "",
+                        style: AppText.text16_bold,
+                      ),
+
+                      // còn nhiều hơn 1
+                      if (postData.friendsTagged!.length > 1) ...[
+                        const SizedBox(width: 4),
+                        Text(
+                          "và ${postData.friendsTagged!.length - 1} người khác",
+                          style: AppText.text16,
+                        ),
+                      ],
+                    ],
+                  ],
+                ),
                 Row(
                   children: [
                     Text("12 giờ", style: AppText.text12),

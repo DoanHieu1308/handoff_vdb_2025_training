@@ -10,6 +10,17 @@ extension StringExtension on String {
         lower.endsWith('.webm');
   }
 
+  bool get isImageFile {
+    final lower = toLowerCase();
+    return lower.endsWith('.jpg') ||
+        lower.endsWith('.jpeg') ||
+        lower.endsWith('.png') ||
+        lower.endsWith('.gif') ||
+        lower.endsWith('.bmp') ||
+        lower.endsWith('.webp') ||
+        lower.endsWith('.heic') ||
+        lower.endsWith('.tiff');
+  }
 
   /// Hashtag
   static final RegExp hashtagRegExp = RegExp(r'\B#([\w\-]+)');
@@ -54,6 +65,24 @@ extension StringExtension on String {
 
   /// Có chứa ít nhất một link không
   bool get hasLink => firstLink != null;
+
+  /// Check link youtube
+  bool get isYoutubeUrl {
+    final ytRegex = RegExp(r'^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/');
+    return ytRegex.hasMatch(this);
+  }
+
+  String get youtubeEmbedUrl {
+    if (contains("youtube.com/watch")) {
+      final uri = Uri.parse(this);
+      final videoId = uri.queryParameters["v"];
+      return "https://www.youtube.com/embed/$videoId?autoplay=1&controls=1&playsinline=1";
+    } else if (contains("youtu.be/")) {
+      final videoId = split("/").last;
+      return "https://www.youtube.com/embed/$videoId?autoplay=1&controls=1&playsinline=1";
+    }
+    return this;
+  }
 }
 
 

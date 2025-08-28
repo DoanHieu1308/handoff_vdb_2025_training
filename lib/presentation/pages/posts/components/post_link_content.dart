@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:handoff_vdb_2025/core/base_widget/video/set_up_video_player.dart';
+import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import '../../../../core/helper/size_util.dart';
 import '../../../../data/model/post/post_output_model.dart';
@@ -10,8 +12,10 @@ class PostLinkContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PostItemStore store = AppInit.instance.postStatusStore;
+    final PostItemStore store = AppInit.instance.postItemStore;
     final hasUrl = (postData.postLinkMeta?.postLinkUrl ?? '').isNotEmpty;
+    final linkUrl = postData.postLinkMeta?.postLinkUrl;
+    final linkImage = postData.postLinkMeta?.postLinkImage;
 
     if (!hasUrl) {
       return Container(
@@ -80,14 +84,29 @@ class PostLinkContent extends StatelessWidget {
               ),
             ),
           ),
-          if (postData.postLinkMeta?.postLinkImage != null && postData.postLinkMeta!.postLinkImage!.isNotEmpty)
+          if (linkUrl != null && linkUrl.isYoutubeUrl)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: SizedBox(
+                width: SizeUtil.getMaxWidth(),
+                height: 200,
+                child: SetUpVideoPlayer(
+                  videoUrl: linkUrl,
+                  autoPlay: true,
+                  startPaused: false,
+                  looping: false,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+          else if (linkImage != null && linkImage.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: SizedBox(
                 width: SizeUtil.getMaxWidth(),
                 height: 200,
                 child: Image.network(
-                  postData.postLinkMeta!.postLinkImage!,
+                  linkImage,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
                     color: Colors.grey,
@@ -95,7 +114,9 @@ class PostLinkContent extends StatelessWidget {
                   ),
                 ),
               ),
-            ),
+            )
+          else
+            const SizedBox(),
         ],
       ),
     );

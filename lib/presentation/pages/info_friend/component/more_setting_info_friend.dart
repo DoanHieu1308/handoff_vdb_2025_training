@@ -16,70 +16,66 @@ class MoreSettingInfoFriend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (context) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            leading: GestureDetector(
-                onTap: (){
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back_ios_new, color: Colors.black)
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+            },
+            child: Icon(Icons.arrow_back_ios_new, color: Colors.black)
+        ),
+      ),
+      body: Container(
+        width: SizeUtil.getMaxWidth(),
+        height: SizeUtil.getMaxHeight(),
+        color: Colors.white,
+        child: Column(
+          children: [
+            Container(
+              height: 10.h,
+              width: SizeUtil.getMaxWidth(),
+              color: ColorResources.LIGHT_GREY,
             ),
-          ),
-          body: Container(
-            width: SizeUtil.getMaxWidth(),
-            height: SizeUtil.getMaxHeight(),
-            color: Colors.white,
-            child: Column(
-              children: [
-                Container(
-                  height: 10.h,
-                  width: SizeUtil.getMaxWidth(),
-                  color: ColorResources.LIGHT_GREY,
-                ),
-                buildItemMore(context),
-                Container(
-                  height: 10.h,
-                  width: SizeUtil.getMaxWidth(),
-                  color: ColorResources.LIGHT_GREY,
-                ),
-                Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 10.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Liên kết đến trang cá nhân", style: AppText.text23_bold,),
-                          Text("Liên kết riêng trên Facebook", style: AppText.text18.copyWith(color: Colors.grey),),
-                          Container(
-                            margin: EdgeInsets.symmetric(vertical: 15.h),
-                            height: 1.h,
-                            width: SizeUtil.getMaxWidth(),
-                            color: ColorResources.LIGHT_GREY,
-                          ),
-                          Text("https://www.facebook.com/doan.hieu", style: AppText.text14_bold,),
-                          Container(
-                            margin: EdgeInsets.only(top: 10.h),
-                            height: 40.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: ColorResources.LIGHT_GREY.withOpacity(0.4)
-                            ),
-                            child: Center(
-                              child: Text("Sao chép liên kết", style: AppText.text14_bold,),
-                            ),
-                          )
-                        ],
+            buildItemMore(context),
+            Container(
+              height: 10.h,
+              width: SizeUtil.getMaxWidth(),
+              color: ColorResources.LIGHT_GREY,
+            ),
+            Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 10.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Liên kết đến trang cá nhân", style: AppText.text23_bold,),
+                      Text("Liên kết riêng trên Facebook", style: AppText.text18.copyWith(color: Colors.grey),),
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 15.h),
+                        height: 1.h,
+                        width: SizeUtil.getMaxWidth(),
+                        color: ColorResources.LIGHT_GREY,
                       ),
-                    )
+                      Text("https://www.facebook.com/doan.hieu", style: AppText.text14_bold,),
+                      Container(
+                        margin: EdgeInsets.only(top: 10.h),
+                        height: 40.h,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: ColorResources.LIGHT_GREY.withOpacity(0.4)
+                        ),
+                        child: Center(
+                          child: Text("Sao chép liên kết", style: AppText.text14_bold,),
+                        ),
+                      )
+                    ],
+                  ),
                 )
-              ],
-            ),
-          ),
-        );
-      }
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -122,50 +118,46 @@ class MoreSettingInfoFriend extends StatelessWidget {
     Color? textColor,
     required VoidCallback onTap,
   }) {
-    return Observer(
-      builder: (context) {
-        return GestureDetector(
-          onTap: onTap,
-          child: Container(
-            height: 53.h,
-            width: 400.w,
-            color: Colors.transparent,
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: 30.h,
-                        width: 30.w,
-                        child:
-                            image.isEmpty
-                            ? Icon(
-                              store.profileFriend.isFollowing == true ? Icons.visibility : Icons.visibility_off,
-                              color: store.profileFriend.isFollowing == true ? Colors.blue : Colors.black,
-                              size: 25,
-                            )
-                            : SetUpAssetImage(
-                                image,
-                                color: color,
-                            ),
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(name, style: AppText.text16.copyWith(color: textColor)),
-                    ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 53.h,
+        width: 400.w,
+        color: Colors.transparent,
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 8.h),
+              child: Row(
+                children: [
+                  SizedBox(
+                    height: 30.h,
+                    width: 30.w,
+                    child:
+                        image.isEmpty
+                        ? Icon(
+                          store.profileFriend.isFollowing == true ? Icons.visibility : Icons.visibility_off,
+                          color: store.profileFriend.isFollowing == true ? Colors.blue : Colors.black,
+                          size: 25,
+                        )
+                        : SetUpAssetImage(
+                            image,
+                            color: color,
+                        ),
                   ),
-                ),
-                Container(
-                  height: 1.h,
-                  width: SizeUtil.getMaxWidth(),
-                  color: ColorResources.LIGHT_GREY,
-                ),
-              ],
+                  SizedBox(width: 8.w),
+                  Text(name, style: AppText.text16.copyWith(color: textColor)),
+                ],
+              ),
             ),
-          ),
-        );
-      }
+            Container(
+              height: 1.h,
+              width: SizeUtil.getMaxWidth(),
+              color: ColorResources.LIGHT_GREY,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

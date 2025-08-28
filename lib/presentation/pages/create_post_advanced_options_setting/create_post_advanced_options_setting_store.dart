@@ -73,7 +73,6 @@ abstract class _CreatePostAdvancedOptionSettingStore with Store {
   /// OnTap option draggable
   @action
   void onTapOptionPost(BuildContext context, PostOptionType type) {
-    final item = listNameItemOption.firstWhere((e) => e.type == type);
     switch (type) {
       case PostOptionType.onlyMe:
         context.push(AuthRoutes.STATUS_POST);

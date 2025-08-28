@@ -5,8 +5,9 @@ class EndPoint {
 
   EndPoint._internal();
 
+  // static const String BASE_URL = "http://192.168.100.65:5000/v1/api";
   static const String BASE_URL = "http://192.168.100.64:5000/v1/api";
-  // static const String BASE_URL = "http://192.168.1.9:5000/v1/api";
+  // static const String BASE_URL = "http://192.168.1.12:5000/v1/api";
 
   ///AUTH
   // Đăng kí email.
@@ -42,7 +43,12 @@ class EndPoint {
   static const String POST_CREATE = "/posts/create";
   // get all post
   static const String POSTS = "/posts";
+  // feel
+  static const String FEEL = "/feel";
 
   /// Upload file
   static const String UPLOAD = "/upload";
+
+  /// Comment create post
+  static const String COMMENT = '/comment';
 }

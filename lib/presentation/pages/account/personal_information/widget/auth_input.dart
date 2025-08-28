@@ -79,20 +79,36 @@ class AuthInput extends StatefulWidget {
 class _AuthInputState extends State<AuthInput> {
   bool obscureText = false;
   bool isFocus = false;
+  VoidCallback? _focusListener;
 
   @override
   void initState() {
+    super.initState();
+    
     if (widget.isPassword) {
       obscureText = true;
     }
 
-    widget.focusNode?.addListener(() {
-      setState(() {
-        isFocus = widget.focusNode!.hasFocus;
-      });
-    });
+    // Tạo listener function và lưu reference để có thể hủy sau
+    _focusListener = () {
+      if (mounted) {
+        setState(() {
+          isFocus = widget.focusNode!.hasFocus;
+        });
+      }
+    };
 
-    super.initState();
+    // Đăng ký listener
+    widget.focusNode?.addListener(_focusListener!);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener trước khi dispose
+    if (widget.focusNode != null && _focusListener != null) {
+      widget.focusNode!.removeListener(_focusListener!);
+    }
+    super.dispose();
   }
 
   @override

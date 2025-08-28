@@ -9,10 +9,8 @@ part of 'sign_up_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SignUpStore on _SignUpStore, Store {
-  late final _$isLoadingAtom = Atom(
-    name: '_SignUpStore.isLoading',
-    context: context,
-  );
+  late final _$isLoadingAtom =
+      Atom(name: '_SignUpStore.isLoading', context: context);
 
   @override
   bool get isLoading {
@@ -27,10 +25,8 @@ mixin _$SignUpStore on _SignUpStore, Store {
     });
   }
 
-  late final _$errorMessageAtom = Atom(
-    name: '_SignUpStore.errorMessage',
-    context: context,
-  );
+  late final _$errorMessageAtom =
+      Atom(name: '_SignUpStore.errorMessage', context: context);
 
   @override
   String? get errorMessage {
@@ -45,10 +41,8 @@ mixin _$SignUpStore on _SignUpStore, Store {
     });
   }
 
-  late final _$nameErrorAtom = Atom(
-    name: '_SignUpStore.nameError',
-    context: context,
-  );
+  late final _$nameErrorAtom =
+      Atom(name: '_SignUpStore.nameError', context: context);
 
   @override
   String? get nameError {
@@ -63,10 +57,8 @@ mixin _$SignUpStore on _SignUpStore, Store {
     });
   }
 
-  late final _$emailErrorAtom = Atom(
-    name: '_SignUpStore.emailError',
-    context: context,
-  );
+  late final _$emailErrorAtom =
+      Atom(name: '_SignUpStore.emailError', context: context);
 
   @override
   String? get emailError {
@@ -81,10 +73,8 @@ mixin _$SignUpStore on _SignUpStore, Store {
     });
   }
 
-  late final _$passwordErrorAtom = Atom(
-    name: '_SignUpStore.passwordError',
-    context: context,
-  );
+  late final _$passwordErrorAtom =
+      Atom(name: '_SignUpStore.passwordError', context: context);
 
   @override
   String? get passwordError {
@@ -99,10 +89,8 @@ mixin _$SignUpStore on _SignUpStore, Store {
     });
   }
 
-  late final _$confirmPasswordErrorAtom = Atom(
-    name: '_SignUpStore.confirmPasswordError',
-    context: context,
-  );
+  late final _$confirmPasswordErrorAtom =
+      Atom(name: '_SignUpStore.confirmPasswordError', context: context);
 
   @override
   String? get confirmPasswordError {
@@ -112,50 +100,38 @@ mixin _$SignUpStore on _SignUpStore, Store {
 
   @override
   set confirmPasswordError(String? value) {
-    _$confirmPasswordErrorAtom.reportWrite(
-      value,
-      super.confirmPasswordError,
-      () {
-        super.confirmPasswordError = value;
-      },
-    );
+    _$confirmPasswordErrorAtom.reportWrite(value, super.confirmPasswordError,
+        () {
+      super.confirmPasswordError = value;
+    });
   }
 
-  late final _$testConnectionAsyncAction = AsyncAction(
-    '_SignUpStore.testConnection',
-    context: context,
-  );
+  late final _$testConnectionAsyncAction =
+      AsyncAction('_SignUpStore.testConnection', context: context);
 
   @override
   Future<void> testConnection() {
     return _$testConnectionAsyncAction.run(() => super.testConnection());
   }
 
-  late final _$signUpAsyncAction = AsyncAction(
-    '_SignUpStore.signUp',
-    context: context,
-  );
+  late final _$signUpAsyncAction =
+      AsyncAction('_SignUpStore.signUp', context: context);
 
   @override
-  Future<void> signUp({
-    required dynamic Function(AuthModel) onSuccess,
-    required dynamic Function(String) onError,
-  }) {
-    return _$signUpAsyncAction.run(
-      () => super.signUp(onSuccess: onSuccess, onError: onError),
-    );
+  Future<void> signUp(
+      {required dynamic Function(AuthModel) onSuccess,
+      required dynamic Function(String) onError}) {
+    return _$signUpAsyncAction
+        .run(() => super.signUp(onSuccess: onSuccess, onError: onError));
   }
 
-  late final _$_SignUpStoreActionController = ActionController(
-    name: '_SignUpStore',
-    context: context,
-  );
+  late final _$_SignUpStoreActionController =
+      ActionController(name: '_SignUpStore', context: context);
 
   @override
   bool validate() {
     final _$actionInfo = _$_SignUpStoreActionController.startAction(
-      name: '_SignUpStore.validate',
-    );
+        name: '_SignUpStore.validate');
     try {
       return super.validate();
     } finally {
@@ -166,8 +142,7 @@ mixin _$SignUpStore on _SignUpStore, Store {
   @override
   void checkSavedData() {
     final _$actionInfo = _$_SignUpStoreActionController.startAction(
-      name: '_SignUpStore.checkSavedData',
-    );
+        name: '_SignUpStore.checkSavedData');
     try {
       return super.checkSavedData();
     } finally {

@@ -9,10 +9,8 @@ part of 'profile_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ProfileStore on _ProfileStore, Store {
-  late final _$selectedFolderIndexAtom = Atom(
-    name: '_ProfileStore.selectedFolderIndex',
-    context: context,
-  );
+  late final _$selectedFolderIndexAtom =
+      Atom(name: '_ProfileStore.selectedFolderIndex', context: context);
 
   @override
   int get selectedFolderIndex {
@@ -27,10 +25,8 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$isLSeeMoreAtom = Atom(
-    name: '_ProfileStore.isLSeeMore',
-    context: context,
-  );
+  late final _$isLSeeMoreAtom =
+      Atom(name: '_ProfileStore.isLSeeMore', context: context);
 
   @override
   bool get isLSeeMore {
@@ -45,10 +41,8 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$isLoadingAtom = Atom(
-    name: '_ProfileStore.isLoading',
-    context: context,
-  );
+  late final _$isLoadingAtom =
+      Atom(name: '_ProfileStore.isLoading', context: context);
 
   @override
   bool get isLoading {
@@ -63,10 +57,24 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$userProfileAtom = Atom(
-    name: '_ProfileStore.userProfile',
-    context: context,
-  );
+  late final _$isLoadingPostAtom =
+      Atom(name: '_ProfileStore.isLoadingPost', context: context);
+
+  @override
+  bool get isLoadingPost {
+    _$isLoadingPostAtom.reportRead();
+    return super.isLoadingPost;
+  }
+
+  @override
+  set isLoadingPost(bool value) {
+    _$isLoadingPostAtom.reportWrite(value, super.isLoadingPost, () {
+      super.isLoadingPost = value;
+    });
+  }
+
+  late final _$userProfileAtom =
+      Atom(name: '_ProfileStore.userProfile', context: context);
 
   @override
   UserModel get userProfile {
@@ -81,10 +89,8 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$errorMessageAtom = Atom(
-    name: '_ProfileStore.errorMessage',
-    context: context,
-  );
+  late final _$errorMessageAtom =
+      Atom(name: '_ProfileStore.errorMessage', context: context);
 
   @override
   String? get errorMessage {
@@ -114,10 +120,8 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$currentPageAtom = Atom(
-    name: '_ProfileStore.currentPage',
-    context: context,
-  );
+  late final _$currentPageAtom =
+      Atom(name: '_ProfileStore.currentPage', context: context);
 
   @override
   int get currentPage {
@@ -132,10 +136,8 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$hasMoreAtom = Atom(
-    name: '_ProfileStore.hasMore',
-    context: context,
-  );
+  late final _$hasMoreAtom =
+      Atom(name: '_ProfileStore.hasMore', context: context);
 
   @override
   bool get hasMore {
@@ -150,36 +152,32 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$logOutAsyncAction = AsyncAction(
-    '_ProfileStore.logOut',
-    context: context,
-  );
+  late final _$logOutAsyncAction =
+      AsyncAction('_ProfileStore.logOut', context: context);
 
   @override
   Future<void> logOut({required BuildContext context}) {
     return _$logOutAsyncAction.run(() => super.logOut(context: context));
   }
 
-  late final _$goToFriendPageAsyncAction = AsyncAction(
-    '_ProfileStore.goToFriendPage',
-    context: context,
-  );
+  late final _$_ProfileStoreActionController =
+      ActionController(name: '_ProfileStore', context: context);
 
   @override
-  Future<void> goToFriendPage(BuildContext context) {
-    return _$goToFriendPageAsyncAction.run(() => super.goToFriendPage(context));
+  void clearPostMessage() {
+    final _$actionInfo = _$_ProfileStoreActionController.startAction(
+        name: '_ProfileStore.clearPostMessage');
+    try {
+      return super.clearPostMessage();
+    } finally {
+      _$_ProfileStoreActionController.endAction(_$actionInfo);
+    }
   }
-
-  late final _$_ProfileStoreActionController = ActionController(
-    name: '_ProfileStore',
-    context: context,
-  );
 
   @override
   void onChangedFolderIndexProfile({required int index}) {
     final _$actionInfo = _$_ProfileStoreActionController.startAction(
-      name: '_ProfileStore.onChangedFolderIndexProfile',
-    );
+        name: '_ProfileStore.onChangedFolderIndexProfile');
     try {
       return super.onChangedFolderIndexProfile(index: index);
     } finally {
@@ -193,6 +191,7 @@ mixin _$ProfileStore on _ProfileStore, Store {
 selectedFolderIndex: ${selectedFolderIndex},
 isLSeeMore: ${isLSeeMore},
 isLoading: ${isLoading},
+isLoadingPost: ${isLoadingPost},
 userProfile: ${userProfile},
 errorMessage: ${errorMessage},
 posts: ${posts},

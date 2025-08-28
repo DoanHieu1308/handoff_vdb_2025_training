@@ -11,4 +11,8 @@ mixin AuthRoutes {
   static const String TAG_FRIEND = '/tag_friend';
   static const String SHOW_ALL_IMAGE = '/show_all_image';
   static const String IMAGE_VIEWER = '/image_viewer';
+  static const String CHAT = '/chat';
+  static const String MESSENGER = '/messenger';
+  static const String CONVERSATION = '/conversation';
+  static const String ALL_FRIEND = '/all_friend';
 }

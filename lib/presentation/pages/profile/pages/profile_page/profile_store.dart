@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -24,6 +25,7 @@ abstract class _ProfileStore with Store {
   /// Store
   final friendsStore = AppInit.instance.friendsStore;
   DashBoardStore get dashBoardStore => AppInit.instance.dashBoardStore;
+  CreatePostStore get createPostStore => AppInit.instance.createPostStore;
 
   /// Controller
   final RefreshController refreshController = RefreshController(initialRefresh: false);
@@ -38,6 +40,10 @@ abstract class _ProfileStore with Store {
   bool isLSeeMore = false;
   @observable
   bool isLoading = false;
+
+  /// Post
+  @observable
+  bool isLoadingPost = false;
 
   /// Accept
   @observable
@@ -68,6 +74,13 @@ abstract class _ProfileStore with Store {
   void disposeAll() {
     friendsStore.disposeAll();
     refreshController.dispose();
+  }
+
+  /// Clear post message
+  @action
+  void clearPostMessage() {
+    createPostStore.postMessage = '';
+    createPostStore.isPostSuccess = false;
   }
 
   ///
@@ -122,21 +135,21 @@ abstract class _ProfileStore with Store {
     );
   }
 
-  ///
-  /// Go to all friend
-  ///
-  @action
-  Future<void> goToFriendPage(BuildContext context) async {
-    // Tắt bàn phím trước khi navigate
-    FocusScope.of(context).unfocus();
-    
-    // Clear search text
-    friendsStore.searchCtrl.textEditingController.clear();
-    friendsStore.searchCtrl.searchText = '';
-    
-    friendsStore.getAllFriends();
-    context.push(AuthRoutes.FRIENDS);
-  }
+  // ///
+  // /// Go to all friend
+  // ///
+  // @action
+  // Future<void> goToFriendPage(BuildContext context) async {
+  //   // Tắt bàn phím trước khi navigate
+  //   FocusScope.of(context).unfocus();
+  //
+  //   // Clear search text
+  //   friendsStore.searchCtrl.textEditingController.clear();
+  //   friendsStore.searchCtrl.searchText = '';
+  //
+  //   friendsStore.getAllFriends();
+  //   context.push(AuthRoutes.FRIENDS);
+  // }
 
   ///
   /// Get All Friends

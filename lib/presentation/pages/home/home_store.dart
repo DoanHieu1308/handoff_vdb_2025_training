@@ -1,4 +1,6 @@
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
+import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
@@ -16,17 +18,17 @@ abstract class _HomeStore with Store {
 
   /// Store
   final ProfileStore profileStore = AppInit.instance.profileStore;
+  CreatePostStore get createPostStore => AppInit.instance.createPostStore;
 
   /// Controller
   final RefreshController refreshController = RefreshController(initialRefresh: false);
 
+  /// Shared Preference
+  final SharedPreferenceHelper sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
+
   /// Post
   @observable
   bool isLoadingPost = false;
-  @observable
-  String postMessage = '';
-  @observable
-  bool isPostSuccess = false;
 
   @observable
   ObservableList<PostOutputModel> allPostsPublic = ObservableList();
@@ -40,15 +42,35 @@ abstract class _HomeStore with Store {
   /// Clear post message
   @action
   void clearPostMessage() {
-    postMessage = '';
-    isPostSuccess = false;
+    createPostStore.postMessage = '';
+    createPostStore.isPostSuccess = false;
   }
 
   ///
   /// Init
   ///
   Future<void> init() async {
+    await getALlPosts(type: PUBLIC);
   }
+
+  ///------------------------------------------------------------
+  /// Dispose
+  ///
+  void disposeAll() {
+    // Dispose controller
+    refreshController.dispose();
+
+    // Reset observable values
+    isLoadingPost = false;
+    createPostStore.isPostSuccess = false;
+    currentPage = 1;
+    hasMore = true;
+
+    // Clear lists
+    allPostsPublic.clear();
+    allPostsFriend.clear();
+  }
+
 
   ///
   /// Get all list post
@@ -111,6 +133,38 @@ abstract class _HomeStore with Store {
       onError: (error) {
         refreshController.loadFailed();
       },
+    );
+  }
+
+  /// Lấy top 2 biểu tượng cảm xúc được thả nhiều nhất
+  @action
+  List<String> getTop2Reactions(PostOutputModel postData) {
+    final feelCount = postData.feelCount;
+    if (feelCount != null && feelCount.isNotEmpty) {
+      final filtered = feelCount.entries
+          .where((e) => e.value > 0 && e.key != "unLike")
+          .toList();
+
+      if (filtered.isEmpty) return [];
+
+      filtered.sort((a, b) => b.value.compareTo(a.value));
+
+      if (filtered.length == 1) {
+        return [filtered.first.key, ""];
+      }
+
+      return filtered.take(2).map((e) => e.key).toList();
+    }
+    return [];
+  }
+
+  /// Tổng số lượng cảm xúc
+  @action
+  int getTotalFeelCount(Map<String, dynamic>? feelCount) {
+    if (feelCount == null || feelCount.isEmpty) return 0;
+
+    return feelCount.values.fold<int>(
+      0, (prev, element) => prev + (element is int ? element : 0),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 
 import '../../../../core/base_widget/images/set_up_asset_image.dart';
 import '../../../../core/helper/app_text.dart';
@@ -73,9 +75,7 @@ class FriendProfile extends StatelessWidget {
                 crossAxisSpacing: 4,
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                children: List.generate(store.friendsStore.friendList.length, (
-                    index,
-                    ) {
+                children: List.generate(store.friendsStore.friendList.length, (index,) {
                   return GestureDetector(
                     onTap: () {
                       store.friendsStore.goToInfoFriend(
@@ -89,12 +89,17 @@ class FriendProfile extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SetUpAssetImage(
-                            height: 90.h,
-                            width: 90.w,
-                            store.friendsStore.friendList[index].avatar ??
-                                ImagesPath.icPerson,
-                            fit: BoxFit.cover,
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(3),
+                            child: SizedBox(
+                              height: 90.h,
+                              width: 90.w,
+                              child: SetUpAssetImage(
+                                store.friendsStore.friendList[index].avatar ??
+                                    ImagesPath.icPerson,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                           Text(
                             store.friendsStore.friendList[index].name ?? '',
@@ -134,7 +139,7 @@ class FriendProfile extends StatelessWidget {
             SizedBox(height: 10.h),
             GestureDetector(
               onTap: () {
-                store.goToFriendPage(context);
+                router.push(AuthRoutes.ALL_FRIEND);
               },
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 15.w),

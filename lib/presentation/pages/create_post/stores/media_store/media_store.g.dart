@@ -9,10 +9,8 @@ part of 'media_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$MediaStore on _MediaStore, Store {
-  late final _$listFileAtom = Atom(
-    name: '_MediaStore.listFile',
-    context: context,
-  );
+  late final _$listFileAtom =
+      Atom(name: '_MediaStore.listFile', context: context);
 
   @override
   ObservableList<dynamic> get listFile {
@@ -27,10 +25,8 @@ mixin _$MediaStore on _MediaStore, Store {
     });
   }
 
-  late final _$imageListUrlAtom = Atom(
-    name: '_MediaStore.imageListUrl',
-    context: context,
-  );
+  late final _$imageListUrlAtom =
+      Atom(name: '_MediaStore.imageListUrl', context: context);
 
   @override
   ObservableList<String> get imageListUrl {
@@ -45,10 +41,8 @@ mixin _$MediaStore on _MediaStore, Store {
     });
   }
 
-  late final _$videoListUrlAtom = Atom(
-    name: '_MediaStore.videoListUrl',
-    context: context,
-  );
+  late final _$videoListUrlAtom =
+      Atom(name: '_MediaStore.videoListUrl', context: context);
 
   @override
   ObservableList<String> get videoListUrl {
@@ -63,10 +57,8 @@ mixin _$MediaStore on _MediaStore, Store {
     });
   }
 
-  late final _$videoControllerAtom = Atom(
-    name: '_MediaStore.videoController',
-    context: context,
-  );
+  late final _$videoControllerAtom =
+      Atom(name: '_MediaStore.videoController', context: context);
 
   @override
   VideoPlayerController? get videoController {
@@ -81,10 +73,8 @@ mixin _$MediaStore on _MediaStore, Store {
     });
   }
 
-  late final _$hasImageAtom = Atom(
-    name: '_MediaStore.hasImage',
-    context: context,
-  );
+  late final _$hasImageAtom =
+      Atom(name: '_MediaStore.hasImage', context: context);
 
   @override
   bool get hasImage {
@@ -99,10 +89,8 @@ mixin _$MediaStore on _MediaStore, Store {
     });
   }
 
-  late final _$hasVideoAtom = Atom(
-    name: '_MediaStore.hasVideo',
-    context: context,
-  );
+  late final _$hasVideoAtom =
+      Atom(name: '_MediaStore.hasVideo', context: context);
 
   @override
   bool get hasVideo {
@@ -117,57 +105,56 @@ mixin _$MediaStore on _MediaStore, Store {
     });
   }
 
-  late final _$pickImageFromGalleryAsyncAction = AsyncAction(
-    '_MediaStore.pickImageFromGallery',
-    context: context,
-  );
+  late final _$isProcessingImageAtom =
+      Atom(name: '_MediaStore.isProcessingImage', context: context);
 
   @override
-  Future<void> pickImageFromGallery(BuildContext context) {
-    return _$pickImageFromGalleryAsyncAction.run(
-      () => super.pickImageFromGallery(context),
-    );
+  bool get isProcessingImage {
+    _$isProcessingImageAtom.reportRead();
+    return super.isProcessingImage;
   }
 
-  late final _$pickVideoFromGalleryAsyncAction = AsyncAction(
-    '_MediaStore.pickVideoFromGallery',
-    context: context,
-  );
+  @override
+  set isProcessingImage(bool value) {
+    _$isProcessingImageAtom.reportWrite(value, super.isProcessingImage, () {
+      super.isProcessingImage = value;
+    });
+  }
+
+  late final _$pickImagesFromGalleryAsyncAction =
+      AsyncAction('_MediaStore.pickImagesFromGallery', context: context);
+
+  @override
+  Future<void> pickImagesFromGallery(BuildContext context) {
+    return _$pickImagesFromGalleryAsyncAction
+        .run(() => super.pickImagesFromGallery(context));
+  }
+
+  late final _$cropImageAtIndexAsyncAction =
+      AsyncAction('_MediaStore.cropImageAtIndex', context: context);
+
+  @override
+  Future<void> cropImageAtIndex(BuildContext context, int index) {
+    return _$cropImageAtIndexAsyncAction
+        .run(() => super.cropImageAtIndex(context, index));
+  }
+
+  late final _$pickVideoFromGalleryAsyncAction =
+      AsyncAction('_MediaStore.pickVideoFromGallery', context: context);
 
   @override
   Future<void> pickVideoFromGallery() {
-    return _$pickVideoFromGalleryAsyncAction.run(
-      () => super.pickVideoFromGallery(),
-    );
+    return _$pickVideoFromGalleryAsyncAction
+        .run(() => super.pickVideoFromGallery());
   }
 
-  late final _$uploadAllFilesAndSplitAsyncAction = AsyncAction(
-    '_MediaStore.uploadAllFilesAndSplit',
-    context: context,
-  );
+  late final _$uploadAllFilesAndSplitAsyncAction =
+      AsyncAction('_MediaStore.uploadAllFilesAndSplit', context: context);
 
   @override
   Future<void> uploadAllFilesAndSplit() {
-    return _$uploadAllFilesAndSplitAsyncAction.run(
-      () => super.uploadAllFilesAndSplit(),
-    );
-  }
-
-  late final _$_MediaStoreActionController = ActionController(
-    name: '_MediaStore',
-    context: context,
-  );
-
-  @override
-  void showDialogSelectImageOrVideo(BuildContext context) {
-    final _$actionInfo = _$_MediaStoreActionController.startAction(
-      name: '_MediaStore.showDialogSelectImageOrVideo',
-    );
-    try {
-      return super.showDialogSelectImageOrVideo(context);
-    } finally {
-      _$_MediaStoreActionController.endAction(_$actionInfo);
-    }
+    return _$uploadAllFilesAndSplitAsyncAction
+        .run(() => super.uploadAllFilesAndSplit());
   }
 
   @override
@@ -178,7 +165,8 @@ imageListUrl: ${imageListUrl},
 videoListUrl: ${videoListUrl},
 videoController: ${videoController},
 hasImage: ${hasImage},
-hasVideo: ${hasVideo}
+hasVideo: ${hasVideo},
+isProcessingImage: ${isProcessingImage}
     ''';
   }
 }

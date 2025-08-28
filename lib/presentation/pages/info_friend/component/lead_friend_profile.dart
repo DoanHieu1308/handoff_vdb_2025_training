@@ -66,7 +66,10 @@ class LeadFriendProfile extends StatelessWidget {
     return Positioned(
       left: 10.w,
       bottom: -45.h,
-      child: AvatarFriendProfile(),
+      child: Hero(
+          tag: store.profileFriend.user?.id ?? "",
+          child: AvatarFriendProfile()
+      ),
     );
   }
 }

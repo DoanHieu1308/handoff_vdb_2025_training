@@ -8,7 +8,8 @@ class CustomIconInteractPost extends StatelessWidget {
   final String name;
   final String image;
   final int width;
-  const CustomIconInteractPost({super.key, required this.name, required this.image, required this.width});
+  final double? imageHeight;
+  const CustomIconInteractPost({super.key, required this.name, required this.image, required this.width, this.imageHeight});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class CustomIconInteractPost extends StatelessWidget {
       child: Row(
         children: [
           SetUpAssetImage(
-            height: 20.h,
+            height: imageHeight ?? 20.h,
             width: 15.w,
             image,
             color: Colors.black,

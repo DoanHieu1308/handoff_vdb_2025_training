@@ -13,8 +13,8 @@ class ShowImageWithUrl extends StatelessWidget {
       child: SetUpAssetImage(
         imageUrl,
         fit: BoxFit.cover,
-        width: double.infinity,
-        filterQuality: FilterQuality.high,
+        // Remove width: double.infinity to avoid layout issues
+        filterQuality: FilterQuality.medium, // Changed from high to medium for better performance
         errorBuilder: (context, error, stackTrace) {
           return Container(
             width: double.infinity,

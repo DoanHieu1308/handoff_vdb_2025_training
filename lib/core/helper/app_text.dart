@@ -266,6 +266,13 @@ class AppText extends TextStyle{
     color: Colors.black,
   );
 
+  static TextStyle get text13_Inter => TextStyle(
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 13.sp,
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+  );
+
   static TextStyle get text14_Inter => TextStyle(
     fontFamily: 'Inter-SemiBold',
     fontSize: 14.sp,
