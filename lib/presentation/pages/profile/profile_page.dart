@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
 import 'package:handoff_vdb_2025/presentation/pages/profile/profile_store.dart';
 
+import '../../../core/enums/auth_enums.dart';
 import '../../../core/utils/color_resources.dart';
 import 'component/item_post_widget.dart';
 import 'component/item_folder_profile.dart';
@@ -367,7 +367,7 @@ class ProfilePage extends StatelessWidget {
                         SizedBox(height: 10.h),
                         GestureDetector(
                           onTap: (){
-                            Navigator.of(context).pushNamed(AuthRouters.FRIENDS);
+                            Navigator.of(context).pushNamed(AuthRoutes.FRIENDS);
                           },
                           child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 15.w),
