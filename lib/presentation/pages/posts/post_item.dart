@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_output_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/post_item_store.dart';
-import '../../../core/base_widget/images/set_up_asset_image.dart';
 import '../../../core/enums/auth_enums.dart';
-import '../../../core/helper/app_text.dart';
 import '../../../core/helper/size_util.dart';
-import '../../../core/utils/images_path.dart';
 import 'components/post_item_bottom_actions.dart';
 import 'components/post_item_header.dart';
 import 'components/post_image_video_content.dart';
@@ -20,7 +16,7 @@ import 'components/post_text_content.dart';
 
 class PostItem extends StatefulWidget {
   final PostOutputModel itemPost;
-  PostItem({super.key, required this.itemPost});
+  const PostItem({super.key, required this.itemPost});
 
   @override
   State<PostItem> createState() => _PostItemState();

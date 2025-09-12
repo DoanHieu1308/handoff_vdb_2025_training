@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/stories/stories_page.dart';
@@ -30,13 +31,15 @@ class _ConversationPageState extends State<ConversationPage> {
           backgroundColor: ColorResources.WHITE,
           appBar: AppBar(
             backgroundColor: ColorResources.WHITE,
-            title: Text("messenger"),
+            title: Text("Messenger"),
             titleTextStyle: AppText.text25_bold.copyWith(
               color: Colors.indigoAccent,
             ),
             leading: AppTapAnimation(
               enabled: true,
-              onTap: () {},
+              onTap: () {
+                router.pop();
+              },
               child: const Icon(
                 Icons.arrow_back_ios_new,
                 color: Colors.black,
@@ -74,13 +77,12 @@ class _ConversationPageState extends State<ConversationPage> {
             index: conversationStore.currentIndex,
             preloadCount: 0,
             children: [
-              const MessengerPage(),
-              const StoriesPage(),
+              const MessengerPage(), // Tab "Đoạn chat" - hiển thị danh sách chat
+              const StoriesPage(), // Tab "Tin"
             ],
           ),
         );
       }
     );
   }
-
 }

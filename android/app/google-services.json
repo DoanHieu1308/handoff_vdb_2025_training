@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1018382182517",
+    "firebase_url": "https://handoffvdb2025-default-rtdb.firebaseio.com",
+    "project_id": "handoffvdb2025",
+    "storage_bucket": "handoffvdb2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018382182517:android:09951ba7237abac2a6303c",
+        "android_client_info": {
+          "package_name": "com.example.handoff_vdb_2025"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmXRkXUrJe69VZj4bUs8KEtbeIW6voQ1g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

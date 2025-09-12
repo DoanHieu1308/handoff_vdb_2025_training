@@ -11,7 +11,6 @@ import '../../domain/end_points/end_point.dart';
 import '../data_source/dio/dio_client.dart';
 import '../exception/api_error_handler.dart';
 import '../model/base/api_response.dart';
-import '../model/friend/friend_request_model.dart';
 import '../model/response/user_model.dart';
 
 class UserRepository {

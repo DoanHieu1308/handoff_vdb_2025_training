@@ -1,4 +1,5 @@
 extension StringExtension on String {
+  /// Check video file
   bool get isVideoFile {
     final lower = toLowerCase();
     return lower.endsWith('.mp4') ||
@@ -10,6 +11,7 @@ extension StringExtension on String {
         lower.endsWith('.webm');
   }
 
+  /// Check image file
   bool get isImageFile {
     final lower = toLowerCase();
     return lower.endsWith('.jpg') ||
@@ -82,6 +84,29 @@ extension StringExtension on String {
       return "https://www.youtube.com/embed/$videoId?autoplay=1&controls=1&playsinline=1";
     }
     return this;
+  }
+
+  /// Check only emoji
+  bool get isOnlyEmoji {
+    final trimmed = trim();
+    if (trimmed.isEmpty) return false;
+
+    final emojiRegex = RegExp(
+      r'^(?:[\u{1F600}-\u{1F64F}' // Emoticons
+      r'\u{1F300}-\u{1F5FF}'     // Symbols & Pictographs
+      r'\u{1F680}-\u{1F6FF}'     // Transport & Map
+      r'\u{2600}-\u{26FF}'       // Misc symbols
+      r'\u{2700}-\u{27BF}'       // Dingbats
+      r'\u{1F900}-\u{1F9FF}'     // Supplemental Symbols and Pictographs
+      r'\u{1FA70}-\u{1FAFF}'     // Symbols and Pictographs Extended-A
+      r'\u{200D}'                // Zero Width Joiner
+      r'\u{2640}\u{2642}'        // Gender symbols
+      r'\u{FE0F}'                // Variation Selector
+      r']+$)',
+      unicode: true,
+    );
+
+    return emojiRegex.hasMatch(trimmed);
   }
 }
 

@@ -6,14 +6,14 @@ class AppCustomCircleAvatar extends StatelessWidget {
   final double radius;
   final double height;
   final double width;
-  final String? image;
+  final String image;
 
   const AppCustomCircleAvatar({
     super.key,
     required this.radius,
     required this.height,
     required this.width,
-    this.image,
+    required this.image,
   });
 
   @override
@@ -25,7 +25,7 @@ class AppCustomCircleAvatar extends StatelessWidget {
           height: height,
           width: width,
           child: SetUpAssetImage(
-            image ?? ImagesPath.icPerson,
+            image,
             fit: BoxFit.cover,
           ),
         ),

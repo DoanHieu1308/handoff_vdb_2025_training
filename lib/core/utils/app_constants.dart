@@ -40,3 +40,7 @@ const String PRIVATE = 'private';
 
 /// [checkImageWithExtSvg] to check image form svg.
 const String checkImageWithExtSvg = '.svg';
+
+/// Chat
+const String ACTION_MORE = 'action_more';
+const String ACTION_OPEN_GALLERY = 'action_open_Gallery';

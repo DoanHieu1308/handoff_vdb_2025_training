@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/auth_helper.dart';
-import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/chat_page.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/components/chat_custom_show_media_gallery.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/conversation_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_page.dart';
@@ -18,6 +18,8 @@ import '../../../presentation/pages/create_post_advanced_options_setting/compone
 import '../../../presentation/pages/create_post_advanced_options_setting/component/tag_friends_page.dart';
 import '../../../presentation/pages/posts/components/show_all_image.dart';
 import '../../../presentation/pages/profile/pages/profile_picture_camera/profile_picture_camera.dart';
+import '../../../presentation/pages/conversation/chat/chat_page.dart';
+import '../../../data/model/response/user_model.dart';
 
 final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 
@@ -89,7 +91,10 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: AuthRoutes.CHAT,
-      builder: (context, state) => ChatPage(),
+      builder: (context, state) {
+        final friend = state.extra as UserModel;
+        return ChatPage(friend: friend);
+      },
     ),
     GoRoute(
       path: AuthRoutes.MESSENGER,
@@ -102,6 +107,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AuthRoutes.ALL_FRIEND,
       builder: (context, state) => ShowAllFriendInProfile(),
+    ),
+    GoRoute(
+      path: AuthRoutes.CHAT_CUSTOM_SHOW_MEDIA,
+      builder: (context, state) => ChatCustomShowMediaGallery(),
     ),
     GoRoute(
       path: AuthRoutes.SHOW_ALL_IMAGE,

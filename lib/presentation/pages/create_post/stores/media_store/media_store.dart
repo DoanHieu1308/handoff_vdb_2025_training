@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:handoff_vdb_2025/core/extensions/dynamic_extension.dart';
 import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
-import 'package:handoff_vdb_2025/core/helper/app_tap_animation.dart';
 import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/text_store/text_store.dart';
 import 'package:image/image.dart' as img;
@@ -16,8 +15,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../../../../core/helper/app_text.dart';
-import '../../../../widget/custom_dialog.dart';
 import '../../../../widget/select_dialog_widget.dart';
 import '../../../profile/pages/profile_picture_camera/profile_picture_camera_store.dart';
 import '../../create_post_store.dart';

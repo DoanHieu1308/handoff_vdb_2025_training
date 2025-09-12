@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
+import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 
 import '../../../../../core/helper/app_custom_circle_avatar.dart';
-import '../../../../../core/helper/app_sitebox.dart';
 import '../../../../../core/helper/app_tap_animation.dart';
 import '../../../../../core/helper/app_text.dart';
 import '../../../../../core/helper/size_util.dart';
-import '../../../../../core/utils/images_path.dart';
 
 class MessengerItem extends StatelessWidget {
-  const MessengerItem({super.key});
+  final String avatar;
+  final String friendId;
+  final String friendName;
+  final UserModel friend;
+  final Color color;
+  
+  const MessengerItem({
+    super.key,
+    required this.avatar,
+    required this.friendId,
+    required this.friendName,
+    required this.friend,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return AppTapAnimation(
       enabled: true,
       onTap: (){
-        router.push(AuthRoutes.CHAT);
+        // Truyền thông tin friend khi navigate
+        router.push(
+          AuthRoutes.CHAT,
+          extra: friend,
+        );
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -30,67 +46,70 @@ class MessengerItem extends StatelessWidget {
                 child: Stack(
                   children: [
                     AppCustomCircleAvatar(
-                      image: ImagesPath.icPerson,
-                      radius: 32,
+                      image: avatar,
+                      radius: 31,
                       height: 70,
                       width: 70,
                     ),
                     Transform.translate(
                       offset: Offset(46, 46),
                       child: Container(
-                          height: 15,
-                          width: 15,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2,),
-                                blurRadius: 2,
-                                spreadRadius: 1,
-                                offset: Offset(0, 0),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Container(
-                              height: 10,
-                              width: 10,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.green
-                              ),
+                        height: 15,
+                        width: 15,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.2,),
+                              blurRadius: 2,
+                              spreadRadius: 1,
+                              offset: Offset(0, 0),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Container(
+                            height: 10,
+                            width: 10,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color,
                             ),
                           )
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              AppSiteBox.w10,
-              Transform.translate(
-                offset: Offset(0, 3),
+              const SizedBox(width: 15),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Thi Mai", style: AppText.text14_Inter,),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text("Bạn: Đi chơi thôi", style: AppText.text13,),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Transform.translate(
-                              offset: Offset(0, -5),
-                              child: Text(".", style: AppText.text20_bold)
-                          ),
-                        ),
-                        Text("10:01", style: AppText.text13)
-                      ],
+                    Text(
+                      friendName,
+                      style: AppText.text16_bold.copyWith(
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      "Tap to start chatting",
+                      style: AppText.text14.copyWith(
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),
-              )
+              ),
+              const SizedBox(width: 10),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.grey,
+                size: 16,
+              ),
             ],
           ),
         ),

@@ -21,6 +21,8 @@ abstract class _ItemDetailStore with Store {
   final FriendsStore friendsStore;
   _ItemDetailStore(this.friendsStore);
 
+
+
   /// Item filtered
   late List<Map<String, dynamic>> filteredItems;
 

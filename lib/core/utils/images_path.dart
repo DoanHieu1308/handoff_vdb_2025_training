@@ -112,4 +112,23 @@ mixin ImagesPath {
   static String icStories = 'assets/features/ic_stories.svg';
   static String icPhone = 'assets/features/ic_phone.svg';
   static String icCameraBlack = 'assets/features/ic_camera_black.svg';
+  static String icActionsChat = 'assets/features/ic_actions_chat.svg';
+  static String icAudioChat = 'assets/features/ic_audio_chat.svg';
+  static String icEmojiChat = 'assets/features/ic_emoji_chat.svg';
+  static String icGalleryChat = 'assets/features/ic_gallery_chat.svg';
+  static String icPhotoChat = 'assets/features/ic_photo_chat.svg';
+  static String icShapeLikeChat = 'assets/features/ic_shape_like_chat.svg';
+  static String icSendChat = 'assets/features/ic_send_chat.svg';
+  static String icLocationChat = 'assets/features/ic_location_chat.svg';
+  static String icGamesChat = 'assets/features/ic_games_chat.svg';
+  static String icRemindersChat = 'assets/features/ic_reminders_chat.svg';
+  static String icGifsChat = 'assets/features/ic_gif_chat.svg';
+  static String icAppleMusicChat = 'assets/features/ic_apple_music_chat.png';
+  static String icSwellyChat = 'assets/features/ic_swelly_chat.png';
+  static String icPinterestChat = 'assets/features/ic_printerest_chat.png';
+  static String icGfycatChat = 'assets/features/ic_gftcat_chat.png';
+  static String icTenorGifChat = 'assets/features/ic_tenor_gif_chat.png';
+  static String icReplyChat = 'assets/features/ic_reply_chat.svg';
+  static String icGooglePhoto = 'assets/features/ic_google_photos.svg';
+  static String icHDImage = 'assets/features/ic_hd_image.svg';
 }

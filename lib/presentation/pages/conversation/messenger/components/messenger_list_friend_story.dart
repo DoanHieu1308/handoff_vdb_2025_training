@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/core/utils/images_path.dart';
+import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_store.dart';
 
 import '../../../../../core/helper/app_custom_circle_avatar.dart';
 import '../../../../../core/helper/app_text.dart';
-import '../../../../../core/utils/images_path.dart';
 
 class MessengerListFriendStory extends StatelessWidget {
-  const MessengerListFriendStory({super.key});
+  final MessengerStore messengerStore = AppInit.instance.messengerStore;
+  MessengerListFriendStory({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +22,7 @@ class MessengerListFriendStory extends StatelessWidget {
           itemCount: 10,
           itemBuilder: (context, index) {
             return SizedBox(
-              width: 90,
+              width: 96,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -29,8 +32,8 @@ class MessengerListFriendStory extends StatelessWidget {
                     child: Stack(
                       children: [
                         AppCustomCircleAvatar(
-                          image: ImagesPath.icPerson,
-                          radius: 39,
+                          image: messengerStore.conversationStore.profileStore.userProfile.avatar ?? ImagesPath.icPerson,
+                          radius: 38,
                           height: 100,
                           width: 180,
                         ),

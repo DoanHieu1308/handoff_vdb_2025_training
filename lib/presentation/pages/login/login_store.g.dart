@@ -137,6 +137,14 @@ mixin _$LoginStore on _LoginStore, Store {
     });
   }
 
+  late final _$logoutAsyncAction =
+      AsyncAction('_LoginStore.logout', context: context);
+
+  @override
+  Future<void> logout() {
+    return _$logoutAsyncAction.run(() => super.logout());
+  }
+
   late final _$logInAsyncAction =
       AsyncAction('_LoginStore.logIn', context: context);
 

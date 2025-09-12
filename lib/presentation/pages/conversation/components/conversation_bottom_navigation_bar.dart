@@ -48,7 +48,7 @@ class ConversationBottomNavigationBar extends StatelessWidget {
       enabled: true,
       onTap: onTap,
       child: Container(
-        width: SizeUtil.getMaxWidth() / 3 - 10,
+        width: SizeUtil.getMaxWidth() / 3 - 10, // Điều chỉnh width cho 2 tab
         height: 58,
         color: Colors.transparent,
         child: Column(
@@ -64,7 +64,14 @@ class ConversationBottomNavigationBar extends StatelessWidget {
               fit: BoxFit.fill,
             ),
             AppSiteBox.h5,
-            Text(label, style: AppText.text11),
+            Text(
+              label, 
+              style: AppText.text11.copyWith(
+                color: currentIndex == index
+                    ? ColorResources.COLOR_0956D6
+                    : ColorResources.COLOR_071A52,
+              ),
+            ),
           ],
         ),
       ),

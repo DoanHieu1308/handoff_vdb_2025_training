@@ -15,4 +15,5 @@ mixin AuthRoutes {
   static const String MESSENGER = '/messenger';
   static const String CONVERSATION = '/conversation';
   static const String ALL_FRIEND = '/all_friend';
+  static const String CHAT_CUSTOM_SHOW_MEDIA = '/chat_custom_show_media';
 }

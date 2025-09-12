@@ -2,17 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
-import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/profile/pages/profile_page/profile_store.dart';
 import 'package:mobx/mobx.dart';
 import '../../../core/enums/auth_enums.dart';
-import '../../../data/data_source/dio/dio_client.dart';
 import '../../../data/model/auth/auth_model.dart';
 import '../../../data/model/response/user_model.dart';
-import '../../../data/repositories/auth_repository.dart';
-import '../../widget/build_snackbar.dart';
 import '../home/home_store.dart';
 part 'login_store.g.dart';
 
@@ -34,6 +31,9 @@ abstract class _LoginStore with Store {
 
   /// SharePreference
   final sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
+
+  /// Firebase
+  final firebasePresenceService = AppInit.instance.firebasePresenceService;
 
   /// Repository
   final _authRepository = AppInit.instance.authRepository;
@@ -123,6 +123,29 @@ abstract class _LoginStore with Store {
   void goToForgotPassword() {
 
   }
+  
+  /// Xử lý logout và cleanup Firebase presence
+  @action
+  Future<void> logout() async {
+    try {
+      // Cleanup Firebase presence
+
+      // Sign out khỏi Firebase Auth
+      try {
+        await FirebaseAuth.instance.signOut();
+        print('LoginStore: Firebase Auth sign out successful');
+      } catch (e) {
+        print('LoginStore: Error signing out from Firebase Auth: $e');
+      }
+      
+      // Clear local data
+      await sharedPreferenceHelper.clearAuthData();
+      
+      print('LoginStore: Logout completed successfully');
+    } catch (e) {
+      print('LoginStore: Error during logout: $e');
+    }
+  }
 
   @action
   bool validate() {
@@ -176,13 +199,12 @@ abstract class _LoginStore with Store {
           final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
 
           if (args != null && args['redirectTo'] == AuthRoutes.CREATE_POST) {
-            await profileStore.getUserProfile();
             context.go(args['redirectTo'], extra: args['files']);
           } else {
             await homeStore.getALlPosts(type: PUBLIC);
             context.go(AuthRoutes.DASH_BOARD);
           }
-
+          await profileStore.getUserProfile();
           onSuccess(auth);
         },
         onError: (error){
@@ -211,9 +233,68 @@ abstract class _LoginStore with Store {
 
     await Future.wait(futures.whereType<Future<void>>());
 
+    try {
+      await _createFirebaseAuthUser(user);
+    } catch (e) {
+      print('Error creating Firebase Auth user: $e');
+    }
+
+    try {
+      firebasePresenceService.setupUserPresence(auth.user?.id ?? "");
+    } catch (e) {
+      print('Error initializing Firebase Presence Service: $e');
+    }
 
     checkSavedData();
-    // await _dio.refreshTokens();
+  }
+  
+  /// Tạo Firebase Auth user để có thể bắt sự kiện online/offline
+  Future<void> _createFirebaseAuthUser(UserModel user) async {
+    try {
+      final auth = FirebaseAuth.instance;
+      
+      // Kiểm tra xem đã có user đang đăng nhập không
+      if (auth.currentUser != null) {
+        print('Firebase Auth user already exists: ${auth.currentUser!.uid}');
+        return;
+      }
+      
+      // Tạo anonymous user hoặc sign in với email/password
+      // Sử dụng email từ BE API và tạo password tạm thời
+      final email = user.email ?? 'user_${user.id}@handoff.com';
+      final password = 'temp_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
+      
+      try {
+        // Thử tạo user mới
+        final userCredential = await auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        print('Firebase Auth user created: ${userCredential.user?.uid}');
+      } catch (e) {
+        if (e.toString().contains('email-already-in-use')) {
+          // Nếu email đã tồn tại, thử sign in
+          final userCredential = await auth.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          );
+          print('Firebase Auth user signed in: ${userCredential.user?.uid}');
+        } else {
+          // Nếu không thể tạo hoặc sign in, tạo anonymous user
+          final userCredential = await auth.signInAnonymously();
+          print('Firebase Auth anonymous user created: ${userCredential.user?.uid}');
+        }
+      }
+    } catch (e) {
+      print('Error in Firebase Auth user creation: $e');
+      // Fallback: tạo anonymous user
+      try {
+        final userCredential = await FirebaseAuth.instance.signInAnonymously();
+        print('Firebase Auth anonymous user created as fallback: ${userCredential.user?.uid}');
+      } catch (fallbackError) {
+        print('Error creating anonymous user: $fallbackError');
+      }
+    }
   }
 
 

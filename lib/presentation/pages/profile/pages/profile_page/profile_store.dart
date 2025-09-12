@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/data/services/firebase_presence_service.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:mobx/mobx.dart';
@@ -29,6 +30,9 @@ abstract class _ProfileStore with Store {
 
   /// Controller
   final RefreshController refreshController = RefreshController(initialRefresh: false);
+
+  /// Server
+  final FirebasePresenceService firebasePresenceService = AppInit.instance.firebasePresenceService;
 
   /// SharePreference
   final _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
@@ -104,6 +108,11 @@ abstract class _ProfileStore with Store {
         onSuccess: () async {
           isLoading = false;
 
+          final userId = _sharedPreferenceHelper.getIdUser;
+          if (userId != null) {
+            await firebasePresenceService.setUserOffline(userId);
+          }
+
           await _sharedPreferenceHelper.clearAuthData();
           print("accesstoken: ${_sharedPreferenceHelper.getAccessToken}");
 
@@ -134,22 +143,6 @@ abstract class _ProfileStore with Store {
         }
     );
   }
-
-  // ///
-  // /// Go to all friend
-  // ///
-  // @action
-  // Future<void> goToFriendPage(BuildContext context) async {
-  //   // Tắt bàn phím trước khi navigate
-  //   FocusScope.of(context).unfocus();
-  //
-  //   // Clear search text
-  //   friendsStore.searchCtrl.textEditingController.clear();
-  //   friendsStore.searchCtrl.searchText = '';
-  //
-  //   friendsStore.getAllFriends();
-  //   context.push(AuthRoutes.FRIENDS);
-  // }
 
   ///
   /// Get All Friends

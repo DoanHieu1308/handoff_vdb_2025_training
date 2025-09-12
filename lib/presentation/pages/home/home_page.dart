@@ -56,6 +56,7 @@ class _HomePageState extends State<HomePage>{
   }
 
   void onRefresh() {
+    store.profileStore.getUserProfile();
     store.getALlPosts(type: PUBLIC);
   }
 

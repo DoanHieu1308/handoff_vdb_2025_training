@@ -301,5 +301,19 @@ class AppText extends TextStyle{
     color: Colors.black,
   );
 
+  static TextStyle get text25_Inter => TextStyle(
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 25.sp,
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+  );
+
+  static TextStyle get text26_Inter => TextStyle(
+    fontFamily: 'Inter-SemiBold',
+    fontSize: 26.sp,
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+  );
+
 
 }

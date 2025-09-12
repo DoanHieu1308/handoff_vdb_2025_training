@@ -7,6 +7,8 @@ import 'package:handoff_vdb_2025/data/repositories/follow_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
+import 'package:handoff_vdb_2025/data/services/firebase_chat_service.dart';
+import 'package:handoff_vdb_2025/data/services/firebase_presence_service.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/chat_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/conversation_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_store.dart';
@@ -67,6 +69,10 @@ class AppInit {
   ChatStore? _chatStore;
   MessengerStore? _messengerStore;
   ConversationStore? _conversationStore;
+  
+  // Firebase Presence Service
+  FirebasePresenceService? _firebasePresenceService;
+  FirebaseChatService? _firebaseChatService;
 
   /// Initialize all dependencies
   Future<void> init() async {
@@ -163,19 +169,29 @@ class AppInit {
     return _postItemStore!;
   }
 
-  MessengerStore get messengerStore {
-    _messengerStore ??= MessengerStore();
-    return _messengerStore!;
-  }
-
   ConversationStore get conversationStore {
     _conversationStore ??= ConversationStore();
     return _conversationStore!;
   }
 
+  MessengerStore get messengerStore {
+    _messengerStore ??= MessengerStore(conversationStore);
+    return _messengerStore!;
+  }
+
   ChatStore get chatStore {
-    _chatStore ??= ChatStore();
+    _chatStore ??= ChatStore(conversationStore);
     return _chatStore!;
+  }
+  
+  FirebasePresenceService get firebasePresenceService {
+    _firebasePresenceService ??= FirebasePresenceService();
+    return _firebasePresenceService!;
+  }
+
+  FirebaseChatService get firebaseChatService {
+    _firebaseChatService ??= FirebaseChatService();
+    return _firebaseChatService!;
   }
   
   CreatePostAdvancedOptionSettingStore get createPostAdvancedOptionSettingStore {
@@ -228,7 +244,8 @@ class AppInit {
       _linkPreviewStore?.dispose();
       _textStore?.dispose();
       _chatStore?.disposeAll();
-      
+
+
       debugPrint('App resources disposed');
     } catch (e) {
       debugPrint('App disposal failed: $e');
