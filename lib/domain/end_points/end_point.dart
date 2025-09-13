@@ -8,18 +8,9 @@ class EndPoint {
   EndPoint._internal();
 
   // static const String BASE_URL = "http://192.168.100.65:5000/v1/api";
-  static const String BASE_URL = "http://192.168.100.64:5000/v1/api";
+  // static const String BASE_URL = "http://192.168.100.64:5000/v1/api";
   // static const String BASE_URL = "http://192.168.1.12:5000/v1/api";
-  
-  // Web-safe base URL (you need to replace this with your actual production API URL)
-  static const String WEB_BASE_URL = "https://192.168.100.64:5000/v1/api";
-  
-  static String get baseUrl {
-    if (kIsWeb) {
-      return WEB_BASE_URL;
-    }
-    return BASE_URL;
-  }
+  static const String BASE_URL = "https://be-handoff-vdb-2025-training.onrender.com/v1/api";
 
   ///AUTH
   // Đăng kí email.

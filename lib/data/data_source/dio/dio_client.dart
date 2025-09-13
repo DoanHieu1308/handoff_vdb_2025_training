@@ -43,10 +43,10 @@ class DioClient {
 
     final token = _sharedPreferenceHelper.getAccessToken;
     print("Dio access____: $token");
-    print("Using base URL: ${EndPoint.baseUrl}");
+    print("Using base URL: ${EndPoint.BASE_URL}");
 
     _dio!
-      ..options.baseUrl = EndPoint.baseUrl
+      ..options.baseUrl = EndPoint.BASE_URL
       ..options.connectTimeout = const Duration(seconds: 15) // Reduced from 60s
       ..options.receiveTimeout = const Duration(seconds: 20) // Reduced from 60s
       ..options.sendTimeout = const Duration(seconds: 15) // Added send timeout
