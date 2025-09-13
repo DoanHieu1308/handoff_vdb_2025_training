@@ -16,6 +16,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter_portal/flutter_portal.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,7 @@ void main() async {
   final createPostStore = AppInit.instance.createPostStore;
   createPostStore.listenNetwork();
 
+  usePathUrlStrategy();
   runApp(const MyApp());
 }
 

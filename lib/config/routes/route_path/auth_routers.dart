@@ -28,21 +28,23 @@ final GoRouter router = GoRouter(
   initialLocation: AuthRoutes.SIGNUP,
     redirect: (context, state) {
       final bool isLoggedIn = AuthHelper.isUserLoggedIn();
+      final String goingTo = state.matchedLocation;
 
-      final bool goingToLogin = state.matchedLocation == AuthRoutes.LOGIN;
-      final bool goingToSignup = state.matchedLocation == AuthRoutes.SIGNUP;
-
-      // Nếu chưa đăng nhập và không ở login/signup thì chuyển về login
-      if (!isLoggedIn && !goingToLogin && !goingToSignup) {
+      // Nếu chưa đăng nhập và đang cố vào trang ngoài login/signup → bắt về login
+      if (!isLoggedIn &&
+          goingTo != AuthRoutes.LOGIN &&
+          goingTo != AuthRoutes.SIGNUP) {
         return AuthRoutes.LOGIN;
       }
 
-      // Nếu đã login mà lại vào login/signup thì về dashboard
-      if (isLoggedIn && (goingToLogin || goingToSignup)) {
+      // Nếu đã login mà lại vào login/signup → chuyển về dashboard
+      if (isLoggedIn &&
+          (goingTo == AuthRoutes.LOGIN || goingTo == AuthRoutes.SIGNUP)) {
         return AuthRoutes.DASH_BOARD;
       }
 
-      return null; // Không redirect
+      // Ngược lại → cho đi đúng trang đã chọn
+      return null;
     },
   routes: [
     GoRoute(
