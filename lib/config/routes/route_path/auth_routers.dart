@@ -25,25 +25,23 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 
 
 final GoRouter router = GoRouter(
-  initialLocation: AuthRoutes.SIGNUP,
     redirect: (context, state) {
-      final bool isLoggedIn = AuthHelper.isUserLoggedIn();
-      final String goingTo = state.matchedLocation;
+      final isLoggedIn = AuthHelper.isUserLoggedIn();
+      final goingTo = state.matchedLocation;
 
-      // Nếu chưa đăng nhập và đang cố vào trang ngoài login/signup → bắt về login
+      // Nếu chưa login thì chỉ cho /login hoặc /sign_up
       if (!isLoggedIn &&
           goingTo != AuthRoutes.LOGIN &&
           goingTo != AuthRoutes.SIGNUP) {
         return AuthRoutes.LOGIN;
       }
 
-      // Nếu đã login mà lại vào login/signup → chuyển về dashboard
+      // Nếu đã login thì chặn quay lại login/signup
       if (isLoggedIn &&
           (goingTo == AuthRoutes.LOGIN || goingTo == AuthRoutes.SIGNUP)) {
         return AuthRoutes.DASH_BOARD;
       }
 
-      // Ngược lại → cho đi đúng trang đã chọn
       return null;
     },
   routes: [
@@ -117,9 +115,14 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AuthRoutes.SHOW_ALL_IMAGE,
       builder: (context, state) {
+        final id = state.pathParameters['id']!;
+
         final postData = state.extra as PostOutputModel;
-        return ShowAllImage(postData: postData);
-      }
+        return ShowAllImage(
+          postId: id,
+          postData: postData,
+        );
+      },
     ),
   ],
   observers: [routeObserver]

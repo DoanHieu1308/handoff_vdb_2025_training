@@ -9,7 +9,10 @@ mixin AuthRoutes {
   static const String CREATE_POST = '/create_post';
   static const String STATUS_POST = '/status_post';
   static const String TAG_FRIEND = '/tag_friend';
-  static const String SHOW_ALL_IMAGE = '/show_all_image';
+
+  // thêm tham số :id
+  static const String SHOW_ALL_IMAGE = '/show_all_image/:id';
+
   static const String IMAGE_VIEWER = '/image_viewer';
   static const String CHAT = '/chat';
   static const String MESSENGER = '/messenger';

@@ -17,8 +17,9 @@ import 'post_item_header.dart';
 
 class ShowAllImage extends StatelessWidget {
   final PostOutputModel postData;
+  final String postId;
   final PostItemStore store = AppInit.instance.postItemStore;
-  ShowAllImage({super.key, required this.postData});
+  ShowAllImage({super.key, required this.postData, required this.postId});
 
   @override
   Widget build(BuildContext context) {

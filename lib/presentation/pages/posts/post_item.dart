@@ -59,8 +59,7 @@ class _PostItemState extends State<PostItem> with AutomaticKeepAliveClientMixin{
             ),
             GestureDetector(
               onTap: (){
-                context.push(
-                  AuthRoutes.SHOW_ALL_IMAGE,
+                context.push(AuthRoutes.SHOW_ALL_IMAGE.replaceAll(":id", widget.itemPost.id ?? ""),
                   extra: widget.itemPost,
                 );
               },
