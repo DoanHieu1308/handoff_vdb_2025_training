@@ -103,6 +103,13 @@ dependencies:
   device_info_plus: any
   # https://pub.dev/packages/photo_manager
   photo_manager: ^3.7.1
+  # https://pub.dev/packages/image_network
+  image_network: ^2.6.0
+  # https://pub.dev/packages/flutter_widget_from_html
+  flutter_widget_from_html: 0.16.1
+  # https://pub.dev/packages/share_plus
+  share_plus: ^12.0.0
+
 
 
   go_router: ^16.0.0

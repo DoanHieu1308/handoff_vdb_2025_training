@@ -1,12 +1,10 @@
-import 'dart:io';
-
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
-import '../../enums/enums.dart';
+import 'package:image_network/image_network.dart';
 import '../../utils/color_resources.dart';
-import '../../utils/images_path.dart';
 
 class SetUpAssetImage extends StatelessWidget {
   final String urlImage;
@@ -39,6 +37,28 @@ class SetUpAssetImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_isNetworkImage(urlImage)) {
+      // Web => ImageNetwork
+      if (kIsWeb) {
+        return ImageNetwork(
+          image: urlImage,
+          height: height ?? 120,
+          width: width ?? 120,
+          duration: 800,
+          curve: Curves.easeInOut,
+          onPointer: true,
+          debugPrint: false,
+          backgroundColor: Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          fitWeb: _mapToBoxFitWeb(fit ?? BoxFit.contain),
+          onLoading: _buildLoadingPlaceholder(),
+          onError: _buildErrorPlaceholder(),
+          onTap: () {
+            debugPrint("Image tapped: $urlImage");
+          },
+        );
+      }
+
+      // Mobile => CachedNetworkImage
       return CachedNetworkImage(
         imageUrl: urlImage,
         fit: fit ?? BoxFit.contain,
@@ -51,11 +71,12 @@ class SetUpAssetImage extends StatelessWidget {
         errorWidget: (context, url, error) => _buildErrorPlaceholder(),
         fadeInDuration: const Duration(milliseconds: 200),
         fadeOutDuration: const Duration(milliseconds: 200),
-        maxWidthDiskCache: 1920, // Limit disk cache size
+        maxWidthDiskCache: 1920,
         maxHeightDiskCache: 1920,
       );
     }
 
+    // SVG asset
     if (_isSvg(urlImage)) {
       return SvgPicture.asset(
         urlImage,
@@ -67,36 +88,38 @@ class SetUpAssetImage extends StatelessWidget {
       );
     }
 
-    if (_isLocalFile(urlImage)) {
+    // Local file (mobile only)
+    if (!kIsWeb && _isLocalFile(urlImage)) {
       final file = File(urlImage);
       return Image.file(
         file,
         height: height,
         width: width,
         fit: fit ?? BoxFit.contain,
-        filterQuality: filterQuality ?? FilterQuality.medium, // Changed from high to medium for better performance
+        filterQuality: filterQuality ?? FilterQuality.medium,
         gaplessPlayback: gaplessPlayback ?? true,
-        errorBuilder: errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
+        errorBuilder:
+        errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
         cacheWidth: _getSafeIntValue(width, memCacheWidth),
         cacheHeight: _getSafeIntValue(height, memCacheHeight),
       );
     }
 
-    // Default fallback to asset
+    // Default asset
     return Image.asset(
       urlImage,
       height: height,
       width: width,
       fit: fit ?? BoxFit.contain,
       color: color,
-      filterQuality: filterQuality ?? FilterQuality.medium, // Changed from high to medium
+      filterQuality: filterQuality ?? FilterQuality.medium,
       cacheWidth: _getSafeIntValue(width, memCacheWidth),
       cacheHeight: _getSafeIntValue(height, memCacheHeight),
-      errorBuilder: errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
+      errorBuilder:
+      errorBuilder ?? (context, error, stackTrace) => _buildErrorPlaceholder(),
     );
   }
 
-  /// Helper method to safely convert double to int, handling infinity and NaN
   int? _getSafeIntValue(double? value, int? fallback) {
     if (fallback != null) return fallback;
     if (value == null) return null;
@@ -106,12 +129,24 @@ class SetUpAssetImage extends StatelessWidget {
   }
 
   bool _isSvg(String url) => url.toLowerCase().endsWith('.svg');
-
   bool _isNetworkImage(String url) =>
       url.startsWith('http://') || url.startsWith('https://');
-
   bool _isLocalFile(String url) =>
       url.startsWith('/') || url.startsWith('file://');
+
+  /// Map BoxFit to BoxFitWeb
+  BoxFitWeb _mapToBoxFitWeb(BoxFit fit) {
+    switch (fit) {
+      case BoxFit.cover:
+        return BoxFitWeb.cover;
+      case BoxFit.fill:
+        return BoxFitWeb.fill;
+      case BoxFit.contain:
+        return BoxFitWeb.contain;
+      default:
+        return BoxFitWeb.contain;
+    }
+  }
 
   Widget _buildLoadingPlaceholder() {
     return SizedBox(

@@ -12,6 +12,7 @@ import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/home/home_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../data/repositories/post_repository.dart';
 import '../../../core/utils/images_path.dart';
@@ -214,6 +215,33 @@ abstract class _PostItemStore with Store {
   ///
   /// Delete post
   ///
+  Future<void> getPostById({
+    required String postId,
+    required Function(PostOutputModel data) onSuccess,
+    required Function(dynamic error) onError,
+  }) async {
+    try {
+      await _postRepository.getPostById(
+        postId: postId,
+        onSuccess: (data) async {
+          onSuccess(data);
+        },
+        onError: (error) {
+          onError(error);
+          print("Lỗi ở getPostById: $error");
+        },
+      );
+    } catch (e, stack) {
+      onError(e);
+      print("Exception ở getPostById: $e");
+      print(stack);
+    }
+  }
+
+
+  ///
+  /// Delete post
+  ///
   Future<void> deletePost({
     required String postId,
     required Function() onSuccess,
@@ -383,6 +411,20 @@ abstract class _PostItemStore with Store {
         curve: Curves.easeInOut,
         alignment: 0.2,
       );
+    }
+  }
+
+  /// Share post
+  Future<void> sharePost({
+    required String postId,
+  }) async {
+    try {
+      final String postLink = "https://handoff-vdb-2025-training.vercel.app/posts/$postId";
+      await SharePlus.instance.share(
+          ShareParams(text: 'Hãy xem bài viết này: $postLink')
+      );
+    } catch (e) {
+      print("Lỗi khi share bài viết: $e");
     }
   }
 }

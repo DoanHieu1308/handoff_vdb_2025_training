@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
+import 'package:handoff_vdb_2025/core/utils/navigation_helper.dart';
 import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/search/search_store.dart';
@@ -75,7 +76,7 @@ abstract class _CreatePostAdvancedOptionSettingStore with Store {
   void onTapOptionPost(BuildContext context, PostOptionType type) {
     switch (type) {
       case PostOptionType.onlyMe:
-        context.push(AuthRoutes.STATUS_POST);
+        NavigationHelper.navigateTo(context, AuthRoutes.STATUS_POST);
         break;
       case PostOptionType.album:
         break;

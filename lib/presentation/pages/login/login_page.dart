@@ -216,10 +216,14 @@ class _LoginPageState extends State<LoginPage> {
                               
                               if (hasSharedFiles) {
                                 // Có shared values từ SharedPreferences, redirect đến create post
-                                context.go(AuthRoutes.CREATE_POST);
+                                if (mounted) {
+                                  context.go(AuthRoutes.CREATE_POST);
+                                }
                               } else {
                                 // Đăng nhập bình thường, vào dashboard
-                                context.go(AuthRoutes.DASH_BOARD);
+                                if (mounted) {
+                                  context.go(AuthRoutes.DASH_BOARD);
+                                }
                               }
                               
                               widget.store.checkSavedData();

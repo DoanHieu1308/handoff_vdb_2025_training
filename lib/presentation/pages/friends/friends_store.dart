@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
+import 'package:handoff_vdb_2025/core/utils/navigation_helper.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_model.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_request_model.dart';
 import 'package:handoff_vdb_2025/data/model/friend/friend_sent_model.dart';
@@ -564,7 +565,7 @@ abstract class _FriendsStore with Store {
   })async {
     await infoFriendStore.getFriendProfile(friendId: friendId);
     await infoFriendStore.getPostsOfFriendByUserId(userId: friendId).then((_) {
-      context.push(AuthRoutes.INFO_FRIENDS);
+      NavigationHelper.navigateTo(context, AuthRoutes.INFO_FRIENDS);
     });
   }
 

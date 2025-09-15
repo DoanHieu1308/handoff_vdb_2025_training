@@ -360,6 +360,49 @@ class PostRepository {
     }
   }
 
+  /// Get list Post By userID
+  Future<void> getPostById({
+    required String postId,
+    required void Function(PostOutputModel data) onSuccess,
+    required void Function(dynamic error) onError,
+  }) async {
+    final accessToken = _sharedPreferenceHelper.getAccessToken;
+    if (accessToken == null || accessToken.isEmpty) {
+      onError("User not logged in");
+      return;
+    }
+
+    print("acces: $accessToken");
+
+    try {
+      final response = await _dio.get(
+        "${EndPoint.POSTS}/$postId",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      final statusCode = response.statusCode ?? 0;
+
+      if (statusCode >= 200 && statusCode < 300) {
+        final results = response.data as Map<String, dynamic>;
+        final metadata = results['metadata'] as Map<String, dynamic>;
+
+        final PostOutputModel post = PostOutputModel.fromMap(metadata);
+        onSuccess(post);
+      } else {
+        final message = ApiErrorHandler.getMessage(response.data);
+        onError(ApiResponse.withError(message).error);
+      }
+    } catch (e) {
+      print("Get Posts Error: $e");
+      onError(ApiResponse.withError(ApiErrorHandler.getMessage(e)).error);
+    }
+  }
+
+
   /// Delete post
   Future<void> deletePost({
     required String postId,
@@ -553,6 +596,8 @@ class PostRepository {
       onSuccess(commentList);
     }
   }
+
+
 
   /// Delete comment
   Future<void> deleteComment({

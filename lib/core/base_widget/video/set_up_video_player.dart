@@ -1,12 +1,17 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+// Web-specific imports
+import 'web_video_controller.dart' if (dart.library.io) 'web_video_controller_stub.dart';
+
 import '../../../config/routes/route_path/auth_routers.dart';
+import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 
 class VideoPlayerHandle {
   late _SetUpVideoPlayerState _state;
@@ -61,14 +66,16 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
   bool _disposed = false;
   bool _isVisible = true;
   bool _isInViewport = true;
-  
-  // Thêm debounce timer để tránh gọi quá nhiều lần
+
   Timer? _visibilityDebounceTimer;
-  static const Duration _visibilityDebounceDelay = Duration(milliseconds: 300);
+  static const Duration _visibilityDebounceDelay =
+  Duration(milliseconds: 300);
 
   @override
   void initState() {
     super.initState();
+
+    if (kIsWeb) return; // web sẽ render HtmlWidget trong build()
 
     if (widget.videoUrl.isYoutubeUrl) {
       _ytController = WebViewController()
@@ -77,19 +84,17 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (url) {
-              // Nếu autoplay thì ngay khi load xong gọi play
               if (widget.autoPlay && !widget.startPaused && !_disposed) {
                 _ytController?.runJavaScript("""
-            var video = document.querySelector('video');
-            if(video && video.paused){ video.muted = true; video.play(); }
-          """);
+                  var video = document.querySelector('video');
+                  if(video && video.paused){ video.muted = true; video.play(); }
+                """);
               }
             },
           ),
         )
         ..loadRequest(Uri.parse(
-            "${widget.videoUrl.youtubeEmbedUrl}?autoplay=1&mute=1&playsinline=1&controls=0&rel=0&modestbranding=1"
-        ));
+            "${widget.videoUrl.youtubeEmbedUrl}?autoplay=1&mute=1&playsinline=1&controls=0&rel=0&modestbranding=1"));
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _initializeVideoController();
@@ -99,11 +104,10 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
 
   Future<void> _initializeVideoController() async {
     if (_disposed) return;
-    
+
     try {
-      // Cleanup controller cũ nếu có
       _controller?.dispose();
-      
+
       if (widget.fileVideo != null) {
         _controller = VideoPlayerController.file(widget.fileVideo!);
       } else if (widget.isAsset) {
@@ -122,7 +126,6 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
       setState(() => _initialized = true);
       widget.handle?._attach(this);
 
-      // auto play nếu cần - sử dụng Timer thay vì Future.delayed
       if (!_disposed) {
         Timer(const Duration(milliseconds: 100), _checkAndPlay);
       }
@@ -133,15 +136,11 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
     }
   }
 
-  // Helpers
   void _play() {
     if (!_disposed && _initialized && _isVisible && _isInViewport) {
       final wasPlaying = _controller?.value.isPlaying ?? false;
       _controller?.play();
-      // Chỉ setState nếu trạng thái thay đổi
-      if (!wasPlaying) {
-        setState(() {});
-      }
+      if (!wasPlaying) setState(() {});
     }
   }
 
@@ -154,18 +153,32 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
 
   void _checkAndPlay() {
     if (_disposed) return;
-
-    // Debounce visibility changes để tránh gọi quá nhiều lần
     _visibilityDebounceTimer?.cancel();
-    _visibilityDebounceTimer = Timer(_visibilityDebounceDelay, () {
-      if (_disposed) return;
-      _performPlayPause();
-    });
+    _visibilityDebounceTimer =
+        Timer(_visibilityDebounceDelay, _performPlayPause);
   }
 
   void _performPlayPause() {
     if (_disposed) return;
 
+    if (kIsWeb) {
+      if (widget.videoUrl.isYoutubeUrl) {
+        if (_isVisible && _isInViewport) {
+          WebVideoController.playYoutubeVideo();
+        } else {
+          WebVideoController.pauseYoutubeVideo();
+        }
+      } else {
+        if (_isVisible && _isInViewport && widget.autoPlay && !widget.startPaused) {
+          WebVideoController.playCustomVideo();
+        } else {
+          WebVideoController.pauseCustomVideo();
+        }
+      }
+      return;
+    }
+
+    // --- Mobile logic giữ nguyên ---
     if (widget.videoUrl.isYoutubeUrl) {
       if (_isVisible && _isInViewport && widget.autoPlay && !widget.startPaused) {
         _ytController?.runJavaScript("""
@@ -194,23 +207,15 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
   @override
   void dispose() {
     _disposed = true;
-    
-    // Cleanup timers
     _visibilityDebounceTimer?.cancel();
     _visibilityDebounceTimer = null;
-    
-    // Cleanup route observer
     routeObserver.unsubscribe(this);
-
-    // Cleanup video controllers
     try {
       _controller?.pause();
       _controller?.dispose();
       _controller = null;
-      
       _ytController = null;
     } catch (_) {}
-    
     super.dispose();
   }
 
@@ -221,7 +226,6 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
     if (modalRoute != null) routeObserver.subscribe(this, modalRoute);
   }
 
-  // RouteAware
   @override
   void didPushNext() => _pause();
   @override
@@ -234,6 +238,54 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
   Widget build(BuildContext context) {
     super.build(context);
 
+    // --- WEB MODE ---
+    if (kIsWeb) {
+      return VisibilityDetector(
+        key: ValueKey(widget.videoUrl),
+        onVisibilityChanged: (info) {
+          final visibleFraction = info.visibleFraction;
+          final newVisible = visibleFraction > 0.6;
+          final newInViewport = visibleFraction > 0.6;
+          if (_isVisible != newVisible || _isInViewport != newInViewport) {
+            setState(() {
+              _isVisible = newVisible;
+              _isInViewport = newInViewport;
+            });
+          }
+        },
+        child: !_isVisible
+            ? SizedBox(
+          width: widget.width ?? 300,
+          height: widget.height ?? 200,
+          child: const Center(child: Text("Video paused")),
+        )
+            : HtmlWidget(
+          widget.videoUrl.isYoutubeUrl
+              ? """
+              <iframe id="ytplayer"
+                width="${widget.width ?? 300}" height="${widget.height ?? 200}"
+                src="${widget.videoUrl.youtubeEmbedUrl}?enablejsapi=1&autoplay=${widget.autoPlay ? 1 : 0}&mute=1&playsinline=1&loop=${widget.looping ? 1 : 0}&rel=0&modestbranding=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+              </iframe>
+            """
+              : """
+              <video id="customVideo"
+                src="${widget.videoUrl}"
+                width="${widget.width ?? 300}"
+                height="${widget.height ?? 200}"
+                ${widget.autoPlay ? "autoplay" : ""}
+                ${widget.looping ? "loop" : ""}
+                ${widget.startPaused ? "" : "controls"}
+                muted playsinline>
+              </video>
+            """,
+        ),
+      );
+    }
+
+    // --- MOBILE MODE (giữ nguyên logic cũ) ---
     if (widget.videoUrl.isYoutubeUrl) {
       return VisibilityDetector(
         key: ValueKey(widget.videoUrl),
@@ -241,8 +293,6 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
           final visibleFraction = info.visibleFraction;
           final newVisible = visibleFraction > 0.8;
           final newInViewport = visibleFraction > 0.8;
-          
-          // Chỉ cập nhật nếu có thay đổi thực sự
           if (_isVisible != newVisible || _isInViewport != newInViewport) {
             _isVisible = newVisible;
             _isInViewport = newInViewport;
@@ -271,8 +321,6 @@ class _SetUpVideoPlayerState extends State<SetUpVideoPlayer>
         final visibleFraction = info.visibleFraction;
         final newVisible = visibleFraction > 0.4;
         final newInViewport = visibleFraction > 0.4;
-        
-        // Chỉ cập nhật nếu có thay đổi thực sự
         if (_isVisible != newVisible || _isInViewport != newInViewport) {
           _isVisible = newVisible;
           _isInViewport = newInViewport;

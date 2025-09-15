@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
+import 'package:handoff_vdb_2025/core/utils/navigation_helper.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_input_model.dart';
 import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/stores/link_preview_store/link_preview_store.dart';
@@ -217,7 +218,7 @@ abstract class _CreatePostStore with Store {
         mediaStore.showDialogSelectImageOrVideo(context);
         break;
       case 2:
-        context.push(AuthRoutes.TAG_FRIEND);
+        NavigationHelper.navigateTo(context, AuthRoutes.TAG_FRIEND);
         break;
       case 3:
         break;

@@ -7,6 +7,7 @@ import 'package:handoff_vdb_2025/core/base_widget/lazy_index_stack.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/utils/color_resources.dart';
 import 'package:handoff_vdb_2025/core/utils/images_path.dart';
+import 'package:handoff_vdb_2025/core/utils/navigation_helper.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/component/bottom_bar_widget.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
@@ -18,8 +19,9 @@ import '../profile/pages/profile_page/profile_page.dart';
 import 'component/item_menu.dart';
 
 class DashBoardPage extends StatefulWidget {
+  final int? initialIndex;
 
-  DashBoardPage({super.key});
+  DashBoardPage({super.key, this.initialIndex});
 
   @override
   State<DashBoardPage> createState() => _DashBoardPageState();
@@ -33,6 +35,11 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     store.init();
+    
+    // Set initial index if provided
+    if (widget.initialIndex != null) {
+      store.currentIndex = widget.initialIndex!;
+    }
   }
 
   @override
@@ -51,6 +58,20 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
+    // Update current index based on route if not set by initialIndex
+    if (widget.initialIndex == null) {
+      final location = GoRouterState.of(context).matchedLocation;
+      if (location.endsWith('/home') && store.currentIndex != 0) {
+        store.currentIndex = 0;
+      } else if (location.endsWith('/video') && store.currentIndex != 1) {
+        store.currentIndex = 1;
+      } else if (location.endsWith('/friends') && store.currentIndex != 2) {
+        store.currentIndex = 2;
+      } else if (location.endsWith('/profile') && store.currentIndex != 3) {
+        store.currentIndex = 3;
+      }
+    }
+
     return WillPopScope(
       onWillPop: () async {
         final shouldExit = await _showExitDialog();
@@ -70,7 +91,7 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
                   ItemMenu(image: ImagesPath.icBell, number: 1),
                   ItemMenu(
                       onTap: (){
-                        context.push(AuthRoutes.CONVERSATION);
+                        NavigationHelper.navigateTo(context, AuthRoutes.CONVERSATION);
                       },
                       image: ImagesPath.icMessenger, number: 1
                   )
@@ -89,7 +110,7 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
               ),
               body: LazyIndexedStack(
                 index: store.currentIndex,
-                preloadCount: 1, // Preload adjacent pages for better UX
+                preloadCount: 0, // Disable preloading to avoid RefreshController conflicts
                 children: [
                   const HomePage(),
                   const VideoPage(),
@@ -130,14 +151,14 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
           children: [
             BottomBarWidget(
               onTap: () {
-                store.onChangedDashboardPage(index: 0);
+                context.go('/dash_board/home');
               },
               imagePath: ImagesPath.icHome,
               isSelected: store.currentIndex == 0,
             ),
             BottomBarWidget(
               onTap: () {
-                store.onChangedDashboardPage(index: 1);
+                context.go('/dash_board/video');
               },
               imagePath: ImagesPath.icVideoLibrary,
               isSelected: store.currentIndex == 1,
@@ -145,7 +166,7 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
             BottomBarWidget(
               onTap: () {
                 store.friendsStore.searchCtrl.textEditingController.text = '';
-                store.onChangedDashboardPage(index: 2);
+                context.go('/dash_board/friends');
               },
               imagePath: ImagesPath.icFriends,
               isSelected: store.currentIndex == 2,
@@ -154,7 +175,7 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
               onTap: () {
                 store.profileStore.getUserProfile();
                 store.profileStore.loadInitialPostsByUserId();
-                store.onChangedDashboardPage(index: 3);
+                context.go('/dash_board/profile');
               },
               imagePath: ImagesPath.icPerson,
               isSelected: store.currentIndex == 3,

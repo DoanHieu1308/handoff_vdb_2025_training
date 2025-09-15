@@ -24,10 +24,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>{
   final HomeStore store = AppInit.instance.homeStore;
   final ScrollController _scrollController = ScrollController();
+  late final RefreshController _refreshController;
 
   @override
   void initState() {
     super.initState();
+    
+    // Initialize refresh controller
+    _refreshController = RefreshController(initialRefresh: false);
     
     // Listen to post message changes
     reaction((_) => store.createPostStore.postMessage, (String message) {
@@ -52,16 +56,23 @@ class _HomePageState extends State<HomePage>{
   @override
   void dispose() {
     _scrollController.dispose();
+    _refreshController.dispose();
     super.dispose();
   }
 
-  void onRefresh() {
+  void onRefresh() async {
     store.profileStore.getUserProfile();
-    store.getALlPosts(type: PUBLIC);
+    await store.getALlPosts(type: PUBLIC);
+    if (mounted) {
+      _refreshController.refreshCompleted();
+    }
   }
 
-  void onLoading() {
-    store.getMorePosts(type: PUBLIC);
+  void onLoading() async {
+    await store.getMorePosts(type: PUBLIC);
+    if (mounted) {
+      _refreshController.loadComplete();
+    }
   }
 
   @override
@@ -71,7 +82,7 @@ class _HomePageState extends State<HomePage>{
         return Scaffold(
           backgroundColor: Colors.white,
           body: SmartRefresher(
-            controller: store.refreshController,
+            controller: _refreshController,
             enablePullDown: true,
             enablePullUp: true,
             onRefresh: onRefresh,
@@ -157,7 +168,6 @@ class _HomePageState extends State<HomePage>{
             itemBuilder: (context, index) {
               try {
                 final post = store.allPostsPublic[index];
-                if (post == null) return const SizedBox(height: 100);
                 return Container(
                   key: ValueKey('post_${post.id ?? index}'),
                   margin: const EdgeInsets.only(bottom: 8),
@@ -207,7 +217,12 @@ class _HomePageState extends State<HomePage>{
               const Text("Tải thêm thất bại!"),
               const SizedBox(height: 8),
               ElevatedButton(
-                onPressed: () => store.getMorePosts(type: PUBLIC),
+                onPressed: () async {
+                  await store.getMorePosts(type: PUBLIC);
+                  if (mounted) {
+                    _refreshController.loadComplete();
+                  }
+                },
                 child: const Text("Thử lại"),
               ),
             ],

@@ -199,10 +199,14 @@ abstract class _LoginStore with Store {
           final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
 
           if (args != null && args['redirectTo'] == AuthRoutes.CREATE_POST) {
-            context.go(args['redirectTo'], extra: args['files']);
+            if (context.mounted) {
+              context.go(args['redirectTo'], extra: args['files']);
+            }
           } else {
             await homeStore.getALlPosts(type: PUBLIC);
-            context.go(AuthRoutes.DASH_BOARD);
+            if (context.mounted) {
+              context.go(AuthRoutes.DASH_BOARD);
+            }
           }
           await profileStore.getUserProfile();
           onSuccess(auth);

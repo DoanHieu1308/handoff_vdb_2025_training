@@ -9,6 +9,7 @@ import '../../../../core/enums/auth_enums.dart';
 import '../../../../core/helper/app_text.dart';
 import '../../../../core/init/app_init.dart';
 import '../../../../core/utils/images_path.dart';
+import '../../../../core/utils/navigation_helper.dart';
 import '../home_store.dart';
 
 class CreatePostButton extends StatelessWidget {
@@ -33,7 +34,7 @@ class CreatePostButton extends StatelessWidget {
               ),
               GestureDetector(
                 onTap: (){
-                  context.push(AuthRoutes.CREATE_POST);
+                  NavigationHelper.navigateTo(context, AuthRoutes.CREATE_POST);
                 },
                 child: Container(
                   height: 40.h,

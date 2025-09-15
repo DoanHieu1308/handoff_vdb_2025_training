@@ -72,10 +72,16 @@ class PostItemBottomActions extends StatelessWidget {
             name: "Nhắn tin",
             image: ImagesPath.icMessenger,
           ),
-          CustomIconInteractPost(
-            width: 70,
-            name: "Chia sẻ",
-            image: ImagesPath.icShare,
+          AppTapAnimation(
+            enabled: true,
+            onTap: (){
+              postItemStore.sharePost(postId: itemPost.id ?? "");
+            },
+            child: CustomIconInteractPost(
+              width: 70,
+              name: "Chia sẻ",
+              image: ImagesPath.icShare,
+            ),
           ),
         ],
       ),

@@ -6,6 +6,7 @@ import 'package:handoff_vdb_2025/data/model/post/post_output_model.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/post_item_store.dart';
 import '../../../core/enums/auth_enums.dart';
 import '../../../core/helper/size_util.dart';
+import '../../../core/utils/navigation_helper.dart';
 import 'components/post_item_bottom_actions.dart';
 import 'components/post_item_header.dart';
 import 'components/post_image_video_content.dart';
@@ -59,8 +60,8 @@ class _PostItemState extends State<PostItem> with AutomaticKeepAliveClientMixin{
             ),
             GestureDetector(
               onTap: (){
-                context.push(AuthRoutes.SHOW_ALL_IMAGE.replaceAll(":id", widget.itemPost.id ?? ""),
-                  extra: widget.itemPost,
+                NavigationHelper.navigateTo(
+                  context, AuthRoutes.POSTS.replaceAll(":id", widget.itemPost.id ?? ""),
                 );
               },
               child: Container(

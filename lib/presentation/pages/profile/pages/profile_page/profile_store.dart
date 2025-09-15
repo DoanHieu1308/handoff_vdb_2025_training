@@ -134,7 +134,9 @@ abstract class _ProfileStore with Store {
 
           await Future.delayed(Duration(milliseconds: 200));
 
-          context.go(AuthRoutes.LOGIN);
+          if (context.mounted) {
+            context.go(AuthRoutes.LOGIN);
+          }
         },
         onError: (error){
           isLoading = false;

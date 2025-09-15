@@ -21,19 +21,33 @@ class InfoFriendPage extends StatefulWidget {
 
 class _InfoFriendPageState extends State<InfoFriendPage> {
   final InfoFriendStore store = AppInit.instance.infoFriendStore;
+  late final RefreshController _refreshController;
 
   @override
   void initState() {
-    store.init();
     super.initState();
+    _refreshController = RefreshController(initialRefresh: false);
+    store.init();
   }
 
-  void onRefresh() {
-    store.getPostsOfFriendByUserId(userId: store.profileFriend.user?.id ?? "");
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
   }
 
-  void onLoading() {
-    store.loadMorePostsOfFriendByUserId(userId: store.profileFriend.user?.id ?? "");
+  void onRefresh() async {
+    await store.getPostsOfFriendByUserId(userId: store.profileFriend.user?.id ?? "");
+    if (mounted) {
+      _refreshController.refreshCompleted();
+    }
+  }
+
+  void onLoading() async {
+    await store.loadMorePostsOfFriendByUserId(userId: store.profileFriend.user?.id ?? "");
+    if (mounted) {
+      _refreshController.loadComplete();
+    }
   }
 
   @override
@@ -47,7 +61,7 @@ class _InfoFriendPageState extends State<InfoFriendPage> {
       child: Scaffold(
         appBar: AppBar(),
         body: SmartRefresher(
-          controller: store.refreshController,
+          controller: _refreshController,
           enablePullDown: true,
           enablePullUp: true,
           onRefresh: onRefresh,

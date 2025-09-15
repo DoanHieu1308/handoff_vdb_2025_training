@@ -10,22 +10,56 @@ import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_text_c
 import 'package:handoff_vdb_2025/presentation/widget/show_image_with_url.dart';
 import 'package:handoff_vdb_2025/presentation/widget/show_video_with_url.dart';
 import '../../../../data/model/post/post_output_model.dart';
+import '../../../widget/build_snackbar.dart';
 import '../post_item_store.dart';
 import 'full_screen_dialog_wrapper.dart';
 import 'full_screen_image_viewer.dart';
 import 'post_item_header.dart';
 
-class ShowAllImage extends StatelessWidget {
-  final PostOutputModel postData;
+class ShowAllImage extends StatefulWidget {
   final String postId;
+  ShowAllImage({super.key, required this.postId});
+
+  @override
+  State<ShowAllImage> createState() => _ShowAllImageState();
+}
+
+class _ShowAllImageState extends State<ShowAllImage> {
   final PostItemStore store = AppInit.instance.postItemStore;
-  ShowAllImage({super.key, required this.postData, required this.postId});
+  PostOutputModel? postData;
+
+  @override
+  void initState() {
+    super.initState();
+    store.getPostById(
+        postId: widget.postId,
+        onSuccess: (post){
+          setState(() {
+            postData = post;
+          });
+        },
+        onError: (error){
+          ScaffoldMessenger.of(context).showSnackBar(
+            buildSnackBarNotify(
+              textNotify: error.toString(),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (postData == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final List<String> mediaFiles = [
-      ...?postData.images,
-      ...?postData.videos,
+      ...?postData?.images,
+      ...?postData?.videos,
     ];
 
     return Scaffold(
@@ -37,14 +71,14 @@ class ShowAllImage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               PostItemHeader(
-                  postData : postData,
+                  postData : postData!,
                   onTapMore: (){},
               ),
               SizedBox(height: 5.h),
-              PostReactionOverview(itemPost: postData),
+              PostReactionOverview(itemPost: postData!),
               SizedBox(height: 20.h),
               PostTextContent(
-                text: postData.title ?? '',
+                text: postData?.title ?? '',
                 onTapHashtag: (tag) {
                   print("Hashtag tapped: $tag");
                 },
@@ -151,8 +185,8 @@ class ShowAllImage extends StatelessWidget {
                   );
                 },
               ),
-              if(mediaFiles.isEmpty && postData.postLinkMeta?.postLinkUrl != null)
-              PostLinkContent(postData: postData)
+              if(mediaFiles.isEmpty && postData?.postLinkMeta?.postLinkUrl != null)
+              PostLinkContent(postData: postData!)
             ],
           ),
         ),

@@ -47,9 +47,9 @@ class DioClient {
 
     _dio!
       ..options.baseUrl = EndPoint.BASE_URL
-      ..options.connectTimeout = const Duration(seconds: 15) // Reduced from 60s
-      ..options.receiveTimeout = const Duration(seconds: 20) // Reduced from 60s
-      ..options.sendTimeout = const Duration(seconds: 15) // Added send timeout
+      ..options.connectTimeout = const Duration(seconds: 15)
+      ..options.receiveTimeout = const Duration(seconds: 20)
+      ..options.sendTimeout = const Duration(seconds: 15)
       ..options.headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         if (token != null && token.isNotEmpty)
@@ -121,44 +121,6 @@ class DioClient {
       ),
     );
 
-    // Auto refresh token when 401
-    // dio!.interceptors.add(InterceptorsWrapper(
-    //   onError: (DioException e, ErrorInterceptorHandler handler) async {
-    //     if (e.requestOptions.path.contains(EndPoint.REFRESH_TOKEN)) {
-    //       return handler.next(e);
-    //     }
-    //
-    //     if (e.response?.statusCode == 401) {
-    //       print("Access token expired, refreshing...");
-    //
-    //       final success = await refreshTokens();
-    //       if (success) {
-    //         final newToken = _sharedPreferenceHelper.getAccessToken;
-    //
-    //         // Update header for all requests
-    //         dio!.options.headers['Authorization'] = 'Bearer $newToken';
-    //
-    //         // Retry the original request
-    //         final requestOptions = e.requestOptions;
-    //         requestOptions.headers['Authorization'] = 'Bearer $newToken';
-    //
-    //         try {
-    //           final cloneReq = await dio!.fetch(requestOptions);
-    //           return handler.resolve(cloneReq);
-    //         } catch (retryError) {
-    //           return handler.next(e);
-    //         }
-    //       }
-    //       else {
-    //         await _sharedPreferenceHelper.clearAuthData();
-    //         router.push(AuthRoutes.LOGIN);
-    //         return;
-    //       }
-    //     }
-    //     return handler.next(e);
-    //   },
-    // ));
-
     _isInitialized = true;
   }
 
@@ -178,8 +140,8 @@ class DioClient {
         final response = await _dio!.post(
           EndPoint.REFRESH_TOKEN,
           options: Options(
-            sendTimeout: const Duration(seconds: 10),
-            receiveTimeout: const Duration(seconds: 10),
+            sendTimeout: const Duration(seconds: 5),
+            receiveTimeout: const Duration(seconds: 5),
           ),
         );
 

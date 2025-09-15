@@ -24,10 +24,12 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final store = AppInit.instance.profileStore;
+  late final RefreshController _refreshController;
 
   @override
   void initState() {
     super.initState();
+    _refreshController = RefreshController(initialRefresh: false);
 
     // Listen to post message changes
     reaction((_) => store.createPostStore.postMessage, (String message) {
@@ -50,17 +52,33 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
         return Scaffold(
           backgroundColor: Colors.white,
           body: SmartRefresher(
-            controller: store.refreshController,
+            controller: _refreshController,
             enablePullDown: true,
             enablePullUp: true,
-            onRefresh: store.loadInitialPostsByUserId,
-            onLoading: store.loadMorePostsByUserId,
+            onRefresh: () async {
+              await store.loadInitialPostsByUserId();
+              if (mounted) {
+                _refreshController.refreshCompleted();
+              }
+            },
+            onLoading: () async {
+              await store.loadMorePostsByUserId();
+              if (mounted) {
+                _refreshController.loadComplete();
+              }
+            },
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
@@ -132,7 +150,6 @@ class _ProfilePageState extends State<ProfilePage> {
             itemBuilder: (context, index) {
               try {
                 final post = store.posts[index];
-                if (post == null) return const SizedBox(height: 100);
                 return Container(
                   key: ValueKey('profile_post_${post.id ?? index}'),
                   margin: const EdgeInsets.only(bottom: 8),

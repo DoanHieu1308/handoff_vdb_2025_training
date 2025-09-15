@@ -9,6 +9,7 @@ import '../../../../core/helper/size_util.dart';
 import '../../../../core/init/app_init.dart';
 import '../../../../core/utils/color_resources.dart';
 import '../../../../core/utils/images_path.dart';
+import '../../../../core/utils/navigation_helper.dart';
 import 'build_drawer.dart';
 
 class LeadProfile extends StatelessWidget {
@@ -207,7 +208,7 @@ class LeadProfile extends StatelessWidget {
                 bottom: 12.h,
                 child: GestureDetector(
                   onTap: () {
-                    context.push(AuthRoutes.CAMERA);
+                    NavigationHelper.navigateTo(context, AuthRoutes.CAMERA);
                   },
                   child: CircleAvatar(
                     radius: 20,

@@ -25,6 +25,7 @@ final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<v
 
 
 final GoRouter router = GoRouter(
+    initialLocation: AuthRoutes.LOGIN,
     redirect: (context, state) {
       final isLoggedIn = AuthHelper.isUserLoggedIn();
       final goingTo = state.matchedLocation;
@@ -48,6 +49,24 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AuthRoutes.DASH_BOARD,
       builder: (context, state) => DashBoardPage(),
+      routes: [
+        GoRoute(
+          path: "home",
+          builder: (context, state) => DashBoardPage(initialIndex: 0),
+        ),
+        GoRoute(
+          path: 'video',
+          builder: (context, state) => DashBoardPage(initialIndex: 1),
+        ),
+        GoRoute(
+          path: 'friends',
+          builder: (context, state) => DashBoardPage(initialIndex: 2),
+        ),
+        GoRoute(
+          path: 'profile',
+          builder: (context, state) => DashBoardPage(initialIndex: 3),
+        ),
+      ],
     ),
     GoRoute(
       path: AuthRoutes.FRIENDS,
@@ -113,14 +132,11 @@ final GoRouter router = GoRouter(
       builder: (context, state) => ChatCustomShowMediaGallery(),
     ),
     GoRoute(
-      path: AuthRoutes.SHOW_ALL_IMAGE,
+      path: AuthRoutes.POSTS,
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-
-        final postData = state.extra as PostOutputModel;
         return ShowAllImage(
           postId: id,
-          postData: postData,
         );
       },
     ),

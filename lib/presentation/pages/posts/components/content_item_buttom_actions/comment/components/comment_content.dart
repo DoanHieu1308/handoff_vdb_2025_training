@@ -16,14 +16,33 @@ import '../../../../../../../core/utils/images_path.dart';
 import '../../../../../../../data/model/post/post_comment_model.dart';
 
 
-class CommentContent extends StatelessWidget {
-  final postItemStore = AppInit.instance.postItemStore;
+class CommentContent extends StatefulWidget {
   final String postId;
 
   CommentContent({super.key, required this.postId});
 
+  @override
+  State<CommentContent> createState() => _CommentContentState();
+}
+
+class _CommentContentState extends State<CommentContent> {
+  final postItemStore = AppInit.instance.postItemStore;
+  late final RefreshController _refreshController;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshController = RefreshController(initialRefresh: false);
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
   void onLoading() {
-    postItemStore.getMoreComments(commentPostId: postId);
+    postItemStore.getMoreComments(commentPostId: widget.postId);
   }
 
   @override
@@ -49,7 +68,7 @@ class CommentContent extends StatelessWidget {
 
           return Expanded(
             child: SmartRefresher(
-              controller: postItemStore.refreshController,
+              controller: _refreshController,
               enablePullDown: false,
               enablePullUp: true,
               onLoading: onLoading,

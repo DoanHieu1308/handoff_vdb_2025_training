@@ -10,7 +10,9 @@ import '../../../../core/init/app_init.dart';
 import '../../../../core/utils/app_constants.dart';
 import '../../../../core/utils/color_resources.dart';
 import '../../../../core/utils/images_path.dart';
+import '../../../../core/utils/navigation_helper.dart';
 import '../info_friend_store.dart';
+import 'more_setting_info_friend.dart';
 
 class SentAndAcceptFriend extends StatelessWidget {
   final InfoFriendStore store = AppInit.instance.infoFriendStore;
@@ -137,7 +139,7 @@ class SentAndAcceptFriend extends StatelessWidget {
                 flex: 3,
                 child: GestureDetector(
                   onTap: () {
-                    context.push(AuthRoutes.MORE_SETTING_INFO_FRIEND);
+                    NavigationHelper.navigateTo(context, AuthRoutes.MORE_SETTING_INFO_FRIEND);
                   },
                   child: Container(
                     height: 40.h,
