@@ -32,10 +32,6 @@ class _ShowAllImageState extends State<ShowAllImage> {
   PostOutputModel? postData;
   bool showBanner = true;
 
-  bool isWebOnMobileSize(BuildContext context) {
-    return kIsWeb && MediaQuery.of(context).size.width < 600;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -76,7 +72,7 @@ class _ShowAllImageState extends State<ShowAllImage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (isWebOnMobileSize(context) && showBanner) _buildNavigateApp(),
+              if (kIsWeb && showBanner) _buildNavigateApp(),
               PostItemHeader(postData: postData!, onTapMore: () {}),
               SizedBox(height: 5.h),
               PostReactionOverview(itemPost: postData!),
