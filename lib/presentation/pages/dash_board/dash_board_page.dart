@@ -10,6 +10,7 @@ import 'package:handoff_vdb_2025/core/utils/images_path.dart';
 import 'package:handoff_vdb_2025/core/utils/navigation_helper.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/component/bottom_bar_widget.dart';
+import 'package:handoff_vdb_2025/presentation/pages/dash_board/component/chat_bot_action_button.dart';
 import 'package:handoff_vdb_2025/presentation/pages/dash_board/dash_board_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/home/home_page.dart';
@@ -107,6 +108,9 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
                   padding: EdgeInsets.only(top: 0.h),
                   child: _buildBottomNavigationBar(),
                 ),
+              ),
+              floatingActionButton: ChatBotActionButton(
+                onPress: () {}
               ),
               body: LazyIndexedStack(
                 index: store.currentIndex,

@@ -131,4 +131,8 @@ mixin ImagesPath {
   static String icReplyChat = 'assets/features/ic_reply_chat.svg';
   static String icGooglePhoto = 'assets/features/ic_google_photos.svg';
   static String icHDImage = 'assets/features/ic_hd_image.svg';
+
+  /// Chat bot
+  static String geniusTouch = 'assets/base/images/genius_touch.png';
+  static String messTouch = 'assets/base/icons/mess.svg';
 }

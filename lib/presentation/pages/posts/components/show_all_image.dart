@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
+import 'package:handoff_vdb_2025/core/helper/app_sitebox.dart';
 import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_link_content.dart';
@@ -9,6 +10,7 @@ import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_reacti
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_text_content.dart';
 import 'package:handoff_vdb_2025/presentation/widget/show_image_with_url.dart';
 import 'package:handoff_vdb_2025/presentation/widget/show_video_with_url.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../data/model/post/post_output_model.dart';
 import '../../../widget/build_snackbar.dart';
 import '../post_item_store.dart';
@@ -18,6 +20,7 @@ import 'post_item_header.dart';
 
 class ShowAllImage extends StatefulWidget {
   final String postId;
+
   ShowAllImage({super.key, required this.postId});
 
   @override
@@ -27,34 +30,37 @@ class ShowAllImage extends StatefulWidget {
 class _ShowAllImageState extends State<ShowAllImage> {
   final PostItemStore store = AppInit.instance.postItemStore;
   PostOutputModel? postData;
+  bool showBanner = true;
+
+  bool isWebOnMobileSize(BuildContext context) {
+    return kIsWeb && MediaQuery.of(context).size.width < 600;
+  }
 
   @override
   void initState() {
     super.initState();
     store.getPostById(
-        postId: widget.postId,
-        onSuccess: (post){
-          setState(() {
-            postData = post;
-          });
-        },
-        onError: (error){
-          ScaffoldMessenger.of(context).showSnackBar(
-            buildSnackBarNotify(
-              textNotify: error.toString(),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      postId: widget.postId,
+      onSuccess: (post) {
+        setState(() {
+          postData = post;
+        });
+      },
+      onError: (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          buildSnackBarNotify(
+            textNotify: error.toString(),
+            backgroundColor: Colors.red,
+          ),
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     if (postData == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final List<String> mediaFiles = [
@@ -70,10 +76,8 @@ class _ShowAllImageState extends State<ShowAllImage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PostItemHeader(
-                  postData : postData!,
-                  onTapMore: (){},
-              ),
+              if (isWebOnMobileSize(context) && showBanner) _buildNavigateApp(),
+              PostItemHeader(postData: postData!, onTapMore: () {}),
               SizedBox(height: 5.h),
               PostReactionOverview(itemPost: postData!),
               SizedBox(height: 20.h),
@@ -83,112 +87,165 @@ class _ShowAllImageState extends State<ShowAllImage> {
                   print("Hashtag tapped: $tag");
                 },
               ),
-              if(mediaFiles.isNotEmpty)
-              ListView.builder(
-                shrinkWrap: true,
-                controller: store.scrollImageController,
-                itemCount: mediaFiles.length,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  final mediaFile = mediaFiles[index];
-                  final isVideo = mediaFile.isVideoFile;
+              if (mediaFiles.isNotEmpty)
+                ListView.builder(
+                  shrinkWrap: true,
+                  controller: store.scrollImageController,
+                  itemCount: mediaFiles.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    final mediaFile = mediaFiles[index];
+                    final isVideo = mediaFile.isVideoFile;
 
-                  return GestureDetector(
-                    onTap: () {
-                      showGeneralDialog(
-                        context: context,
-                        barrierColor: Colors.black.withValues(alpha: 0.95),
-                        barrierDismissible: true,
-                        barrierLabel:
-                            MaterialLocalizations.of(
-                              context,
-                            ).modalBarrierDismissLabel,
-                        transitionDuration: const Duration(
-                          milliseconds: 300,
-                        ),
-                        pageBuilder: (
-                          context,
-                          animation,
-                          secondaryAnimation,
-                        ) {
-                          return FullscreenDialogWrapper(
-                            child: FullScreenImageViewer(
-                              mediaFile: mediaFile,
-                              tag: 'img_$index',
-                            ),
-                          );
-                        },
-                        transitionBuilder: (
-                          context,
-                          animation,
-                          secondaryAnimation,
-                          child,
-                        ) {
-                          final fade = CurvedAnimation(
-                            parent: animation,
-                            curve: Curves.easeOut,
-                          );
-                          return FadeTransition(
-                            opacity: fade,
-                            child: child,
-                          );
-                        },
-                      );
-                    },
-                    child: Hero(
-                      tag: 'img_$index',
-                      flightShuttleBuilder: (
-                        BuildContext flightContext,
-                        Animation<double> animation,
-                        HeroFlightDirection flightDirection,
-                        BuildContext fromHeroContext,
-                        BuildContext toHeroContext,
-                      ) {
-                        return AnimatedBuilder(
-                          animation: animation,
-                          builder: (context, child) {
-                            return Material(
-                              color: Colors.transparent,
-                              child: Container(
-                                key: ValueKey(mediaFile),
-                                padding: EdgeInsets.only(bottom: 16.h),
-                                child:
-                                    isVideo
-                                        ? ShowVideoWithUrl(videoUrl: mediaFile)
-                                        : ShowImageWithUrl(imageUrl: mediaFile),
+                    return GestureDetector(
+                      onTap: () {
+                        showGeneralDialog(
+                          context: context,
+                          barrierColor: Colors.black.withValues(alpha: 0.95),
+                          barrierDismissible: true,
+                          barrierLabel:
+                              MaterialLocalizations.of(
+                                context,
+                              ).modalBarrierDismissLabel,
+                          transitionDuration: const Duration(milliseconds: 300),
+                          pageBuilder: (
+                            context,
+                            animation,
+                            secondaryAnimation,
+                          ) {
+                            return FullscreenDialogWrapper(
+                              child: FullScreenImageViewer(
+                                mediaFile: mediaFile,
+                                tag: 'img_$index',
                               ),
                             );
                           },
+                          transitionBuilder: (
+                            context,
+                            animation,
+                            secondaryAnimation,
+                            child,
+                          ) {
+                            final fade = CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeOut,
+                            );
+                            return FadeTransition(opacity: fade, child: child);
+                          },
                         );
                       },
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Container(
-                          key: ValueKey(mediaFile),
-                          padding: EdgeInsets.only(bottom: 16.h),
-                          child:
-                              isVideo
-                                  ? Stack(
-                                    children: [
-                                      ShowVideoWithUrl(videoUrl: mediaFile),
-                                      Container(
-                                        height: 200.h,
-                                        width: SizeUtil.getMaxWidth(),
-                                        color: Colors.transparent,
-                                      ),
-                                    ],
-                                  )
-                                  : ShowImageWithUrl(imageUrl: mediaFile),
+                      child: Hero(
+                        tag: 'img_$index',
+                        flightShuttleBuilder: (
+                          BuildContext flightContext,
+                          Animation<double> animation,
+                          HeroFlightDirection flightDirection,
+                          BuildContext fromHeroContext,
+                          BuildContext toHeroContext,
+                        ) {
+                          return AnimatedBuilder(
+                            animation: animation,
+                            builder: (context, child) {
+                              return Material(
+                                color: Colors.transparent,
+                                child: Container(
+                                  key: ValueKey(mediaFile),
+                                  padding: EdgeInsets.only(bottom: 16.h),
+                                  child:
+                                      isVideo
+                                          ? ShowVideoWithUrl(
+                                            videoUrl: mediaFile,
+                                          )
+                                          : ShowImageWithUrl(
+                                            imageUrl: mediaFile,
+                                          ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Container(
+                            key: ValueKey(mediaFile),
+                            padding: EdgeInsets.only(bottom: 16.h),
+                            child:
+                                isVideo
+                                    ? Stack(
+                                      children: [
+                                        ShowVideoWithUrl(videoUrl: mediaFile),
+                                        Container(
+                                          height: 200.h,
+                                          width: SizeUtil.getMaxWidth(),
+                                          color: Colors.transparent,
+                                        ),
+                                      ],
+                                    )
+                                    : ShowImageWithUrl(imageUrl: mediaFile),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
-              if(mediaFiles.isEmpty && postData?.postLinkMeta?.postLinkUrl != null)
-              PostLinkContent(postData: postData!)
+                    );
+                  },
+                ),
+              if (mediaFiles.isEmpty &&
+                  postData?.postLinkMeta?.postLinkUrl != null)
+                PostLinkContent(postData: postData!),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavigateApp() {
+    return SizedBox(
+      height: 80,
+      child: Center(
+        child: Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('For a better experience, open our mobile app!'),
+                AppSiteBox.h5,
+                ElevatedButton(
+                  onPressed: () async {
+                    final appStoreUrl = Uri.parse(
+                      'https://example.com/appstore-link',
+                    );
+                    final deepLinkUrl = Uri.parse(
+                      'handoff_app://app/posts/${widget.postId}',
+                    );
+
+                    if (await canLaunchUrl(deepLinkUrl)) {
+                      await launchUrl(deepLinkUrl);
+                    } else if (await canLaunchUrl(appStoreUrl)) {
+                      await launchUrl(appStoreUrl);
+                    } else {
+                      print('Could not launch app or app store.');
+                    }
+                  },
+                  child: const Text('Open App'),
+                ),
+              ],
+            ),
+            Transform.translate(
+              offset: Offset(350, 0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    showBanner = false;
+                  });
+                },
+                child: const Icon(
+                  Icons.cancel_outlined,
+                  size: 20,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class EndPoint {
   static final EndPoint _instance = EndPoint._internal();
 
@@ -7,10 +5,10 @@ class EndPoint {
 
   EndPoint._internal();
 
-  // static const String BASE_URL = "http://192.168.100.65:5000/v1/api";
-  // static const String BASE_URL = "http://192.168.100.64:5000/v1/api";
-  // static const String BASE_URL = "http://192.168.1.12:5000/v1/api";
+  /// BE
   static const String BASE_URL = "https://be-handoff-vdb-2025-training.onrender.com/v1/api";
+  /// Web
+  static const String BASE_URL_WEB = "https://handoff-vdb-2025-training.vercel.app";
 
   ///AUTH
   // Đăng kí email.

@@ -6,6 +6,7 @@ import 'package:handoff_vdb_2025/core/utils/app_constants.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_comment_model.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_feels.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_output_model.dart';
+import 'package:handoff_vdb_2025/domain/end_points/end_point.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post_advanced_options_setting/create_post_advanced_options_setting_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/friends/friends_store.dart';
@@ -419,7 +420,7 @@ abstract class _PostItemStore with Store {
     required String postId,
   }) async {
     try {
-      final String postLink = "https://handoff-vdb-2025-training.vercel.app/posts/$postId";
+      final String postLink = "${EndPoint.BASE_URL_WEB}/posts/$postId";
       await SharePlus.instance.share(
           ShareParams(text: 'Hãy xem bài viết này: $postLink')
       );
