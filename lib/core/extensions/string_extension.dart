@@ -108,6 +108,16 @@ extension StringExtension on String {
 
     return emojiRegex.hasMatch(trimmed);
   }
+
+  /// Kiểm tra string có phải deep link hợp lệ theo scheme `handoff://`
+  bool get isDeepLink {
+    try {
+      final uri = Uri.parse(this);
+      return uri.scheme == "handoff" && uri.host.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
 }
 
 

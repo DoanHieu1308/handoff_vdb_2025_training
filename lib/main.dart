@@ -5,12 +5,14 @@ import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 import 'package:handoff_vdb_2025/data/services/firebase_presence_service.dart';
 import 'package:handoff_vdb_2025/firebase_options.dart';
 import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
+import 'package:handoff_vdb_2025/core/services/deep_link_service.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_input_model.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_link_meta.dart';
 import 'package:hive/hive.dart';
@@ -70,6 +72,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late final AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
   late StreamSubscription _intentSub;
+  late final DeepLinkService _deepLinkService;
 
   final _sharedFiles = <SharedMediaFile>[];
   final SharedPreferenceHelper _sharedPreferenceHelper = AppInit.instance.sharedPreferenceHelper;
@@ -82,6 +85,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // --- Init Deep Link Service ---
+    _deepLinkService = DeepLinkService();
+    _deepLinkService.initialize(router);
 
     // --- Init Deep Links ---
     _initDeepLinks();
@@ -155,19 +162,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void _handleDeepLink(Uri uri) {
-    print("Deep link received: $uri");
-
-    if (uri.pathSegments.contains('posts')) {
-      final postId = uri.pathSegments.last;
-      if (mounted) {
-        router.push(AuthRoutes.POSTS.replaceAll(':id', postId));
-      }
-    } else if (uri.pathSegments.contains('login')) {
-      if (mounted) router.push(AuthRoutes.LOGIN);
-    } else if (uri.pathSegments.contains('sign_up')) {
-      if (mounted) router.push(AuthRoutes.SIGNUP);
+    if (mounted) {
+      _deepLinkService.handleDeepLink(uri);
     }
-    // TODO: add more routes from AuthRoutes if needed
   }
 
   // --------------------------
@@ -185,7 +182,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         _sharedFiles.map((f) => f.path).toList(),
       );
 
-      if (_isAppReady) {
+      if (_isAppReady && !_sharedFiles[0].path.isDeepLink) {
         await _navigateToCreatePost();
       }
     } catch (e) {

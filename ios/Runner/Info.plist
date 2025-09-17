@@ -49,6 +49,18 @@
 	<array>
 		<string>http</string>
 		<string>https</string>
+		<string>handoff</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>handoff_app</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>handoff</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>

@@ -1,5 +1,5 @@
 mixin AuthRoutes {
-  static const String DASH_BOARD = '/dash_board';
+  static const String DASH_BOARD = '/dashboard';
   static const String FRIENDS = '/friends';
   static const String INFO_FRIENDS = '/info_friends';
   static const String LOGIN = '/login';

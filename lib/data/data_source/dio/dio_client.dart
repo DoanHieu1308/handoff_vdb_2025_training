@@ -47,9 +47,9 @@ class DioClient {
 
     _dio!
       ..options.baseUrl = EndPoint.BASE_URL
-      ..options.connectTimeout = const Duration(seconds: 15)
-      ..options.receiveTimeout = const Duration(seconds: 20)
-      ..options.sendTimeout = const Duration(seconds: 15)
+      ..options.connectTimeout = const Duration(seconds: 60)
+      ..options.receiveTimeout = const Duration(seconds: 60)
+      ..options.sendTimeout = const Duration(seconds: 60)
       ..options.headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         if (token != null && token.isNotEmpty)

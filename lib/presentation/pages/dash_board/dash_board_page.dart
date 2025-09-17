@@ -155,14 +155,14 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
           children: [
             BottomBarWidget(
               onTap: () {
-                context.go('/dash_board/home');
+                context.go('/dashboard/home');
               },
               imagePath: ImagesPath.icHome,
               isSelected: store.currentIndex == 0,
             ),
             BottomBarWidget(
               onTap: () {
-                context.go('/dash_board/video');
+                context.go('/dashboard/video');
               },
               imagePath: ImagesPath.icVideoLibrary,
               isSelected: store.currentIndex == 1,
@@ -170,7 +170,7 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
             BottomBarWidget(
               onTap: () {
                 store.friendsStore.searchCtrl.textEditingController.text = '';
-                context.go('/dash_board/friends');
+                context.go('/dashboard/friends');
               },
               imagePath: ImagesPath.icFriends,
               isSelected: store.currentIndex == 2,
@@ -179,7 +179,7 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
               onTap: () {
                 store.profileStore.getUserProfile();
                 store.profileStore.loadInitialPostsByUserId();
-                context.go('/dash_board/profile');
+                context.go('/dashboard/profile');
               },
               imagePath: ImagesPath.icPerson,
               isSelected: store.currentIndex == 3,

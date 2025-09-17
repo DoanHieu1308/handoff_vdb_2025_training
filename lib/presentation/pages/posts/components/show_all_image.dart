@@ -5,6 +5,7 @@ import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 import 'package:handoff_vdb_2025/core/helper/app_sitebox.dart';
 import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
+import 'package:handoff_vdb_2025/core/services/deep_link_service.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_link_content.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_reaction_overview.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_text_content.dart';
@@ -206,24 +207,42 @@ class _ShowAllImageState extends State<ShowAllImage> {
                 const Text('For a better experience, open our mobile app!'),
                 AppSiteBox.h5,
                 ElevatedButton(
-                  onPressed: () async {
-                    final appStoreUrl = Uri.parse(
-                      'https://example.com/appstore-link',
-                    );
-                    final deepLinkUrl = Uri.parse(
-                      'handoff_app://app/posts/${widget.postId}',
-                    );
+                    onPressed: () async {
+                      final androidStoreUrl = Uri.parse(
+                        'https://play.google.com/store/apps/details?id=com.yourcompany.handoff_vdb_2025',
+                      );
+                      final iosStoreUrl = Uri.parse(
+                        'https://apps.apple.com/app/handoff-vdb-2025/id123456789',
+                      );
 
-                    if (await canLaunchUrl(deepLinkUrl)) {
-                      await launchUrl(deepLinkUrl);
-                    } else if (await canLaunchUrl(appStoreUrl)) {
-                      await launchUrl(appStoreUrl);
-                    } else {
-                      print('Could not launch app or app store.');
-                    }
-                  },
-                  child: const Text('Open App'),
-                ),
+                      // Sử dụng DeepLinkService để tạo deep links
+                      final deepLinkUrl = Uri.parse("handoff://dashboard/posts/${widget.postId}");
+
+                      try {
+                        // Ưu tiên mở app
+                        final launched = await launchUrl(
+                          deepLinkUrl,
+                          mode: LaunchMode.externalApplication,
+                        );
+
+                        // Nếu không mở được app → fallback sang store
+                        if (!launched) {
+                          final storeUrl = defaultTargetPlatform == TargetPlatform.iOS
+                              ? iosStoreUrl
+                              : androidStoreUrl;
+
+                          await launchUrl(storeUrl, mode: LaunchMode.externalApplication);
+                        }
+                      } catch (_) {
+                        final storeUrl = defaultTargetPlatform == TargetPlatform.iOS
+                            ? iosStoreUrl
+                            : androidStoreUrl;
+
+                        await launchUrl(storeUrl, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    child: const Text('Open App'),
+                )
               ],
             ),
             Transform.translate(
@@ -244,32 +263,6 @@ class _ShowAllImageState extends State<ShowAllImage> {
           ],
         ),
       ),
-    );
-  }
-
-  PageRouteBuilder _createCustomRoute(BuildContext context, Widget page) {
-    return PageRouteBuilder(
-      opaque: false,
-      barrierColor: Colors.black.withValues(alpha: 0.9),
-      transitionDuration: const Duration(milliseconds: 400),
-      reverseTransitionDuration: const Duration(milliseconds: 400),
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.0, 0.0);
-        const end = Offset.zero;
-        const curve = Curves.easeInOutCubic;
-
-        var tween = Tween(
-          begin: begin,
-          end: end,
-        ).chain(CurveTween(curve: curve));
-        var offsetAnimation = animation.drive(tween);
-
-        return SlideTransition(
-          position: offsetAnimation,
-          child: FadeTransition(opacity: animation, child: child),
-        );
-      },
     );
   }
 }
