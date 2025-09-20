@@ -13,6 +13,6 @@ echo "Getting dependencies..."
 flutter pub get
 
 echo "Building for web..."
-flutter build web --release
+flutter build web --release --base-href /
 
 echo "Build completed successfully!"
