@@ -59,7 +59,9 @@ void main() async {
 
 
 
-  await AppLocalNotificationService().init();
+  if (!kIsWeb) {
+    await AppLocalNotificationService().init();
+  }
 
   runApp(
       const MyApp()

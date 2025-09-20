@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -26,6 +27,11 @@ class AppLocalNotificationService {
 
 
   Future<void> init() async {
+    if (kIsWeb) {
+      // Web không hỗ trợ local notifications
+      return;
+    }
+
     const AndroidInitializationSettings androidInitSettings =
     AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -43,6 +49,7 @@ class AppLocalNotificationService {
 
   // Xin quyền POST_NOTIFICATIONS (Android 13+)
   Future<void> _requestAndroidPermission() async {
+    if (kIsWeb) return;
     final androidImplementation =
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -53,6 +60,7 @@ class AppLocalNotificationService {
 
   // Tạo notification channels
   Future<void> _createNotificationChannels() async {
+    if (kIsWeb) return;
     final androidImplementation =
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -166,6 +174,7 @@ class AppLocalNotificationService {
 
   // Hàm show notification cho lifecycle
   Future<void> showLifecycleNotification(String message) async {
+    if (kIsWeb) return;
     final androidDetails = AndroidNotificationDetails(
       NotificationConfig.lifecycleChannelId,
       NotificationConfig.lifecycleChannelName,
@@ -211,16 +220,19 @@ class AppLocalNotificationService {
 
   // Hàm show notification đơn giản (backward compatibility)
   Future<void> showNotification(String message) async {
+    if (kIsWeb) return;
     await showLifecycleNotification(message);
   }
 
   // Hàm cancel notification
   Future<void> cancelNotification(int id) async {
+    if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancel(id);
   }
 
   // Hàm cancel tất cả notifications
   Future<void> cancelAllNotifications() async {
+    if (kIsWeb) return;
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
@@ -232,6 +244,7 @@ class AppLocalNotificationService {
 
   // Khởi tạo Firebase Cloud Messaging
   Future<void> _initializeFCM() async {
+    if (kIsWeb) return;
     try {
       // Xin quyền notification
       NotificationSettings settings = await _firebaseMessaging.requestPermission(
@@ -265,6 +278,7 @@ class AppLocalNotificationService {
 
   // Lưu FCM token vào Firestore
   Future<void> _saveFCMTokenToFirestore(String? token) async {
+    if (kIsWeb) return;
     if (token == null) return;
     
     try {
@@ -307,6 +321,7 @@ class AppLocalNotificationService {
 
   // Lắng nghe tin nhắn mới từ conversations
   Future<void> _setupConversationListener() async {
+    if (kIsWeb) return;
 
     try {
       // Lắng nghe tất cả conversations
@@ -325,6 +340,7 @@ class AppLocalNotificationService {
 
   // Xử lý khi có tin nhắn mới
   Future<void> _handleConversationUpdate(DocumentSnapshot doc) async {
+    if (kIsWeb) return;
     try {
       final me = _sharedPreferenceHelper.getIdUser;
       final data = doc.data() as Map<String, dynamic>?;
@@ -386,7 +402,7 @@ class AppLocalNotificationService {
         return;
       }
 
-      final tokenData = tokenDoc.data() as Map<String, dynamic>?;
+      final tokenData = tokenDoc.data();
       final fcmToken = tokenData?['token'] as String?;
 
       if (fcmToken == null || fcmToken.isEmpty) {
@@ -477,6 +493,7 @@ class AppLocalNotificationService {
 // Background message handler (phải là top-level function)
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  if (kIsWeb) return;
   debugPrint('FCM: Handling background message: ${message.messageId}');
   debugPrint('FCM: Message data: ${message.data}');
   
