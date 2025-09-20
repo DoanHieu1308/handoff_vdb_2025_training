@@ -5,7 +5,7 @@ set -e  # dừng ngay khi có lỗi
 FLUTTER_VERSION=3.24.0
 
 echo "🔽 Download Flutter SDK ($FLUTTER_VERSION)..."
-git clone https://github.com/flutter/flutter.git -b $FLUTTER_VERSION
+git clone https://github.com/flutter/flutter.git -b dev
 export PATH="$PATH:`pwd`/flutter/bin"
 
 echo "📌 Flutter version:"
