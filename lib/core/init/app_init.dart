@@ -3,12 +3,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
 import 'package:handoff_vdb_2025/data/data_source/dio/dio_client.dart';
 import 'package:handoff_vdb_2025/data/repositories/auth_repository.dart';
+import 'package:handoff_vdb_2025/data/repositories/chat_bot_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/follow_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/friend_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/post_repository.dart';
 import 'package:handoff_vdb_2025/data/repositories/user_repository.dart';
 import 'package:handoff_vdb_2025/data/services/firebase_chat_service.dart';
 import 'package:handoff_vdb_2025/data/services/firebase_presence_service.dart';
+import 'package:handoff_vdb_2025/presentation/pages/chat_bot/chat_bot_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/chat_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/conversation_store.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_store.dart';
@@ -47,6 +49,7 @@ class AppInit {
   late final UserRepository userRepository;
   late final FollowRepository followRepository;
   late final PostRepository postRepository;
+  late final ChatBotRepository chatBotRepository;
 
   // Store instances - lazy initialized
   LoginStore? _loginStore;
@@ -69,6 +72,7 @@ class AppInit {
   ChatStore? _chatStore;
   MessengerStore? _messengerStore;
   ConversationStore? _conversationStore;
+  ChatBotStore? _chatBotStore;
   
   // Firebase Presence Service
   FirebasePresenceService? _firebasePresenceService;
@@ -116,6 +120,7 @@ class AppInit {
       userRepository = UserRepository();
       followRepository = FollowRepository();
       postRepository = PostRepository();
+      chatBotRepository = ChatBotRepository();
       debugPrint('Repositories initialized');
     } catch (e) {
       debugPrint('Repositories initialization failed: $e');
@@ -183,6 +188,11 @@ class AppInit {
     _chatStore ??= ChatStore(conversationStore);
     return _chatStore!;
   }
+
+  ChatBotStore get chatBotStore {
+    _chatBotStore ??= ChatBotStore();
+    return _chatBotStore!;
+  }
   
   FirebasePresenceService get firebasePresenceService {
     _firebasePresenceService ??= FirebasePresenceService();
@@ -218,6 +228,7 @@ class AppInit {
     _itemDetailStore ??= ItemDetailStore(friendsStore);
     return _itemDetailStore!;
   }
+
 
   /// Initialize ScreenUtil
   void initScreenUtil(BuildContext context) {

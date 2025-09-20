@@ -1,4 +1,3 @@
-import 'package:chatview/chatview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:handoff_vdb_2025/core/base_widget/images/set_up_asset_image.dart';

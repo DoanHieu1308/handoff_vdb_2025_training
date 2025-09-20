@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_output_model.dart';
-import 'package:lottie/lottie.dart';
 
 import '../../../../../../../core/base_widget/images/set_up_asset_image.dart';
 import '../../../../../../../core/helper/app_sitebox.dart';
@@ -30,10 +29,10 @@ class CommentViewHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: itemPost.top2![1] != "" ? 35 : 20,
+                        width: itemPost.top2!.length > 1 && itemPost.top2![1] != "" ? 35 : 20,
                         child: Stack(
                           children: [
-                            if(itemPost.top2![1] != "")
+                            if(itemPost.top2!.length > 1 && itemPost.top2![1] != "")
                               Positioned(
                                 left: 15,
                                 child: SizedBox(

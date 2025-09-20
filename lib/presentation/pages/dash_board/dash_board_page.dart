@@ -110,11 +110,13 @@ class _DashBoardPageState extends State<DashBoardPage> with WidgetsBindingObserv
                 ),
               ),
               floatingActionButton: ChatBotActionButton(
-                onPress: () {}
+                onPress: () {
+                  context.go('/dashboard/chat_bot');
+                }
               ),
               body: LazyIndexedStack(
                 index: store.currentIndex,
-                preloadCount: 0, // Disable preloading to avoid RefreshController conflicts
+                preloadCount: 0,
                 children: [
                   const HomePage(),
                   const VideoPage(),

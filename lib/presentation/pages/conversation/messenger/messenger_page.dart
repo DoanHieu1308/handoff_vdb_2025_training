@@ -10,6 +10,7 @@ import 'package:handoff_vdb_2025/data/model/response/user_model.dart';
 import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/helper/app_custom_circle_avatar.dart';
 import 'package:handoff_vdb_2025/core/helper/app_text.dart';
+import 'package:handoff_vdb_2025/core/enums/message_content_type.dart';
 import '../../../../core/enums/auth_enums.dart';
 import 'components/messenger_item.dart';
 import 'components/messenger_list_friend_story.dart';
@@ -26,11 +27,30 @@ class _MessengerPageState extends State<MessengerPage> {
   final MessengerStore messengerStore = AppInit.instance.messengerStore;
   final ChatStore chatStore = AppInit.instance.chatStore;
   late String _me = "";
+  String? _lastProcessedMessageId; // Để tránh duplicate notification
 
   @override
   void initState() {
     super.initState();
     _me = messengerStore.sharedPreferenceHelper.getIdUser!;
+  }
+
+  // Helper method để convert message type
+  MessageContentType _getMessageType(String? type) {
+    switch (type) {
+      case 'text':
+        return MessageContentType.text;
+      case 'image':
+        return MessageContentType.image;
+      case 'voice':
+        return MessageContentType.voice;
+      case 'video':
+        return MessageContentType.video;
+      case 'custom':
+        return MessageContentType.custom;
+      default:
+        return MessageContentType.text;
+    }
   }
 
   @override

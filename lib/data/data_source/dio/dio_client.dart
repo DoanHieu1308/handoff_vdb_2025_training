@@ -17,8 +17,8 @@ class DioClient {
   Dio? get dio => _dio;
   
   // Retry configuration
-  static const int _maxRetries = 3;
-  static const Duration _retryDelay = Duration(seconds: 1);
+  static const int _maxRetries = 5;
+  static const Duration _retryDelay = Duration(seconds: 2);
 
   DioClient(){
     _init();
@@ -140,8 +140,8 @@ class DioClient {
         final response = await _dio!.post(
           EndPoint.REFRESH_TOKEN,
           options: Options(
-            sendTimeout: const Duration(seconds: 5),
-            receiveTimeout: const Duration(seconds: 5),
+            sendTimeout: const Duration(seconds: 30),
+            receiveTimeout: const Duration(seconds: 30),
           ),
         );
 
@@ -201,6 +201,7 @@ class DioClient {
              error.type == DioExceptionType.receiveTimeout ||
              error.type == DioExceptionType.sendTimeout ||
              error.type == DioExceptionType.connectionError ||
+             error.type == DioExceptionType.unknown ||
              (error.response?.statusCode != null && 
               error.response!.statusCode! >= 500);
     }
@@ -216,7 +217,7 @@ class DioClient {
       }) async {
     try {
       await ensureInitialized();
-      
+
       return await _retryRequest(() async {
         return await _dio!.get(
           uri,
@@ -247,12 +248,16 @@ class DioClient {
     try {
       await ensureInitialized();
       
+      // Set default timeout for this request if not provided
+      final requestOptions = options ?? Options();
+      requestOptions.receiveTimeout ??= const Duration(seconds: 120);
+      
       return await _retryRequest(() async {
         return await _dio!.post(
           uri,
           data: data,
           queryParameters: queryParameters,
-          options: options,
+          options: requestOptions,
           cancelToken: cancelToken,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress,

@@ -155,3 +155,5 @@ app.*.map.json
 .dart_tool/
 .flutter-plugins/
 .flutter-plugins-dependencies
+
+*.env

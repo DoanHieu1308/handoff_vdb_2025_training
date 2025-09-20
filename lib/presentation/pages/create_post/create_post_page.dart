@@ -15,6 +15,7 @@ import 'package:handoff_vdb_2025/presentation/pages/create_post/component/create
 import 'package:handoff_vdb_2025/presentation/pages/create_post/component/create_post_draggable_options.dart';
 import 'package:handoff_vdb_2025/presentation/pages/create_post/create_post_store.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import '../../../config/routes/route_path/auth_routers.dart';
 import '../../widget/build_snackbar.dart';
 import '../create_post_advanced_options_setting/create_post_advanced_option_setting.dart';
 import 'component/button_post.dart';
@@ -172,7 +173,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         context: context,
         onOption1Tap: () {
           store.resetPostForm();
-          context.pop();
+          router.go("/dashboard/home");
         },
         onOption2Tap: () {
         },
@@ -244,8 +245,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                         ),
                                       );
                                       if (mounted) {
-                                        if (!store.isLoadingEditPost)
-                                          context.pop();
+                                        if (!store.isLoadingEditPost) {
+                                          router.go("/dashboard/home");
+                                        }
                                       }
                                     },
                                     onError: (error) {

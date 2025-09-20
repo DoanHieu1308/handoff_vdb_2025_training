@@ -102,9 +102,6 @@ abstract class _MediaStore with Store {
         final pickedFile = File(picked.path);
         if (!await pickedFile.exists()) continue;
 
-        // final croppedImage = await cameraStore.cropImage(pickedFile, context);
-        // if (croppedImage == null) continue;
-
         final croppedFile = File(pickedFile.path);
 
         final processedFile = await resizeImageSync(croppedFile);

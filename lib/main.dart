@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,7 +13,7 @@ import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
 import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/shared_preference_helper.dart';
-import 'package:handoff_vdb_2025/core/services/deep_link_service.dart';
+import 'package:handoff_vdb_2025/data/services/deep_link_service.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_input_model.dart';
 import 'package:handoff_vdb_2025/data/model/post/post_link_meta.dart';
 import 'package:hive/hive.dart';
@@ -21,10 +22,13 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
+import 'data/services/app_local_notification_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // --- Firebase Init ---
+  await dotenv.load(fileName: ".env");
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
@@ -39,10 +43,8 @@ void main() async {
     }
   }
 
-  // --- App Dependencies Init ---
   await AppInit.instance.init();
 
-  // --- Hive Init (non-web only) ---
   if (!kIsWeb) {
     await Hive.initFlutter();
     Hive.registerAdapter(PostInputModelAdapter());
@@ -50,14 +52,18 @@ void main() async {
     await Hive.openBox<PostInputModel>('pending_posts');
   }
 
-  // --- CreatePost store network listener ---
   final createPostStore = AppInit.instance.createPostStore;
   createPostStore.listenNetwork();
 
-  // --- URL Strategy (remove # on web) ---
   usePathUrlStrategy();
 
-  runApp(const MyApp());
+
+
+  await AppLocalNotificationService().init();
+
+  runApp(
+      const MyApp()
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -130,6 +136,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _firebasePresenceService.setupUserPresence(_userId!);
     }
+
   }
 
   @override
@@ -185,6 +192,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       if (_isAppReady && !_sharedFiles[0].path.isDeepLink) {
         await _navigateToCreatePost();
       }
+
     } catch (e) {
       print('Error handling shared files: $e');
     }

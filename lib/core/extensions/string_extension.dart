@@ -118,6 +118,9 @@ extension StringExtension on String {
       return false;
     }
   }
+
+  String capitalize() =>
+      isEmpty ? this : this[0].toUpperCase() + substring(1);
 }
 
 

@@ -42,6 +42,7 @@ class FirebaseChatService {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
       'lastMessage': null,
+      'senderId' : null,
       'lastMessageType': null,
       'lastMessageTime': FieldValue.serverTimestamp(),
       'isActive': true,
@@ -127,6 +128,7 @@ class FirebaseChatService {
 
     await _firestore.collection('conversations').doc(conversationId).update({
       'lastMessage': content,
+      'senderId' : me,
       'lastMessageType': type.name,
       'lastMessageTime': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),

@@ -60,6 +60,7 @@ abstract class _ChatStore with Store {
    AssetPathEntity? path;
    int _page = 0;
    int _totalEntitiesCount = 0;
+
    /// file
    @observable
    ObservableList<dynamic> listFile = ObservableList.of([]);

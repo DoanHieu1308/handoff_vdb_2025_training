@@ -5,7 +5,6 @@ import 'package:handoff_vdb_2025/core/extensions/string_extension.dart';
 import 'package:handoff_vdb_2025/core/helper/app_sitebox.dart';
 import 'package:handoff_vdb_2025/core/helper/size_util.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
-import 'package:handoff_vdb_2025/core/services/deep_link_service.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_link_content.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_reaction_overview.dart';
 import 'package:handoff_vdb_2025/presentation/pages/posts/components/post_text_content.dart';

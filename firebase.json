@@ -1,1 +1,29 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"handoffvdb2025","appId":"1:1018382182517:android:09951ba7237abac2a6303c","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"handoffvdb2025","configurations":{"android":"1:1018382182517:android:09951ba7237abac2a6303c","ios":"1:1018382182517:ios:350487ec497cd404a6303c"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "handoffvdb2025",
+          "appId": "1:1018382182517:android:09951ba7237abac2a6303c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "handoffvdb2025",
+          "configurations": {
+            "android": "1:1018382182517:android:09951ba7237abac2a6303c",
+            "ios": "1:1018382182517:ios:350487ec497cd404a6303c"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": {
+    "source": "functions"
+  }
+}

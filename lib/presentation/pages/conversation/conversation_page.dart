@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/config/routes/route_path/auth_routers.dart';
+import 'package:handoff_vdb_2025/core/enums/auth_enums.dart';
 import 'package:handoff_vdb_2025/core/init/app_init.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/stories/stories_page.dart';
@@ -14,7 +16,8 @@ import '../../../core/utils/images_path.dart';
 import 'components/conversation_bottom_navigation_bar.dart';
 
 class ConversationPage extends StatefulWidget {
-  const ConversationPage({super.key});
+  final int? initialIndex;
+  const ConversationPage({super.key, this.initialIndex});
 
   @override
   State<ConversationPage> createState() => _ConversationPageState();
@@ -25,6 +28,16 @@ class _ConversationPageState extends State<ConversationPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Update current index based on route if not set by initialIndex
+    if (widget.initialIndex == null) {
+      final location = GoRouterState.of(context).matchedLocation;
+      if (location.endsWith(AuthRoutes.MESSENGER) && conversationStore.currentIndex != 0) {
+        conversationStore.currentIndex = 0;
+      } else if (location.endsWith(AuthRoutes.STORY) && conversationStore.currentIndex != 1) {
+        conversationStore.currentIndex = 1;
+      }
+    }
+
     return Observer(
       builder: (context) {
         return Scaffold(
@@ -38,7 +51,7 @@ class _ConversationPageState extends State<ConversationPage> {
             leading: AppTapAnimation(
               enabled: true,
               onTap: () {
-                router.pop();
+                router.go("/dashboard/home");
               },
               child: const Icon(
                 Icons.arrow_back_ios_new,

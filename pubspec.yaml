@@ -113,8 +113,12 @@ dependencies:
   draggable_fab: ^0.1.4
   # https://pub.dev/packages/app_links/example
   app_links: ^6.4.1
-
-
+  # https://pub.dev/packages/flutter_local_notifications
+  flutter_local_notifications: ^19.4.2
+  # https://pub.dev/packages/firebase_messaging
+  firebase_messaging: ^16.0.1
+  # https://pub.dev/packages/flutter_dotenv
+  flutter_dotenv: ^6.0.0
 
   go_router: ^16.0.0
 
@@ -144,6 +148,7 @@ flutter:
     - assets/base/icons/
     - assets/base/images/
     - assets/features/video1.mp4
+    - .env
 
   fonts:
     - family: Inter-Regular

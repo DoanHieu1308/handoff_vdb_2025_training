@@ -6,9 +6,11 @@ class EndPoint {
   EndPoint._internal();
 
   /// BE
-  static const String BASE_URL = "https://be-handoff-vdb-2025-training.onrender.com/v1/api";
+  static const String BASE_URL = "https://be-handoff-vdb-2025-training-v3.vercel.app/v1/api";
   /// Web
   static const String BASE_URL_WEB = "https://handoff-vdb-2025-training.vercel.app";
+  /// Chat bot
+  static const String BASE_CHATBOT = "http://127.0.0.1:8000/chatbot";
 
   ///AUTH
   // Đăng kí email.
@@ -52,4 +54,7 @@ class EndPoint {
 
   /// Comment create post
   static const String COMMENT = '/comment';
+
+  /// Chat bot
+  static const String CHATBOT = '/comment';
 }

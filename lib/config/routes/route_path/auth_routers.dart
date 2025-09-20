@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:handoff_vdb_2025/core/shared_pref/auth_helper.dart';
+import 'package:handoff_vdb_2025/presentation/pages/chat_bot/chat_bot_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/chat/components/chat_custom_show_media_gallery.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/conversation_page.dart';
 import 'package:handoff_vdb_2025/presentation/pages/conversation/messenger/messenger_page.dart';
@@ -51,20 +52,24 @@ final GoRouter router = GoRouter(
       builder: (context, state) => DashBoardPage(),
       routes: [
         GoRoute(
-          path: "home",
+          path: AuthRoutes.Home,
           builder: (context, state) => DashBoardPage(initialIndex: 0),
         ),
         GoRoute(
-          path: 'video',
+          path: AuthRoutes.VIDEO,
           builder: (context, state) => DashBoardPage(initialIndex: 1),
         ),
         GoRoute(
-          path: 'friends',
+          path: AuthRoutes.FRIENDS,
           builder: (context, state) => DashBoardPage(initialIndex: 2),
         ),
         GoRoute(
-          path: 'profile',
+          path: AuthRoutes.PROFILE,
           builder: (context, state) => DashBoardPage(initialIndex: 3),
+        ),
+        GoRoute(
+          path: AuthRoutes.CHATBOT,
+          builder: (context, state) => ChatBotPage(),
         ),
       ],
     ),
@@ -116,12 +121,18 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: AuthRoutes.MESSENGER,
-      builder: (context, state) => MessengerPage(),
-    ),
-    GoRoute(
       path: AuthRoutes.CONVERSATION,
       builder: (context, state) => ConversationPage(),
+      routes: [
+        GoRoute(
+          path: AuthRoutes.MESSENGER,
+          builder: (context, state) => ConversationPage(initialIndex: 0),
+        ),
+        GoRoute(
+          path: AuthRoutes.STORY,
+          builder: (context, state) => ConversationPage(initialIndex: 1),
+        ),
+      ]
     ),
     GoRoute(
       path: AuthRoutes.ALL_FRIEND,

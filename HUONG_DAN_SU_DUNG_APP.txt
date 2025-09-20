@@ -1,0 +1,223 @@
+# HƯỚNG DẪN SỬ DỤNG APP HANDOFF VDB 2025
+
+## Giới thiệu
+HandOff VDB 2025 là ứng dụng mạng xã hội đa nền tảng (iOS, Android, Web) phát triển bằng Flutter.
+Tính năng chính:
+- Đăng nhập và đăng ký tài khoản
+- Tạo và chia sẻ bài viết (text, hình ảnh, video)
+- Chat real-time qua Firebase
+- Quản lý bạn bè
+- Trợ lý AI ChatBot
+- Xem video và nội dung đa phương tiện
+
+---
+
+## Đăng nhập và Đăng ký
+- Đăng nhập bằng email và mật khẩu (deep link: handoff://login)
+- Đăng ký tài khoản mới (deep link: handoff://sign_up)
+- Tự động điều hướng đến Dashboard sau khi đăng nhập thành công
+- Yêu cầu xác thực thông tin cá nhân khi đăng ký
+
+---
+
+## Trang chủ (Home)
+Deep link: handoff://dashboard/home
+Chức năng:
+- Xem feed bài viết từ bạn bè hoặc công khai
+- Tải mới (pull-to-refresh)
+- Xem thêm bài viết cũ (load more)
+- Hiển thị stories của bạn bè
+- Tạo bài viết mới
+Hành động:
+- Like hoặc Unlike bài viết
+- Bình luận, chia sẻ
+- Xem chi tiết bài viết và toàn bộ hình ảnh
+
+---
+
+## Tạo bài viết
+Deep link: handoff://create_post
+Chức năng:
+- Viết nội dung văn bản, hỗ trợ nền gradient
+- Thêm hình ảnh hoặc video từ thư viện/camera
+- Gắn thẻ bạn bè
+- Thêm cảm xúc, hoạt động, check-in địa điểm
+- Quay video trực tiếp
+- Thêm nhạc và link preview
+- Thiết lập quyền riêng tư: Công khai / Bạn bè / Chỉ mình tôi
+
+Deep link liên quan:
+- Quyền riêng tư: handoff://status_post
+- Gắn thẻ bạn bè: handoff://tag_friend
+
+---
+
+## Video
+Deep link: handoff://dashboard/video
+Chức năng:
+- Xem video từ bạn bè
+- Phát video tự động khi cuộn
+- Like, bình luận, chia sẻ video
+- Tải video để xem offline
+
+---
+
+## Quản lý bạn bè
+Deep link: handoff://dashboard/friends
+Chức năng:
+- Xem danh sách bạn bè
+- Tìm kiếm bạn bè
+- Gửi, chấp nhận hoặc từ chối lời mời kết bạn
+- Xem chi tiết bạn bè
+- Chặn hoặc bỏ chặn bạn bè
+
+Deep link liên quan:
+- Thông tin bạn bè: handoff://info_friends
+- Cài đặt bạn bè: handoff://more_setting_info_friend
+
+---
+
+## Chat và Messenger
+Deep link:
+- Danh sách chat: handoff://conversation
+- Messenger chính: handoff://messenger
+- Chat cụ thể: handoff://chat
+
+Chức năng:
+- Chat real-time với Firebase
+- Gửi tin nhắn text, hình ảnh, video, file
+- Hiển thị đang gõ (typing indicators)
+- Trạng thái online/offline
+- Trạng thái tin nhắn: đã gửi, đã nhận, đã đọc
+- Trả lời tin nhắn, reaction
+- Voice message và file sharing
+- Xem media gallery trong chat
+
+---
+
+## Trợ lý AI ChatBot
+Deep link: handoff://dashboard/chat_bot
+Chức năng:
+- Chat trực tiếp với AI Assistant
+- Giao diện chat thân thiện
+- Tự động scroll khi có tin nhắn mới
+- Xóa cuộc trò chuyện
+- Nút quay lại Dashboard
+
+Ví dụ câu hỏi:
+- Xin chào
+- Tên bạn là gì?
+- Thời tiết hôm nay thế nào?
+- Bạn có thể giúp gì?
+- Cảm ơn
+- Tạm biệt
+
+---
+
+## Trang cá nhân (Profile)
+Deep link: handoff://dashboard/profile
+Chức năng:
+- Xem và chỉnh sửa thông tin cá nhân
+- Thay đổi ảnh đại diện
+- Xem bài viết của mình
+- Quản lý bạn bè
+- Cài đặt tài khoản
+- Đăng xuất
+
+Deep link liên quan:
+- Chụp ảnh đại diện: handoff://camera
+- Xem tất cả bạn bè: handoff://all_friend
+
+---
+
+## Thông báo và Menu
+Chức năng:
+- Thông báo real-time
+- Menu ứng dụng
+- Cài đặt chung
+- Trợ giúp và hỗ trợ
+
+---
+
+## Điều hướng (Navigation)
+Bottom navigation bar:
+- Home
+- Video
+- Friends
+- Profile
+
+Floating Action Button:
+- Mở ChatBot Assistant
+
+App Bar Actions:
+- Thông báo (icon chuông)
+- Messenger (icon chat)
+
+---
+
+## Cài đặt nâng cao
+- Deep linking
+- Offline mode cho bài viết
+- Firebase integration
+- Real-time presence tracking
+- Media upload và nén
+- Push notifications
+- Share content từ ứng dụng khác
+- Multi-platform support
+
+---
+
+## Quản lý dữ liệu
+- Local storage với Hive
+- SharedPreferences cho cài đặt
+- Firebase Firestore cho chat
+- API integration với Dio
+- Image caching
+- Video streaming
+
+---
+
+## Công nghệ sử dụng
+- Flutter framework
+- MobX state management
+- GoRouter navigation
+- Firebase services
+- Dio HTTP client
+- Image picker và camera
+- Video player
+- WebView integration
+- Push notifications
+
+---
+
+## Hỗ trợ và liên hệ
+Nếu gặp vấn đề:
+- Sử dụng ChatBot Assistant trong ứng dụng
+- Kiểm tra kết nối internet
+- Khởi động lại ứng dụng
+- Xóa cache nếu cần
+
+---
+
+# FAQ (Câu hỏi thường gặp)
+
+Q: Tôi không đăng nhập được, phải làm sao?
+A: Kiểm tra email/mật khẩu. Nếu quên, hãy dùng chức năng "Quên mật khẩu".
+
+Q: Làm thế nào để tạo bài viết mới?
+A: Chọn nút tạo bài viết trên trang chủ hoặc deep link handoff://create_post.
+
+Q: Tôi có thể xem video khi không có internet không?
+A: Có, bạn có thể tải video để xem offline.
+
+Q: Tôi muốn chặn bạn bè thì làm thế nào?
+A: Vào trang quản lý bạn bè, chọn người cần chặn, sau đó chọn Block.
+
+Q: Tôi muốn chat với bạn bè thì vào đâu?
+A: Vào Messenger (handoff://messenger) hoặc chọn bạn trong danh sách Conversation.
+
+Q: Tôi có thể đổi ảnh đại diện không?
+A: Có, vào trang Profile (handoff://dashboard/profile) và chọn Chụp ảnh đại diện.
+
+Q: Tôi cần hỗ trợ thì liên hệ thế nào?
+A: Sử dụng ChatBot Assistant hoặc vào mục Trợ giúp và Hỗ trợ trong menu.

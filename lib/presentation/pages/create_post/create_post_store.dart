@@ -77,6 +77,8 @@ abstract class _CreatePostStore with Store {
   String postMessage = '';
   @observable
   bool isPostSuccess = false;
+  bool hasSavedOffline = false;
+  bool _isRetrying = false;
 
   /// Init
   Future<void> init() async {
@@ -364,6 +366,9 @@ abstract class _CreatePostStore with Store {
 
   /// Retry pending posts (safe: iterate backwards, check network, aggregate message)
   Future<void> retryPendingPosts() async {
+    if (_isRetrying) return;
+    _isRetrying = true;
+
     try {
       final currentUserId = sharedPreferenceHelper.getIdUser;
       if (currentUserId == null || currentUserId.isEmpty) return;
@@ -436,7 +441,7 @@ abstract class _CreatePostStore with Store {
               successCount++;
               await box.deleteAt(i);
             },
-            onError: (error) {
+            onError: (error) async {
               debugPrint("Post offline lỗi: $error");
               failCount++;
             },
@@ -448,12 +453,13 @@ abstract class _CreatePostStore with Store {
       }
 
       if (successCount > 0 || failCount > 0) {
-        postMessage =
-        "Khôi phục offline: thành công $successCount, lỗi $failCount.";
+        postMessage = "Khôi phục offline: thành công $successCount, lỗi $failCount.";
         isPostSuccess = successCount > 0 && failCount == 0;
       }
     } catch (e) {
       debugPrint('retryPendingPosts tổng lỗi: $e');
+    }finally {
+      _isRetrying = false;
     }
   }
 
@@ -494,7 +500,6 @@ abstract class _CreatePostStore with Store {
         postMessage = "Không có mạng. Bài viết đã lưu offline và sẽ đăng khi có mạng.";
         isPostSuccess = false;
         resetPostForm();
-        return;
       }
 
       await postRepository.createPost(
@@ -514,29 +519,31 @@ abstract class _CreatePostStore with Store {
           postMessage = "Đăng bài viết thất bại! Bài viết đã lưu offline.";
           isPostSuccess = false;
           await savePostOffline(postInputModel);
+          hasSavedOffline = true;
           resetPostForm();
-          print("Lỗi khi post: $error");
         },
       );
     } catch (e, s) {
       postMessage = "Đã xảy ra lỗi không mong muốn! Không thể đăng. Bài viết đã lưu offline.";
       isPostSuccess = false;
       print("Exception khi tạo post: $e\n$s");
-      await savePostOffline(PostInputModel(
-        // id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: textStore.feelingEditingController.text.trim(),
-        content: "Ahihi",
-        privacy: createPostAdvancedOptionSettingStore.currentStatus,
-        hashtags: textStore.hashtags,
-        friends_tagged: (createPostAdvancedOptionSettingStore.tagFriendList ?? [])
-            .map((u) => u.id?.trim())
-            .whereType<String>()
-            .where((n) => n.isNotEmpty)
-            .toList(),
-        images: mediaStore.imageListUrl,
-        videos: mediaStore.videoListUrl,
-        postLinkMeta: linkPreviewStore.previewData,
-      ));
+      if(!hasSavedOffline){
+        await savePostOffline(PostInputModel(
+          // id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: textStore.feelingEditingController.text.trim(),
+          content: "Ahihi",
+          privacy: createPostAdvancedOptionSettingStore.currentStatus,
+          hashtags: textStore.hashtags,
+          friends_tagged: (createPostAdvancedOptionSettingStore.tagFriendList ?? [])
+              .map((u) => u.id?.trim())
+              .whereType<String>()
+              .where((n) => n.isNotEmpty)
+              .toList(),
+          images: mediaStore.imageListUrl,
+          videos: mediaStore.videoListUrl,
+          postLinkMeta: linkPreviewStore.previewData,
+        ));
+      }
     } finally {
       homeStore.isLoadingPost = false;
       profileStore.isLoadingPost = false;
