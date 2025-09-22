@@ -1,15 +1,21 @@
 #!/bin/bash
-set -e  # stop khi có lỗi
+set -e  # dừng script khi có lỗi
 
-echo "🚀 Start Flutter Web Build for Vercel..."
+echo "🚀 Start Flutter Web Build..."
 
-# Cài đặt Flutter SDK (stable)
+# Phiên bản Flutter
 FLUTTER_VERSION="3.24.0"
-echo "📥 Downloading Flutter SDK $FLUTTER_VERSION..."
-git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
+
+# Tải Flutter SDK (stable)
+if [ ! -d "flutter" ]; then
+  echo "📥 Downloading Flutter SDK $FLUTTER_VERSION..."
+  git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
+fi
+
+# Thêm Flutter vào PATH
 export PATH="$PATH:$(pwd)/flutter/bin"
 
-# Kiểm tra Flutter
+# Kiểm tra Flutter version
 flutter --version
 
 # Cài dependencies
@@ -17,17 +23,15 @@ echo "📦 Running flutter pub get..."
 flutter pub get
 
 # Clean build cũ
+echo "🧹 Cleaning old build..."
 flutter clean
 
-# Build Flutter Web (release + canvaskit)
+# Build Flutter Web
 echo "🔨 Building Flutter Web..."
-flutter build web \
-  --release \
-  --web-renderer canvaskit \
-  --source-maps
+flutter build web --release --web-renderer canvaskit --source-maps
 
 # Kiểm tra output
-echo "📁 Build output (build/web):"
+echo "📁 Build output:"
 ls -la build/web
 
-echo "✅ Flutter Web build completed!"
+echo "✅ Flutter Web build completed! Ready for deploy."
