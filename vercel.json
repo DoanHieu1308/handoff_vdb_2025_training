@@ -39,10 +39,5 @@
       "src": "/(.*)",
       "dest": "/build/web/index.html"
     }
-  ],
-  "functions": {
-    "vercel_build.sh": {
-      "maxDuration": 300
-    }
-  }
+  ]
 }
