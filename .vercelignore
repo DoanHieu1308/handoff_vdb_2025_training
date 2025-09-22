@@ -1,0 +1,21 @@
+# Ignore unnecessary files for Vercel deployment
+android/
+ios/
+test/
+.git/
+.gitignore
+README.md
+*.md
+analysis_options.yaml
+devtools_options.yaml
+handoff_vdb_2025.iml
+
+# Keep only essential files for web build
+!lib/
+!web/
+!pubspec.yaml
+!vercel.json
+!vercel_build.sh
+!assets/
+!firebase_options.dart
+!.env
