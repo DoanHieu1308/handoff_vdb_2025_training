@@ -1,18 +1,16 @@
 #!/bin/bash
-set -e  # dừng script khi có lỗi
+set -e  # dừng script ngay khi có lỗi
 
-echo "🚀 Start Flutter Web Build..."
+echo "🚀 Start Flutter Web Build (Local Test)..."
 
-# Tải Flutter SDK (stable - latest)
-if [ ! -d "flutter" ]; then
-  echo "📥 Downloading Flutter SDK (latest stable)..."
-  git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
+# Kiểm tra Flutter đã cài chưa
+if ! command -v flutter &> /dev/null
+then
+    echo "❌ Flutter chưa cài đặt hoặc chưa có trong PATH"
+    exit 1
 fi
 
-# Thêm Flutter vào PATH
-export PATH="$PATH:$(pwd)/flutter/bin"
-
-# Kiểm tra Flutter version
+# Kiểm tra version Flutter
 echo "✅ Flutter version:"
 flutter --version
 
@@ -24,7 +22,7 @@ flutter pub get
 echo "🧹 Cleaning old build..."
 flutter clean
 
-# Build Flutter Web với options tương thích
+# Build Flutter Web
 echo "🔨 Building Flutter Web..."
 flutter build web --release --source-maps
 
