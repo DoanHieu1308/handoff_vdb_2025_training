@@ -3,12 +3,9 @@ set -e  # dừng script khi có lỗi
 
 echo "🚀 Start Flutter Web Build..."
 
-# Phiên bản Flutter
-FLUTTER_VERSION="3.24.0"
-
-# Tải Flutter SDK (stable)
+# Tải Flutter SDK (stable - latest)
 if [ ! -d "flutter" ]; then
-  echo "📥 Downloading Flutter SDK $FLUTTER_VERSION..."
+  echo "📥 Downloading Flutter SDK (latest stable)..."
   git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
 fi
 
@@ -16,6 +13,7 @@ fi
 export PATH="$PATH:$(pwd)/flutter/bin"
 
 # Kiểm tra Flutter version
+echo "✅ Flutter version:"
 flutter --version
 
 # Cài dependencies
@@ -26,9 +24,9 @@ flutter pub get
 echo "🧹 Cleaning old build..."
 flutter clean
 
-# Build Flutter Web
+# Build Flutter Web với options tương thích
 echo "🔨 Building Flutter Web..."
-flutter build web --release --web-renderer canvaskit --source-maps
+flutter build web --release --source-maps
 
 # Kiểm tra output
 echo "📁 Build output:"
