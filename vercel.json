@@ -1,8 +1,42 @@
 {
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "vercel_build.sh",
+      "use": "@vercel/static-build"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "dest": "/build/web/assets/$1"
+    },
+    {
+      "src": "/canvaskit/(.*)",
+      "dest": "/build/web/canvaskit/$1"
+    },
+    {
+      "src": "/icons/(.*)",
+      "dest": "/build/web/icons/$1"
+    },
+    {
+      "src": "/packages/(.*)",
+      "dest": "/build/web/packages/$1"
+    },
+    {
+      "src": "/shaders/(.*)",
+      "dest": "/build/web/shaders/$1"
+    },
+    {
+      "src": "/fonts/(.*)",
+      "dest": "/build/web/fonts/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|otf|wasm|bin|json))",
+      "dest": "/build/web/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/build/web/index.html"
     }
   ]
 }
